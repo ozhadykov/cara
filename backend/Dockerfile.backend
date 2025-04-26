@@ -1,6 +1,14 @@
 FROM python:3.9-slim-bullseye
-WORKDIR /phenix_dockerized
+
+# Copy the application code into the container
+COPY . .
+
+# Set the workdir 
+WORKDIR /app
 
 # Install dependencies
-COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
+
+
+# Start the Fast API
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
