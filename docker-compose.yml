@@ -1,48 +1,42 @@
 services:
   backend:
-    container_name: backend
+    container_name: core
     build:
-      context: ./backend
+      context: ./core
       dockerfile: Dockerfile.backend
     ports:
       - "8080:8080"
     environment:
       DB_HOST: db
       DB_USER: master
-      DB_PASSOWRD: 'strong_password'
+      DB_PASSWORD: 'strong_password'
       DB_NAME: phenix_mysql
     depends_on:
       - db
     restart: always
     networks:
-      phenix:
-        ipv4_address: "10.56.1.1"
+      - phenix
   db:
     container_name: database
     image: 'mysql:8.0'
     environment:
-      DB_NAME: phenix_mysql
-      DB_ROOT_PASSWORD: "strong_password"
+      MYSQL_DATABASE: phenix_mysql
+      MYSQL_ROOT_PASSWORD: "strong_password"
     volumes:
       - ./db_data:/var/lib/mysql
     restart: always
     networks:
-      phenix:
-        ipv4_address: "10.56.1.2"
+      - phenix
   frontend:
-    container_name: frontend
+    container_name: ui
     build:
-        context: ./frontend
+        context: ./ui
         dockerfile: Dockerfile.frontend
     ports:
         - "80:80"
     restart: always
     networks:
-      phenix:
-        ipv4_address: "10.56.1.3"
+      - phenix
 networks:
   phenix:
-    ipam:
-      driver: default
-      config:
-        - subnet: "10.56.1.0/24"
+    driver: bridge
