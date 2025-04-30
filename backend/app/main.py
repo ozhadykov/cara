@@ -1,7 +1,10 @@
 from typing import Union
 
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+import shutil
+from pathlib import Path
+import os
 
 app = FastAPI()
 
@@ -24,6 +27,29 @@ def read_root():
     return {"data": "Hello World"}
 
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+# Create uploads directory if it doesn't exist
+UPLOAD_DIR = Path("uploads")
+UPLOAD_DIR.mkdir(exist_ok=True)
+
+@app.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    # Save the uploaded file
+    file_location = UPLOAD_DIR / file.filename
+    
+    try:
+        with open(file_location, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        
+        # Process the file as needed
+        file_size = os.path.getsize(file_location)
+        
+        return {
+            "message": "File uploaded successfully",
+            "filename": file.filename,
+            "content_type": file.content_type,
+            "size": file_size
+        }
+    except Exception as e:
+        return {"message": f"Error uploading file: {str(e)}"}
+    finally:
+        file.file.close()
