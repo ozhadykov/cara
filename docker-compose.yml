@@ -1,6 +1,7 @@
 services:
   backend:
     container_name: backend
+    command: 'uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload'
     build:
       context: ./backend
       dockerfile: Dockerfile.backend
@@ -11,6 +12,8 @@ services:
       DB_USER: master
       DB_PASSWORD: 'strong_password'
       DB_NAME: phenix_mysql
+    volumes:
+      - ./backend/app:/code/app
     depends_on:
       - db
     restart: always

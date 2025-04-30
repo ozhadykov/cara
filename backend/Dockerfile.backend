@@ -1,10 +1,10 @@
 FROM python:3.9
 
 # Set the workdir 
-WORKDIR /backend
+WORKDIR /code
 
 # Copy the application code into the container
-COPY ./requirements.txt /backend/requirements.txt
+COPY ./requirements.txt /code/requirements.txt
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
@@ -15,10 +15,10 @@ RUN python -m pip install amplpy --no-cache-dir # Install amplpy
 RUN python -m amplpy.modules install highs gurobi --no-cache-dir
 # RUN python -m amplpy.modules install cplex
 
-COPY ./app /backend/app
+COPY ./app /code/app
 
 # docs
 EXPOSE 8080
 
 # Start the Fast API
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
