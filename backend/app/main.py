@@ -22,7 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
+@app.get("/api")
 def read_root():
     return {"data": "Hello World"}
 
@@ -31,7 +31,7 @@ def read_root():
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
-@app.post("/upload")
+@app.post("/api/upload")
 async def upload_file(file: UploadFile = File(...)):
     # Save the uploaded file
     file_location = UPLOAD_DIR / file.filename

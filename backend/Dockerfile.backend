@@ -1,10 +1,10 @@
 FROM python:3.9
 
 # Set the workdir 
-WORKDIR /code
+WORKDIR /backend
 
 # Copy the application code into the container
-COPY ./requirements.txt /code/requirements.txt
+COPY ./requirements.txt /backend/requirements.txt
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
@@ -15,7 +15,7 @@ RUN python -m pip install amplpy --no-cache-dir # Install amplpy
 RUN python -m amplpy.modules install highs gurobi --no-cache-dir
 # RUN python -m amplpy.modules install cplex
 
-COPY ./app /code/app
+COPY ./app /backend/app
 
 # docs
 EXPOSE 8080

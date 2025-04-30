@@ -13,7 +13,7 @@ services:
       DB_PASSWORD: 'strong_password'
       DB_NAME: phenix_mysql
     volumes:
-      - ./backend/app:/code/app
+      - ./backend/app:/backend/app
     depends_on:
       - db
     restart: always
