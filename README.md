@@ -72,6 +72,13 @@ Our milestones:
    - qualification missmatch, but it assitent can still work with a child (FK with QHK)
    - and citation, because I did not understand the meaning "Begleiter:innen, die als Übungsleiter:innen tätig sind, sind im Moment als Vertretung eingeplant und bekommen kein festes Kind!"
 
+6. Data migration. Phenix already has children in care, so this pairs should be imported in the app.
+   - Migration tool from csv, for existing pairs
+
 # Goal
 
 As requested the goal is to get as many pairs as possible with the best possible conditions for every child and assitent
+
+## Look into problem
+
+We have defined this problem as a maximization problem.
