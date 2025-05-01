@@ -1,4 +1,4 @@
-# Phenix Project Dockerized
+# CARA (Child and Assistant Resource Assignment)
 
 ## Important notes about development
 
