@@ -28,7 +28,7 @@ def read_root():
 
 
 # Create uploads directory if it doesn't exist
-UPLOAD_DIR = Path("uploads")
+UPLOAD_DIR = Path("/backend/app/uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
 @app.post("/api/upload")
