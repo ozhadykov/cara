@@ -1,5 +1,7 @@
 # Phenix Project Dockerized
 
+## Important notes about development
+
 I will note important things.
 
 We are working with docker, so all links, are relative to local machines, but when it will be in production
@@ -38,3 +40,38 @@ Our milestones:
 - 29.05.2025 Bug fixes and fine tuning.
 - 05.06.2025 Production ready. (installed proxy for communicating with docekr network)
 - 12.06.2025 fully tested and documented for future installation in phenix
+
+# Requierments
+
+1. CRUD Operations on children and assitents
+
+   - Add new child / assitent
+   - delete child / assitent
+   - update child / assitent
+
+2. Dashboard / Overview
+
+   - Capacity, how many hours are free, how many assitents are free and so on
+   - list of children and assitents, who is working with whom
+
+3. Creating a new paln
+
+   - select children and assitents, who need a pair (because some assitents want to continue work with the same child)
+   - set up soft constraints, such as 'time to destination' as range in mins and more if there are
+
+4. Working with "non assigned"
+
+   - after a new plan is created, create a list with children and assitents who don't have a pair
+   - add to pool new requests from children and new apllications from assistents
+   - use model to find "new possible" pairs
+
+5. Working with edge cases
+
+   - handling "unusual" working days
+   - handling "working pairs", two assitents work with one child, changing in defined period of times
+   - qualification missmatch, but it assitent can still work with a child (FK with QHK)
+   - and citation, because I did not understand the meaning "Begleiter:innen, die als Übungsleiter:innen tätig sind, sind im Moment als Vertretung eingeplant und bekommen kein festes Kind!"
+
+# Goal
+
+As requested the goal is to get as many pairs as possible with the best possible conditions for every child and assitent
