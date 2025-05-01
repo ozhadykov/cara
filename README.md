@@ -20,3 +20,21 @@ fetch('/api/service') -> this is wright
 
 fetch('http://localhost:8080') -> this is WRONG, please don't do that.
 ```
+
+## Planning
+
+Milestones:
+
+- first presentation 22.05.2025
+- last presentation 03.07.2025 or 26.06.2025, depends on us
+- Report 28.08.2205
+
+Our milestones:
+
+- 04.05.2025 first model, should not be optimal
+- 8.05.2025 minimal frontend wich outputs model results
+- 15.05.2025 DB from excel tables, Frontend with iput Forms for Children and Assitents. Also fine tuned model
+- 22.05.2025 Dashboards about capacity of phenix. (How many children, how many assitents, how many hours total and so on)
+- 29.05.2025 Bug fixes and fine tuning.
+- 05.06.2025 Production ready. (installed proxy for communicating with docekr network)
+- 12.06.2025 fully tested and documented for future installation in phenix
