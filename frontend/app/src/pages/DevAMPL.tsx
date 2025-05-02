@@ -1,7 +1,9 @@
 const DevAMPL = () => {
     return (
         <>
-            <h1>Hello world</h1>
+            <div className="content px-4">
+                <h1>Hello world</h1>
+            </div>
         </>
     )
 }
