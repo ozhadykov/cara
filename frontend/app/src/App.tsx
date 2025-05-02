@@ -55,14 +55,12 @@ function App() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold underline">{data.data}</h1>
       <h2>Upload File</h2>
       <form onSubmit={handleSubmit}>
         <input type="file" onChange={handleFileChange} />
         <button type="submit" className='btn btn-xl btn-primary'>Upload</button>
       </form>
       {message && <p>{message}</p>}
-      <h2>test branch</h2>
     </div>
   );
 }
