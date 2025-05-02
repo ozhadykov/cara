@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Installing amplpy
 RUN python -m pip install amplpy --no-cache-dir # Install amplpy
 RUN python -m amplpy.modules install highs gurobi --no-cache-dir
-# RUN python -m amplpy.modules install cplex
+RUN python -m amplpy.modules install cplex
 
 COPY ./app /backend/app
 
