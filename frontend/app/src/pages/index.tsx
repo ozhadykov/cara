@@ -1,7 +1,7 @@
-import DevAMPL from "./DevAMPL";
+import DataImport from "./DataImport.tsx";
 import Home from "./Home";
 
 export {
-    DevAMPL,
+    DataImport,
     Home
 }

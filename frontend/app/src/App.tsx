@@ -1,18 +1,24 @@
 import './App.css';
-import { Route, Routes } from 'react-router';
-import { Navbar, Sidebar } from './components';
-import { Home, DevAMPL } from './pages';
+import {Navbar, Sidebar} from './components';
+import {Routes, Route} from "react-router";
+import routes from "./routes.tsx";
+import {ReactNode} from "react";
 
 function App() {
+
+  const routesHTML: Array<ReactNode> = routes.map(route => {
+    return (
+      <Route key={route.path} path={route.path} element={route.component}></Route>
+    )
+  })
 
   return (
     <>
       <Navbar/>
       <Sidebar/>
-      <main>
+      <main className="content px-4">
         <Routes>
-          <Route path='/' element={<Home/>}></Route>
-          <Route path='/dev' element={<DevAMPL/>}></Route>
+          {routesHTML}
         </Routes>
       </main>
     </>

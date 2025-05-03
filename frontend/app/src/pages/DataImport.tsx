@@ -1,4 +1,4 @@
-const DevAMPL = () => {
+const DataImport = () => {
     return (
         <>
             <div className="content px-4">
@@ -8,4 +8,4 @@ const DevAMPL = () => {
     )
 }
 
-export default DevAMPL
+export default DataImport
