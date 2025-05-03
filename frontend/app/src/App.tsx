@@ -1,5 +1,5 @@
 import './App.css';
-import {Navbar, Sidebar} from './components';
+import {Navbar, Sidebar, Footer} from './components';
 import {Routes, Route} from "react-router";
 import routes from "./routes.tsx";
 import {ReactNode} from "react";
@@ -16,11 +16,12 @@ function App() {
     <>
       <Navbar/>
       <Sidebar/>
-      <main className="content px-4">
+      <main className="content px-4 pt-25 h-full">
         <Routes>
           {routesHTML}
         </Routes>
       </main>
+      <Footer/>
     </>
   );
 }

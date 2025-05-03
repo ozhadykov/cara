@@ -53,7 +53,7 @@ const Home = () => {
   };
 
   return (
-    <>
+    <div className="home-content flex flex-col gap-3 items-center justify-center w-full h-full">
       <h1>{data.data}</h1>
       <h2>Upload File</h2>
       <form onSubmit={handleSubmit}>
@@ -61,7 +61,7 @@ const Home = () => {
         <button type="submit" className='btn btn-xl btn-primary'>Upload</button>
       </form>
       {message && <p>{message}</p>}
-    </>
+    </div>
   )
 }
 

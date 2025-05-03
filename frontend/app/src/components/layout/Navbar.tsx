@@ -4,7 +4,7 @@ const Navbar = () => {
     const { toggle } = useSidebar();
 
     return (
-        <div className="navbar-wrapper p-4">
+        <div className="navbar-wrapper p-4 fixed w-full">
             <div className="navbar bg-base-200 shadow-sm rounded-xl">
                 <div className="flex-none">
                     <button onClick={toggle} className="btn btn-square btn-ghost">
