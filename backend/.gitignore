@@ -1,9 +1,6 @@
 /app/uploads
+/app/.python-version
 
 # local environment
 .venv
 .env
-
-# py cache 
-/app/__pycache__
-/ampl_app/__pycache__

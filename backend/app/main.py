@@ -1,12 +1,16 @@
+import os
+import shutil
 from typing import Union
-
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-import shutil
 from pathlib import Path
-import os
+from .routers import ampl
 
+# creating App
 app = FastAPI()
+
+# registering routers
+app.include_router(ampl.router)
 
 origins = [
     "http://localhost:80",  # Production Frontend
