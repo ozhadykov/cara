@@ -3,6 +3,7 @@ import numpy as np
 import amplpy
 from amplpy import AMPL
 from fastapi import FastAPI
+from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -20,7 +21,13 @@ app.add_middleware(
 )
 
 
-@app.get("/ampl")
+class devAMPLResponse(BaseModel):
+    status: str
+    total_pairs: float
+    assignments: object
+
+
+@app.get("/ampl", summary="solving dummy model with generated data", response_model=devAMPLResponse)
 def read_root():
     # TODO generate dummy data
     # 1. generate children df
@@ -100,9 +107,11 @@ def read_root():
                 columns={"index0": "child_id", "index1": "assistant_id", "Assign.val": "assigned"})
             # Filter only rows where assignment happened
             assigned = assign_df[assign_df["assigned"] >= 1]
+            total_pairs = len(assigned['child_id'].unique())
             print(assigned)
             response = {
                 "status": "success",
+                "total_pairs": total_pairs,
                 "assignments": assigned.to_json()
             }
         else:
