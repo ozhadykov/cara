@@ -1,3 +1,4 @@
+import httpx
 from fastapi import APIRouter
 
 
@@ -8,8 +9,16 @@ router = APIRouter(
     responses={404: {"description": "nothing found in ampl service"}},
 )
 
+BASE_URL = 'http://ampl:8000/ampl'
+
 
 @router.get('/dev')
 async def ampl_dev():
-    
-    return {"data": "Returning something from ampl router"}
+    data = {"message": "something went wrong"}
+    try:
+        r = httpx.get(BASE_URL)
+        if r.status_code == httpx.codes.OK:
+            data = r.json()
+    except:
+        data = {"message": "something went wrong"}
+    return data
