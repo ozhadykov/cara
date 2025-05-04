@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import amplpy
 from amplpy import AMPL
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -30,23 +31,54 @@ def read_root():
 
     # 3. generate Qualification table
     qual = assistants_df['qualification'].to_numpy().reshape(-1, 1)  # vertical
-    req = children_df['qualification_requirment'].to_numpy().reshape(1, -1)  # horizontal
+    req = children_df['qualification_requirment'].to_numpy().reshape(
+        1, -1)  # horizontal
 
     diff = np.abs(req - qual)  # calculate the difference
     score = np.where(diff == 0, 3, np.where(diff == 1, 2, 1))  # setting scores
 
-    score_df = pd.DataFrame(score, index=assistants_df['assistant_id'], columns=children_df['child_id'])
+    score_df = pd.DataFrame(
+        score, index=assistants_df['assistant_id'], columns=children_df['child_id'])
 
     # 4. generate distance table, just rand in range from 1 to 50km
     distances = np.random.randint(low=1, high=100, size=(20, 20))
-    distances_df = pd.DataFrame(distances, index=assistants_df['assistant_id'], columns=children_df['child_id'])
+    distances_df = pd.DataFrame(
+        distances, index=assistants_df['assistant_id'], columns=children_df['child_id'])
 
     print(score_df)
     print("\n distance matrix")
     print(distances_df)
 
     # 5. use amplpy to calculate best pairs
+    try:
+        ampl = AMPL()
+        ampl.set_option("solver", "cplex")
 
+        ampl.eval(
+            r"""
+            set CHILDREN;
+            set ASSISTANTS;
+            set DISTANCES;
+
+            param qualification_requirment {CHILDREN};
+            param hours_requested {CHILDREN};
+            param qualification {ASSISTANTS};
+            param capacity_hours {ASSISTANTS};
+            param QUALIFICATIONS {ASSISTANTS, CHILDREN};
+            param DISTANCES {ASSISTANTS, CHILDREN}
+
+        """
+        )
+
+        ampl.set_data(children_df[['child_id', 'qualification_requirment', 'hours_requested']].set_index("child_id"), "CHILDREN")
+        ampl.set_data(assistants_df[['assistant_id', 'qualification', 'capacity_hours']].set_index("assistant_id"), "ASSISTANTS")
+        ampl.get_parameter("QUALIFICATIONS").set_values(score_df)
+        ampl.get_parameter("DISTANCES").set_values(distances_df)
+
+        ampl.solve()
+
+    except amplpy.AMPLException:
+        return amplpy.AMPLException.get_message()
     return {"data": "Hello from ampl container"}
 
 
@@ -82,7 +114,7 @@ def generate_dummy_children():
 
 def generate_dummy_assistants():
     assistants_df = pd.DataFrame(columns=[
-        'assistant_id'
+        'assistant_id',
         'name',
         'family_name',
         'qualification',
