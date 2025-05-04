@@ -45,9 +45,12 @@ def read_root():
     distances_df = pd.DataFrame(
         distances, index=assistants_df['assistant_id'], columns=children_df['child_id'])
 
+    # DEV AND DEBUG ONLY
     print(score_df)
     print("\n distance matrix")
     print(distances_df)
+
+    response = 'hello'
 
     # 5. use amplpy to calculate best pairs
     try:
@@ -58,28 +61,60 @@ def read_root():
             r"""
             set CHILDREN;
             set ASSISTANTS;
-            set DISTANCES;
 
             param qualification_requirment {CHILDREN};
             param hours_requested {CHILDREN};
             param qualification {ASSISTANTS};
             param capacity_hours {ASSISTANTS};
             param QUALIFICATIONS {ASSISTANTS, CHILDREN};
-            param DISTANCES {ASSISTANTS, CHILDREN}
+            param DISTANCES {ASSISTANTS, CHILDREN};
 
+            var Assign {i in CHILDREN, j in ASSISTANTS} binary;
+
+            maximize Total_Pairs:
+                sum {i in CHILDREN, j in ASSISTANTS} Assign[i, j] * QUALIFICATIONS[i, j];
+
+            subject to CapacityConstraint {j in ASSISTANTS}:
+                sum {i in CHILDREN} Assign[i, j] * hours_requested[i] <= capacity_hours[j];
+
+            subject to DistanceConstraint {j in ASSISTANTS}:
+                sum {i in CHILDREN} Assign[i, j] * DISTANCES[i, j] <= 50;
         """
         )
 
-        ampl.set_data(children_df[['child_id', 'qualification_requirment', 'hours_requested']].set_index("child_id"), "CHILDREN")
-        ampl.set_data(assistants_df[['assistant_id', 'qualification', 'capacity_hours']].set_index("assistant_id"), "ASSISTANTS")
+        ampl.set_data(children_df[['child_id', 'qualification_requirment',
+                      'hours_requested']].set_index("child_id"), "CHILDREN")
+        ampl.set_data(assistants_df[['assistant_id', 'qualification', 'capacity_hours']].set_index(
+            "assistant_id"), "ASSISTANTS")
         ampl.get_parameter("QUALIFICATIONS").set_values(score_df)
         ampl.get_parameter("DISTANCES").set_values(distances_df)
 
         ampl.solve()
 
+        # check if it is solved
+        result = ampl.get_value("solve_result")
+        if result == "optimal" or "solved":
+            assign_df = ampl.get_variable(
+                "Assign").get_values().to_pandas().reset_index()
+            assign_df = assign_df.rename(
+                columns={"index0": "child_id", "index1": "assistant_id", "Assign.val": "assigned"})
+            # Filter only rows where assignment happened
+            assigned = assign_df[assign_df["assigned"] >= 1]
+            print(assigned)
+            response = {
+                "status": "success",
+                "assignments": assigned.to_json()
+            }
+        else:
+            response = {
+                "status": "failure",
+                "reason": result
+            }
+
     except amplpy.AMPLException:
         return amplpy.AMPLException.get_message()
-    return {"data": "Hello from ampl container"}
+
+    return response
 
 
 # DEV HELPERS
