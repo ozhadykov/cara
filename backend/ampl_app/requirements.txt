@@ -1,6 +1,7 @@
 requests
 urllib3
 pandas
+numpy
 fastapi[standard]
 pydantic
 uvicorn

@@ -1,6 +1,1 @@
 /app/uploads
-/app/.python-version
-
-# local environment
-.venv
-.env
