@@ -1,0 +1,6 @@
+requests
+urllib3
+pandas
+fastapi[standard]
+pydantic
+uvicorn

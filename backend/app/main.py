@@ -9,8 +9,8 @@ import os
 app = FastAPI()
 
 origins = [
-    "http://localhost:80", # Production Frontend
-    "http://localhost:5173", # Local Developement Frontend
+    "http://localhost:80",  # Production Frontend
+    "http://localhost:5173",  # Local Developement Frontend
     "http://localhost"
 ]
 
@@ -22,6 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/api")
 def read_root():
     return {"data": "Hello World"}
@@ -31,18 +32,19 @@ def read_root():
 UPLOAD_DIR = Path("/backend/app/uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
+
 @app.post("/api/upload")
 async def upload_file(file: UploadFile = File(...)):
     # Save the uploaded file
     file_location = UPLOAD_DIR / file.filename
-    
+
     try:
         with open(file_location, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
-        
+
         # Process the file as needed
         file_size = os.path.getsize(file_location)
-        
+
         return {
             "message": "File uploaded successfully",
             "filename": file.filename,
