@@ -1,27 +1,28 @@
-import './App.css';
-import {Navbar, Sidebar, Footer} from './components';
-import {Routes, Route} from "react-router";
+import "./App.css";
+import { Navbar, Sidebar, Footer } from "./components";
+import { Routes, Route } from "react-router";
 import routes from "./routes.tsx";
-import {ReactNode} from "react";
+import { ReactNode } from "react";
 
 function App() {
-
-  const routesHTML: Array<ReactNode> = routes.map(route => {
+  const routesHTML: Array<ReactNode> = routes.map((route) => {
     return (
-      <Route key={route.path} path={route.path} element={route.component}></Route>
-    )
-  })
+      <Route
+        key={route.path}
+        path={route.path}
+        element={route.component}
+      ></Route>
+    );
+  });
 
   return (
     <>
-      <Navbar/>
-      <Sidebar/>
+      <Navbar />
+      <Sidebar />
       <main className="content px-4 pt-25 h-full">
-        <Routes>
-          {routesHTML}
-        </Routes>
+        <Routes>{routesHTML}</Routes>
       </main>
-      <Footer/>
+      <Footer />
     </>
   );
 }
