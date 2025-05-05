@@ -82,3 +82,19 @@ async def receive_keys(data: AmplData):
     
     return {"message": "Daten empfangen", "received": data}
 
+@app.get("/api/getGoogleKey")
+async def receive_file():
+    if not os.path.exists("/backend/app/keys/googleApiKey.txt"):
+        return {"data": ""}
+    with open ("/backend/app/keys/googleApiKey.txt", "r") as f:
+        googleKey = f.read()
+        return {"data": googleKey}
+    
+@app.get("/api/getAmplKey")
+async def receive_file():
+    if not os.path.exists("/backend/app/keys/amplKey.txt"):
+        return {"data": ""}
+    with open ("/backend/app/keys/amplKey.txt", "r") as f:
+        amplKey = f.read()
+        return {"data": amplKey}
+
