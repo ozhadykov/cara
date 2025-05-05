@@ -1,6 +1,7 @@
 import {Home} from "./pages";
 import {DataImport} from "./pages";
 import {IRoute} from "./models/IRoute.ts";
+import KeyInput from "./pages/KeyInput.tsx";
 
 
 const routes: Array<IRoute> = [
@@ -13,6 +14,11 @@ const routes: Array<IRoute> = [
     path: '/import',
     component: <DataImport />,
     label: 'Data Import'
+  },
+  {
+    path: "/keyInput",
+    component: <KeyInput />,
+    label: "Key Input"
   }
 ]
 

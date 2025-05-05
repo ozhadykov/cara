@@ -6,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from .routers import ampl
 
+from pydantic import BaseModel
+
 # creating App
 app = FastAPI()
 
@@ -26,6 +28,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class GoogleApiData(BaseModel):
+    apikey: str
+
+class AmplData(BaseModel):
+    ampl: str
 
 @app.get("/api")
 def read_root():
@@ -35,7 +42,6 @@ def read_root():
 # Create uploads directory if it doesn't exist
 UPLOAD_DIR = Path("/backend/app/uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
-
 
 @app.post("/api/upload")
 async def upload_file(file: UploadFile = File(...)):
@@ -59,3 +65,18 @@ async def upload_file(file: UploadFile = File(...)):
         return {"message": f"Error uploading file: {str(e)}"}
     finally:
         file.file.close()
+
+@app.post("/api/googleKey")
+async def receive_keys(data: GoogleApiData):
+    # Zugriff auf die Felder über data.apikey und data.ampl
+    print(f"Empfangener API Key: {data.apikey}")
+    
+    return {"message": "Daten empfangen", "received": data}
+
+@app.post("/api/amplKey")
+async def receive_keys(data: AmplData):
+    # Zugriff auf die Felder über data.apikey und data.ampl
+    print(f"Empfangener API Key: {data.ampl}")
+    
+    return {"message": "Daten empfangen", "received": data}
+
