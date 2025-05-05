@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 
 
 
@@ -64,7 +64,27 @@ const KeyInput = () => {
         }
       };
     
+      useEffect(() => {
+        // dev only
+        const getGoogleKeyData = async () => {
+          const response = await fetch('/api/getGoogleKey')
+          const data = await response.json()
+          if (response.ok) {
+            setApiKey(data.data)
+          }
+        }
+        const getAmplKeyData = async () => {
+          const response = await fetch('/api/getAmplKey')
+          const data = await response.json()
+          if (response.ok) {
+            setAmpl(data.data)
+          }
+        }
     
+    
+        getGoogleKeyData()
+        getAmplKeyData()
+      }, [])
 
   return (
     <div className="home-content flex flex-col gap-3 items-center justify-center w-full h-full">
