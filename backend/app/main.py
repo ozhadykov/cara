@@ -69,14 +69,16 @@ async def upload_file(file: UploadFile = File(...)):
 @app.post("/api/googleKey")
 async def receive_keys(data: GoogleApiData):
     # Zugriff auf die Felder über data.apikey und data.ampl
-    print(f"Empfangener API Key: {data.apikey}")
+    with open ("/backend/app/keys/googleApiKey.txt", "w") as f:
+        f.write (data.apikey)
     
     return {"message": "Daten empfangen", "received": data}
 
 @app.post("/api/amplKey")
 async def receive_keys(data: AmplData):
     # Zugriff auf die Felder über data.apikey und data.ampl
-    print(f"Empfangener API Key: {data.ampl}")
+    with open ("/backend/app/keys/amplKey.txt", "w") as f:
+        f.write (data.ampl)
     
     return {"message": "Daten empfangen", "received": data}
 
