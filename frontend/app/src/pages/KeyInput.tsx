@@ -1,90 +1,37 @@
-import {useEffect, useState} from 'react';
-
-
+import { ChangeEvent, useEffect, useState } from 'react';
+import { postRequest } from '../lib/request';
 
 const KeyInput = () => {
-    //    async function handleRequest() {
-    //        await fetch("/api/keys")
-    //    }
-    const [apikey, setApiKey] = useState ('');
-    const [ampl, setAmpl] = useState ('');
+  const [googleApiKey, setApiKey] = useState('');
+  const [amplKey, setAmplKey] = useState('');
 
-    const handleChangeApiKey = (event: any) => {
+  const handleChangeApiKey = (event: ChangeEvent<HTMLInputElement>) => {
+    setApiKey(event.target.value);
+  };
+  const handleChangeAmpl = (event: ChangeEvent<HTMLInputElement>) => {
+    setAmplKey(event.target.value);
+  };
 
-        setApiKey(event.target.value);
-    }
-    const handleChangeAmpl = (event: any) => {
-        
-        setAmpl(event.target.value);
+  useEffect(() => {
+    // dev only
+    const getGoogleKeyData = async () => {
+      const response = await fetch('/api/getGoogleApiKey');
+      const data = await response.json();
+      if (response.ok) {
+        setApiKey(data.data);
+      }
+    };
+    const getAmplKeyData = async () => {
+      const response = await fetch('/api/getAmplKey');
+      const data = await response.json();
+      if (response.ok) {
+        setAmplKey(data.data);
+      }
     };
 
-    const handleSubmitApiKey = async () => {
-        try {
-          const response = await fetch('/api/googleKey', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              apikey: apikey,
-            }),
-          });
-    
-          if (!response.ok) {
-            throw new Error(`Server returned ${response.status}`);
-          }
-    
-          const result = await response.json();
-          console.log('Erfolgreich gesendet:', result);
-        } catch (error) {
-          console.error('Fehler beim Senden:', error);
-        }
-      };
-
-      const handleSubmitAmpl = async () => {
-        try {
-          const response = await fetch('/api/amplKey', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              ampl: ampl,
-            }),
-          });
-    
-          if (!response.ok) {
-            throw new Error(`Server returned ${response.status}`);
-          }
-    
-          const result = await response.json();
-          console.log('Erfolgreich gesendet:', result);
-        } catch (error) {
-          console.error('Fehler beim Senden:', error);
-        }
-      };
-    
-      useEffect(() => {
-        // dev only
-        const getGoogleKeyData = async () => {
-          const response = await fetch('/api/getGoogleKey')
-          const data = await response.json()
-          if (response.ok) {
-            setApiKey(data.data)
-          }
-        }
-        const getAmplKeyData = async () => {
-          const response = await fetch('/api/getAmplKey')
-          const data = await response.json()
-          if (response.ok) {
-            setAmpl(data.data)
-          }
-        }
-    
-    
-        getGoogleKeyData()
-        getAmplKeyData()
-      }, [])
+    getGoogleKeyData();
+    getAmplKeyData();
+  }, []);
 
   return (
     <div className="home-content flex flex-col gap-3 items-center justify-center w-full h-full">
@@ -93,10 +40,15 @@ const KeyInput = () => {
         <input
           className="border border-gray-300 rounded px-3 py-2 w-64"
           type="text"
-          value={apikey}
+          value={googleApiKey}
           onChange={handleChangeApiKey}
         />
-        <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition" onClick = {handleSubmitApiKey}>
+        <button
+          className="btn btn-primary"
+          onClick={() =>
+            postRequest('/api/googleApiKey', { googleApiKey: googleApiKey })
+          }
+        >
           Send
         </button>
       </div>
@@ -106,16 +58,18 @@ const KeyInput = () => {
         <input
           className="border border-gray-300 rounded px-3 py-2 w-64"
           type="text"
-          value={ampl}
+          value={amplKey}
           onChange={handleChangeAmpl}
         />
-        <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition" onClick = {handleSubmitAmpl}>
+        <button
+          className="btn btn-primary"
+          onClick={() => postRequest('/api/amplKey', { amplKey: amplKey })}
+        >
           Send
         </button>
       </div>
-
     </div>
-  )
-}
+  );
+};
 
-export default KeyInput
+export default KeyInput;
