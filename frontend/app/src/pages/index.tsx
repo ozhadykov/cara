@@ -1,7 +1,4 @@
-import DataImport from "./DataImport.tsx";
-import Home from "./Home";
+import DataImport from "./DataImport.tsx"
+import Home from "./Home"
 
-export {
-    DataImport,
-    Home
-}
+export { DataImport, Home }
