@@ -1,75 +1,73 @@
-import { ChangeEvent, useEffect, useState } from 'react';
-import { postRequest } from '../lib/request';
+import { ChangeEvent, useEffect, useState } from "react"
+import { postRequest } from "../lib/request"
 
 const KeyInput = () => {
-  const [googleApiKey, setApiKey] = useState('');
-  const [amplKey, setAmplKey] = useState('');
+    const [googleApiKey, setApiKey] = useState("")
+    const [amplKey, setAmplKey] = useState("")
 
-  const handleChangeApiKey = (event: ChangeEvent<HTMLInputElement>) => {
-    setApiKey(event.target.value);
-  };
-  const handleChangeAmpl = (event: ChangeEvent<HTMLInputElement>) => {
-    setAmplKey(event.target.value);
-  };
+    const handleChangeApiKey = (event: ChangeEvent<HTMLInputElement>) => {
+        setApiKey(event.target.value)
+    }
+    const handleChangeAmpl = (event: ChangeEvent<HTMLInputElement>) => {
+        setAmplKey(event.target.value)
+    }
 
-  useEffect(() => {
-    // dev only
-    const getGoogleKeyData = async () => {
-      const response = await fetch('/api/getGoogleApiKey');
-      const data = await response.json();
-      if (response.ok) {
-        setApiKey(data.data);
-      }
-    };
-    const getAmplKeyData = async () => {
-      const response = await fetch('/api/getAmplKey');
-      const data = await response.json();
-      if (response.ok) {
-        setAmplKey(data.data);
-      }
-    };
+    useEffect(() => {
+        // dev only
+        const getGoogleKeyData = async () => {
+            const response = await fetch("/api/getGoogleApiKey")
+            const data = await response.json()
+            if (response.ok) {
+                setApiKey(data.data)
+            }
+        }
+        const getAmplKeyData = async () => {
+            const response = await fetch("/api/getAmplKey")
+            const data = await response.json()
+            if (response.ok) {
+                setAmplKey(data.data)
+            }
+        }
 
-    getGoogleKeyData();
-    getAmplKeyData();
-  }, []);
+        getGoogleKeyData()
+        getAmplKeyData()
+    }, [])
 
-  return (
-    <div className="home-content flex flex-col gap-3 items-center justify-center w-full h-full">
-      <div className="flex flex-row items-center gap-2">
-        <label className="w-32">Google API Key</label>
-        <input
-          className="border border-gray-300 rounded px-3 py-2 w-64"
-          type="text"
-          value={googleApiKey}
-          onChange={handleChangeApiKey}
-        />
-        <button
-          className="btn btn-primary"
-          onClick={() =>
-            postRequest('/api/googleApiKey', { googleApiKey: googleApiKey })
-          }
-        >
-          Send
-        </button>
-      </div>
+    return (
+        <div className="home-content flex flex-col gap-3 items-center justify-center w-full h-full">
+            <div className="flex flex-row items-center gap-2">
+                <label className="w-32">Google API Key</label>
+                <input
+                    className="border border-gray-300 rounded px-3 py-2 w-64"
+                    type="text"
+                    value={googleApiKey}
+                    onChange={handleChangeApiKey}
+                />
+                <button
+                    className="btn btn-primary"
+                    onClick={() => postRequest("/api/googleApiKey", { googleApiKey: googleApiKey })}
+                >
+                    Send
+                </button>
+            </div>
 
-      <div className="flex flex-row items-center gap-2">
-        <label className="w-32">AMPL Key</label>
-        <input
-          className="border border-gray-300 rounded px-3 py-2 w-64"
-          type="text"
-          value={amplKey}
-          onChange={handleChangeAmpl}
-        />
-        <button
-          className="btn btn-primary"
-          onClick={() => postRequest('/api/amplKey', { amplKey: amplKey })}
-        >
-          Send
-        </button>
-      </div>
-    </div>
-  );
-};
+            <div className="flex flex-row items-center gap-2">
+                <label className="w-32">AMPL Key</label>
+                <input
+                    className="border border-gray-300 rounded px-3 py-2 w-64"
+                    type="text"
+                    value={amplKey}
+                    onChange={handleChangeAmpl}
+                />
+                <button
+                    className="btn btn-primary"
+                    onClick={() => postRequest("/api/amplKey", { amplKey: amplKey })}
+                >
+                    Send
+                </button>
+            </div>
+        </div>
+    )
+}
 
-export default KeyInput;
+export default KeyInput
