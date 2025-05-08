@@ -15,28 +15,21 @@ function AmplData() {
         const fetchData = async () => {
             try {
                 // Hier die URL zu deinem Backend-Endpunkt
-                const response = await fetch("/api/get-ampl-data-in-backend") // Oder /api/ampl/dev
+                const response = await fetch("/ampl/dev") // Oder /api/ampl/dev
                 const data = await response.json()
                 setAmplData(data)
 
-                // Prüfe, ob die Daten erfolgreich abgerufen wurden
-                if (data && data.data) {
-                    let assignments = data.data.assignments // Greife auf data.data.assignments zu
+                let assignments = data.assignments
 
-                    if (typeof assignments === "string") {
-                        assignments = JSON.parse(assignments)
-                    }
+                assignments = JSON.parse(assignments)
 
-                    const childIds = Object.keys(assignments.child_id)
-                    const tableRows = childIds.map((childId) => ({
-                        child_id: childId,
-                        assistant_id: assignments.assistant_id[childId],
-                        assigned: assignments.assigned[childId],
-                    }))
-                    setTableData(tableRows)
-                } else {
-                    console.error("Keine Daten vom Backend erhalten:", data)
-                }
+                const childIds = Object.keys(assignments.child_id)
+                const tableRows = childIds.map((childId) => ({
+                    child_id: childId,
+                    assistant_id: assignments.assistant_id[childId],
+                    assigned: assignments.assigned[childId],
+                }))
+                setTableData(tableRows)
             } catch (error) {
                 console.error("Error fetching data:", error)
             }
