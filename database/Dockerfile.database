@@ -1,0 +1,6 @@
+FROM mysql:8.0
+
+WORKDIR /database
+
+COPY ./init /docker-entrypoint-initdb.d/
+
