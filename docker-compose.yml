@@ -34,12 +34,15 @@ services:
       - phenix
   db:
     container_name: database
-    image: 'mysql:8.0'
+    build: 
+      context: ./database
+      dockerfile: Dockerfile.database
     environment:
       MYSQL_DATABASE: phenix_mysql
       MYSQL_ROOT_PASSWORD: 'strong_password'
     volumes:
-      - ./db_data:/var/lib/mysql
+      - ./database/init:/database
+      - ./database/db_data:/var/lib/mysql
     restart: always
     networks:
       - phenix
