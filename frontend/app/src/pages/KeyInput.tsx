@@ -15,14 +15,14 @@ const KeyInput = () => {
     useEffect(() => {
         // dev only
         const getGoogleKeyData = async () => {
-            const response = await fetch("/api/getGoogleApiKey")
+            const response = await fetch("/keys/getGoogleApiKey")
             const data = await response.json()
             if (response.ok) {
                 setApiKey(data.data)
             }
         }
         const getAmplKeyData = async () => {
-            const response = await fetch("/api/getAmplKey")
+            const response = await fetch("/keys/getAmplKey")
             const data = await response.json()
             if (response.ok) {
                 setAmplKey(data.data)
@@ -45,7 +45,9 @@ const KeyInput = () => {
                 />
                 <button
                     className="btn btn-primary"
-                    onClick={() => postRequest("/api/googleApiKey", { googleApiKey: googleApiKey })}
+                    onClick={() =>
+                        postRequest("/keys/googleApiKey", { googleApiKey: googleApiKey })
+                    }
                 >
                     Send
                 </button>
@@ -61,7 +63,7 @@ const KeyInput = () => {
                 />
                 <button
                     className="btn btn-primary"
-                    onClick={() => postRequest("/api/amplKey", { amplKey: amplKey })}
+                    onClick={() => postRequest("/keys/amplKey", { amplKey: amplKey })}
                 >
                     Send
                 </button>

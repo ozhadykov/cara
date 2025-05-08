@@ -1,7 +1,8 @@
-import { ReactElement } from "react"
 import { Home } from "./pages"
 import { DataImport } from "./pages"
 import KeyInput from "./pages/KeyInput.tsx"
+import AmplData from "./pages/AmplData.tsx" // Importiere die AmplData Komponente
+import { ReactElement } from "react"
 
 interface IRoute {
     path: string
@@ -25,6 +26,11 @@ const routes: Array<IRoute> = [
         path: "/keyInput",
         component: <KeyInput />,
         label: "Key Input",
+    },
+    {
+        path: "/dashboard",
+        component: <AmplData />,
+        label: "Ampl Data",
     },
 ]
 

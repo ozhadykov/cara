@@ -5,14 +5,13 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from .routers import ampl
-
-from pydantic import BaseModel
-
+from .routers import keys
 # creating App
 app = FastAPI()
 
 # registering routers
 app.include_router(ampl.router)
+app.include_router(keys.router)
 
 origins = [
     "http://localhost:80",  # Production Frontend
@@ -27,16 +26,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-class GoogleApiData(BaseModel):
-    googleApiKey: str
-
-class AmplData(BaseModel):
-    amplKey: str
-
-@app.get("/api")
-def read_root():
-    return {"data": "Hello World"}
 
 
 # Create uploads directory if it doesn't exist
@@ -65,36 +54,3 @@ async def upload_file(file: UploadFile = File(...)):
         return {"message": f"Error uploading file: {str(e)}"}
     finally:
         file.file.close()
-
-@app.post("/api/googleApiKey")
-async def receive_keys(data: GoogleApiData):
-    # Zugriff auf die Felder über data.apikey und data.ampl
-    with open ("/backend/app/keys/googleApiKey.txt", "w") as f:
-        f.write (data.googleApiKey)
-    
-    return {"message": "Daten empfangen", "received": data}
-
-@app.post("/api/amplKey")
-async def receive_keys(data: AmplData):
-    # Zugriff auf die Felder über data.apikey und data.ampl
-    with open ("/backend/app/keys/amplKey.txt", "w") as f:
-        f.write (data.amplKey)
-    
-    return {"message": "Daten empfangen", "received": data}
-
-@app.get("/api/getGoogleApiKey")
-async def receive_file():
-    if not os.path.exists("/backend/app/keys/googleApiKey.txt"):
-        return {"data": ""}
-    with open ("/backend/app/keys/googleApiKey.txt", "r") as f:
-        googleApiKey = f.read()
-        return {"data": googleApiKey}
-    
-@app.get("/api/getAmplKey")
-async def receive_file():
-    if not os.path.exists("/backend/app/keys/amplKey.txt"):
-        return {"data": ""}
-    with open ("/backend/app/keys/amplKey.txt", "r") as f:
-        amplKey = f.read()
-        return {"data": amplKey}
-
