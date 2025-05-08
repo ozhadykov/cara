@@ -88,6 +88,11 @@ def read_root():
                 sum {i in CHILDREN} Assign[i, j] * DISTANCES[i, j] <= 50;
         """
         )
+        # additionals
+        # add constraint about Ci <= Qi if i want to assign assistant to child
+        # add discrete timeslots, 2 dimensions: noon, afternoon? time slot lock
+        # greede children and time slot matrix for caretakers, 3 matrixes?
+        # distance measuring? through possible aasosiations, teacher have to reach the school
 
         ampl.set_data(children_df[['child_id', 'qualification_requirment',
                       'hours_requested']].set_index("child_id"), "CHILDREN")
