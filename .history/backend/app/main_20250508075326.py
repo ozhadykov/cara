@@ -5,8 +5,6 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from .routers import ampl
-import logging
-import httpx
 
 from pydantic import BaseModel
 
@@ -101,9 +99,6 @@ async def receive_file():
         return {"data": amplKey}
 
 AMPL_SERVICE_BASE_URL = 'http://ampl:8000/ampl' # Oder 'http://ampl:8000', je nach tatsächlichem Endpunkt des ampl-Service
-# Konfiguriere die Protokollierung
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 @app.get("/api/get-ampl-data-in-backend")
 async def get_ampl_data_from_service():

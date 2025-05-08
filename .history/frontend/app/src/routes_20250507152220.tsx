@@ -2,7 +2,6 @@ import {Home} from "./pages";
 import {DataImport} from "./pages";
 import {IRoute} from "./models/IRoute.ts";
 import KeyInput from "./pages/KeyInput.tsx";
-import AmplData from "./pages/AmplData.tsx"; // Importiere die AmplData Komponente
 
 
 const routes: Array<IRoute> = [
@@ -20,11 +19,6 @@ const routes: Array<IRoute> = [
     path: "/keyInput",
     component: <KeyInput />,
     label: "Key Input"
-  },
-  {
-    path: "/amplData",
-    component: <AmplData />,
-    label: "Ampl Data"
   }
 ]
 
