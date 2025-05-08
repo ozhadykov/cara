@@ -1,9 +1,15 @@
 import {Home} from "./pages";
 import {DataImport} from "./pages";
-import {IRoute} from "./models/IRoute.ts";
 import KeyInput from "./pages/KeyInput.tsx";
 import AmplData from "./pages/AmplData.tsx"; // Importiere die AmplData Komponente
+import { ReactElement } from "react"
 
+interface IRoute {
+    path: string
+    label: string
+    component: ReactElement | string
+    icon?: ReactElement | string
+}
 
 const routes: Array<IRoute> = [
   {
@@ -28,4 +34,4 @@ const routes: Array<IRoute> = [
   }
 ]
 
-export default routes;
+export default routes

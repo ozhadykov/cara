@@ -31,10 +31,10 @@ app.add_middleware(
 )
 
 class GoogleApiData(BaseModel):
-    apikey: str
+    googleApiKey: str
 
 class AmplData(BaseModel):
-    ampl: str
+    amplKey: str
 
 @app.get("/api")
 def read_root():
@@ -68,11 +68,11 @@ async def upload_file(file: UploadFile = File(...)):
     finally:
         file.file.close()
 
-@app.post("/api/googleKey")
+@app.post("/api/googleApiKey")
 async def receive_keys(data: GoogleApiData):
     # Zugriff auf die Felder über data.apikey und data.ampl
     with open ("/backend/app/keys/googleApiKey.txt", "w") as f:
-        f.write (data.apikey)
+        f.write (data.googleApiKey)
     
     return {"message": "Daten empfangen", "received": data}
 
@@ -80,17 +80,17 @@ async def receive_keys(data: GoogleApiData):
 async def receive_keys(data: AmplData):
     # Zugriff auf die Felder über data.apikey und data.ampl
     with open ("/backend/app/keys/amplKey.txt", "w") as f:
-        f.write (data.ampl)
+        f.write (data.amplKey)
     
     return {"message": "Daten empfangen", "received": data}
 
-@app.get("/api/getGoogleKey")
+@app.get("/api/getGoogleApiKey")
 async def receive_file():
     if not os.path.exists("/backend/app/keys/googleApiKey.txt"):
         return {"data": ""}
     with open ("/backend/app/keys/googleApiKey.txt", "r") as f:
-        googleKey = f.read()
-        return {"data": googleKey}
+        googleApiKey = f.read()
+        return {"data": googleApiKey}
     
 @app.get("/api/getAmplKey")
 async def receive_file():
