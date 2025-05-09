@@ -20,5 +20,6 @@ def read_root():
     with connection.cursor() as cursor:
         cursor.execute("SHOW TABLES")
         result = cursor.fetchone()
+        print(result)
     connection.close()
-    return {"message": result[0]}
+    return {"message": result}
