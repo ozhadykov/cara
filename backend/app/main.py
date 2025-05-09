@@ -4,9 +4,9 @@ from typing import Union
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
-from .routers import ampl
-from .routers import keys
-from .routers import db
+from .routes import ampl
+from .routes import keys
+from .routes import db
 # creating App
 app = FastAPI()
 
