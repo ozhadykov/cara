@@ -3,7 +3,7 @@ import { DataImport } from "./pages"
 import KeyInput from "./pages/KeyInput.tsx"
 import AmplData from "./pages/AmplData.tsx" // Importiere die AmplData Komponente
 import { ReactElement } from "react"
-import { Document, Home2, TransferHorizontal, UsersGroupRounded, Widget } from "solar-icon-set"
+import { Document, TransferHorizontal, UsersGroupRounded, Widget } from "solar-icon-set"
 
 interface IRoute {
     path: string

@@ -6,7 +6,7 @@ const Navbar = () => {
 
     return (
         <div className="fixed top-0 z-50 w-full bg-primary">
-            <div className="navbar flex gap-[32px] bg-primary py-[8px] px-[24px]">
+            <div className="navbar flex bg-primary py-[8px] px-[24px]">
                 <button onClick={toggle} className="btn btn-square btn-ghost">
                     <HamburgerMenu size={32} />
                 </button>

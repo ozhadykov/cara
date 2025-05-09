@@ -12,6 +12,7 @@
     --color-primary-content: #333333;
     --color-secondary: #3960ff;
     --color-secondary-content: oklch(98% 0.016 73.684);
+    --color-base-content: #333333;
 }
 
 #root {
