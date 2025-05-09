@@ -9,3 +9,5 @@ pydantic
 uvicorn
 mysql-connector-python
 httpx
+pymysql
+cryptography

@@ -6,12 +6,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from .routers import ampl
 from .routers import keys
+from .routers import db
 # creating App
 app = FastAPI()
 
 # registering routers
 app.include_router(ampl.router)
 app.include_router(keys.router)
+app.include_router(db.router)
 
 origins = [
     "http://localhost:80",  # Production Frontend
