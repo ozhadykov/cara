@@ -1,21 +1,19 @@
 import { useState, useEffect } from "react"
 
-// Definiere ein Interface für eine Tabellenzeile
 interface TableRow {
     child_id: string
-    assistant_id: string | number // oder spezifischer Typ, falls bekannt
-    assigned: string | number // oder spezifischer Typ, falls bekannt
+    assistant_id: string | number
+    assigned: string | number
 }
 
 function AmplData() {
     const [amplData, setAmplData] = useState(null)
-    const [tableData, setTableData] = useState<TableRow[]>([]) // Korrekter Typ
+    const [tableData, setTableData] = useState<TableRow[]>([])
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Hier die URL zu deinem Backend-Endpunkt
-                const response = await fetch("/api/ampl/dev") // Oder /api/ampl/dev
+                const response = await fetch("/api/ampl/dev")
                 const data = await response.json()
                 setAmplData(data)
 
@@ -44,18 +42,13 @@ function AmplData() {
 
     return (
         <div className="container mx-auto p-4">
-            {/* Füge einen Container hinzu */}
             <h2 className="text-2xl font-bold mb-4">Ampl Data Table</h2>
             <table className="table-auto border-collapse border border-gray-400 w-full">
-                {/* Passe die Tabellenbreite an */}
                 <thead>
                     <tr className="bg-gray-100">
                         <th className="border border-gray-400 px-4 py-2 text-left">Child ID</th>
-                        {/* Füge text-left hinzu */}
                         <th className="border border-gray-400 px-4 py-2 text-left">Assistant ID</th>
-                        {/* Füge text-left hinzu */}
                         <th className="border border-gray-400 px-4 py-2 text-left">Assigned</th>
-                        {/* Füge text-left hinzu */}
                     </tr>
                 </thead>
                 <tbody>
@@ -68,8 +61,6 @@ function AmplData() {
                     ))}
                 </tbody>
             </table>
-            {/* <pre>{JSON.stringify(amplData, null, 2)}</pre> */}{" "}
-            {/* Auskommentierte Debugging-Zeile */}
         </div>
     )
 }

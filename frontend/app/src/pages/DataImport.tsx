@@ -21,7 +21,7 @@ const DataImport = () => {
                     <span>please upload a CSV file, for an import.</span>
                     <input type="file" onChange={handleFileChange} />
                 </div>
-                <button type="submit" className="btn btn-xl btn-primary">
+                <button type="submit" className="btn btn-xl btn-secondary">
                     Upload
                 </button>
             </form>
