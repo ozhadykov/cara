@@ -2,7 +2,7 @@ from fastapi import APIRouter
 import pymysql
 
 router = APIRouter(
-    prefix="/db",
+    prefix="/api/db",
     tags=["db"],
     dependencies=[],
     responses={404: {"description": "nothing found in db service"}},

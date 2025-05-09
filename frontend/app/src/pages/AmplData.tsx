@@ -15,7 +15,7 @@ function AmplData() {
         const fetchData = async () => {
             try {
                 // Hier die URL zu deinem Backend-Endpunkt
-                const response = await fetch("/ampl/dev") // Oder /api/ampl/dev
+                const response = await fetch("/api/ampl/dev") // Oder /api/ampl/dev
                 const data = await response.json()
                 setAmplData(data)
 

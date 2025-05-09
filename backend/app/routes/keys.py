@@ -10,7 +10,7 @@ class AmplData(BaseModel):
 
 
 router = APIRouter(
-    prefix="/keys",
+    prefix="/api/keys",
     tags=["ampl"],
     dependencies=[],
     responses={404: {"description": "nothing found in ampl service"}},
