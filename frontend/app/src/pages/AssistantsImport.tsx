@@ -1,7 +1,12 @@
 import { Import, InfoCircle, SmileCircle } from "solar-icon-set"
-import { CSVImport } from "../components"
+import { CSVImport, AssistantSingleImport } from "../components"
 
 const AssistantsImport = () => {
+
+    const sendData = () => {
+        console.log("Sending data...")
+    }
+
     return (
         <div className="data-import flex flex-col gap-3 w-full h-full">
             <div className="data-import-header mb-5">
@@ -16,7 +21,7 @@ const AssistantsImport = () => {
                         CSV Import
                     </label>
                     <div className="tab-content bg-base-100 border-base-300 p-6">
-                        <CSVImport />
+                        <CSVImport importLabel={"Assistant Import"} sendData={sendData}/>
                     </div>
 
                     <label className="tab">
@@ -24,7 +29,9 @@ const AssistantsImport = () => {
                         <SmileCircle />
                         <span className="ml-1">Single Import</span>
                     </label>
-                    <div className="tab-content bg-base-100 border-base-300 p-6">Tab content 2</div>
+                    <div className="tab-content bg-base-100 border-base-300 p-6">
+                        <AssistantSingleImport />
+                    </div>
 
                 </div>
             </div>
