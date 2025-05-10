@@ -14,7 +14,7 @@ const Sidebar = () => {
             <div className="h-full px-3 pb-4 overflow-y-auto">
                 <ul className="font-medium flex flex-col px-[10px]">
                     {routes.map((route) => (
-                        <NavLink key={route.path} to={route.path} onClick={toggle}>
+                        <NavLink key={route.path} to={route.path}>
                             <div className="flex items-center gap-[20px] py-[15px] px-[20px] hover:bg-base-300 rounded-lg">
                                 {route.icon}
                                 <label className="text-[16px]">{route.label}</label>

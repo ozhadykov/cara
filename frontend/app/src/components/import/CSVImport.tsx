@@ -1,5 +1,6 @@
 import { Upload } from "solar-icon-set"
-import { ChangeEvent, FormEvent } from "react"
+import Papa from "papaparse"
+import { ChangeEvent, FormEvent, useState } from "react"
 
 
 export type CSVImportProps = {
@@ -8,13 +9,42 @@ export type CSVImportProps = {
 }
 
 const CsvImport = (props: CSVImportProps) => {
+    const [csvData, setCsvData] = useState<object | null>(null)
+    const [csvCols, setCsvCols] = useState<string[]>([])
+    const [error, setError] = useState<string>("")
+
 
     const handleSubmit = (e: FormEvent) => {
         console.log(e)
         props.sendData()
     }
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        console.log(e)
+        // reading file
+        const file = e.target.files?.[0]
+        if (file) {
+            if (file.type !== "text/csv") {
+                setError("Input only accepts csv files")
+                setCsvData(null)
+                return
+            }
+
+            const reader = new FileReader()
+            reader.onload = (e) => {
+                const content = e.target.result
+
+                Papa.parse(content, {
+                    header: true,
+                    complete: (result) => {
+                        setCsvData(result.data)
+                        setCsvCols(result.meta.fields)
+                    },
+                    error: (error) => {
+                        console.error(error)
+                    },
+                })
+            }
+            reader.readAsText(file)
+        }
     }
 
     return (
@@ -30,7 +60,7 @@ const CsvImport = (props: CSVImportProps) => {
                             <div className="upload-controls flex flex-col gap-2">
                                 <input
                                     type="file"
-                                    className="file-input file-input-primary w-full"
+                                    className="file-input file-input-secondary w-full"
                                     onChange={handleFileChange}
                                 />
                                 <button className="btn">upload</button>
