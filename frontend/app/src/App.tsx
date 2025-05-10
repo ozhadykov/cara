@@ -15,7 +15,7 @@ function App() {
         <div className="flex flex-col h-full">
             <Navbar />
             <Sidebar />
-            <main className={`flex-1 px-6 pt-20 transition-transform ${isOpen ? "translate-x-64 w-[calc(100%-var(--spacing)*64)]" : ""}`}>
+            <main className={`flex-1 px-9 pt-23 transition-transform ${isOpen ? "translate-x-64 w-[calc(100%-var(--spacing)*64)]" : ""}`}>
                 <Routes>{routesHTML}</Routes>
             </main>
             <Toast />

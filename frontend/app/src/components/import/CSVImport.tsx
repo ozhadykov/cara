@@ -1,6 +1,7 @@
-import { Upload } from "solar-icon-set"
-import Papa from "papaparse"
 import { ChangeEvent, FormEvent, useState } from "react"
+import { Upload } from "solar-icon-set"
+import { useToast } from "../../contexts/ToastContext.tsx"
+import Papa from "papaparse"
 
 
 export type CSVImportProps = {
@@ -12,18 +13,22 @@ const CsvImport = (props: CSVImportProps) => {
     const [csvData, setCsvData] = useState<object | null>(null)
     const [csvCols, setCsvCols] = useState<string[]>([])
     const [error, setError] = useState<string>("")
+    const { sendMessage, toggle } = useToast()
 
 
     const handleSubmit = (e: FormEvent) => {
         console.log(e)
+        e.preventDefault()
         props.sendData()
     }
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+        console.log('hi')
         // reading file
         const file = e.target.files?.[0]
         if (file) {
             if (file.type !== "text/csv") {
-                setError("Input only accepts csv files")
+                sendMessage("Input only accepts csv files")
+                toggle()
                 setCsvData(null)
                 return
             }

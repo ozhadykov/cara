@@ -15,14 +15,6 @@ const ChildrenImport = () => {
             </div>
             <div className="tab-container shadow-md">
                 <div className="tabs tabs-lift">
-                    <label className="tab">
-                        <input type="radio" name="my_tabs_4" />
-                        <Import />
-                        CSV Import
-                    </label>
-                    <div className="tab-content bg-base-100 border-base-300 p-6">
-                        <CSVImport importLabel={"Children Import"} sendData={sendData} />
-                    </div>
 
                     <label className="tab">
                         <input type="radio" name="my_tabs_4" defaultChecked />
@@ -31,6 +23,14 @@ const ChildrenImport = () => {
                     </label>
                     <div className="tab-content bg-base-100 border-base-300 p-6">
                         <ChildrenSingleImport />
+                    </div>
+                    <label className="tab">
+                        <input type="radio" name="my_tabs_4" />
+                        <Import />
+                        CSV Import
+                    </label>
+                    <div className="tab-content bg-base-100 border-base-300 p-6">
+                        <CSVImport importLabel={"Children Import"} sendData={sendData} />
                     </div>
 
                 </div>
