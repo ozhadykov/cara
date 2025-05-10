@@ -13,7 +13,7 @@ function App() {
             <Navbar />
 
             <Sidebar />
-            <main className="flex-1 px-4 pt-25">
+            <main className="flex-1 px-6 pt-20">
                 <Routes>{routesHTML}</Routes>
             </main>
 
