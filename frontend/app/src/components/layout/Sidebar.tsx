@@ -11,7 +11,7 @@ const Sidebar = () => {
                     border-r border-gray-200 bg-white
                     transition-transform ${isOpen ? " translate-x-0" : "-translate-x-full"}`}
         >
-            <div className="h-full px-3 pb-4 overflow-y-auto pt-[25px]">
+            <div className="h-full px-3 pb-4 overflow-y-auto">
                 <ul className="font-medium flex flex-col px-[10px]">
                     {routes.map((route) => (
                         <NavLink key={route.path} to={route.path} onClick={toggle}>
