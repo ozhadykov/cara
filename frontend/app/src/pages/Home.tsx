@@ -57,7 +57,7 @@ const Home = () => {
             <h2>Upload File</h2>
             <form onSubmit={handleSubmit}>
                 <input type="file" onChange={handleFileChange} />
-                <button type="submit" className="btn btn-xl btn-primary">
+                <button type="submit" className="btn btn-xl btn-secondary">
                     Upload
                 </button>
             </form>

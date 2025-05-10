@@ -1,45 +1,29 @@
+import { NavLink } from "react-router"
 import { useSidebar } from "../../contexts/SidebarContext.tsx"
 import routes from "../../routes.tsx"
-import { NavLink } from "react-router"
-import { ReactNode } from "react"
 
 const Sidebar = () => {
     const { isOpen, toggle } = useSidebar()
 
-    const links: Array<ReactNode> = routes.map((route) => {
-        return (
-            <NavLink key={route.path} to={route.path} onClick={toggle}>
-                {route.label}
-            </NavLink>
-        )
-    })
-
     return (
-        <div className="drawer">
-            <input
-                id="my-drawer"
-                type="checkbox"
-                className="drawer-toggle"
-                checked={isOpen}
-                onChange={toggle}
-            />
-            <div className="drawer-side">
-                <label
-                    htmlFor="my-drawer"
-                    aria-label="close sidebar"
-                    className="drawer-overlay"
-                ></label>
-                <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
-                    <div className="sidebar-header border-b-2 border-zinc-400 pb-2.5 flex flex-col">
-                        <span className="text-xl font-bold">CARA</span>
-                        <span className="pl-0.5 text-xs font-light text-zinc-400">
-                            your smart child care assistant
-                        </span>
-                    </div>
-                    <li className="sidebar-body py-3 text-base">{links}</li>
+        <aside
+            className={`fixed top-0 left-0 z-40 w-64 h-screen pt-20 
+                    border-r border-gray-200 bg-white
+                    transition-transform ${isOpen ? " translate-x-0" : "-translate-x-full"}`}
+        >
+            <div className="h-full px-3 pb-4 overflow-y-auto pt-[25px]">
+                <ul className="font-medium flex flex-col px-[10px]">
+                    {routes.map((route) => (
+                        <NavLink key={route.path} to={route.path} onClick={toggle}>
+                            <div className="flex items-center gap-[20px] py-[15px] px-[20px] hover:bg-base-300 rounded-lg">
+                                {route.icon}
+                                <label className="text-[16px]">{route.label}</label>
+                            </div>
+                        </NavLink>
+                    ))}
                 </ul>
             </div>
-        </div>
+        </aside>
     )
 }
 

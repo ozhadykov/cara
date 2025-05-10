@@ -44,7 +44,7 @@ const KeyInput = () => {
                     onChange={handleChangeApiKey}
                 />
                 <button
-                    className="btn btn-primary"
+                    className="btn btn-secondary"
                     onClick={() =>
                         postRequest("/api/keys/googleApiKey", { googleApiKey: googleApiKey })
                     }
@@ -62,7 +62,7 @@ const KeyInput = () => {
                     onChange={handleChangeAmpl}
                 />
                 <button
-                    className="btn btn-primary"
+                    className="btn btn-secondary"
                     onClick={() => postRequest("/api/keys/amplKey", { amplKey: amplKey })}
                 >
                     Send
