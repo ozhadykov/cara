@@ -1,14 +1,11 @@
 import { useToast } from "../../contexts/ToastContext.tsx"
 
 const Toast = () => {
-    const { message, isOpen, toggle } = useToast()
-
-    if (isOpen)
-        setTimeout(toggle, 2000)
+    const { message, type, isOpen } = useToast()
 
     return (
-        <div className={`toast toast-start ${isOpen ? 'opacity-1' : 'opacity-0'}`}>
-            <div className="alert alert-success">
+        <div className={`toast toast-start transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
+            <div className={`alert alert-${type}`}>
                 <span>{message}</span>
             </div>
         </div>

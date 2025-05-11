@@ -2,9 +2,9 @@ import { createContext, ReactNode, useContext, useState } from "react"
 
 export type ToastContextTypes = {
     message: string
+    type: string
     isOpen: boolean
-    toggle: () => void
-    sendMessage: (message: string) => void
+    sendMessage: (message: string, type:string) => void
 }
 
 const ToastContext = createContext<ToastContextTypes | null>(null)
@@ -12,15 +12,16 @@ const ToastContext = createContext<ToastContextTypes | null>(null)
 export const ToastProvider = ({ children }: { children: ReactNode }) => {
     const [message, setMessage] = useState<string>("")
     const [isOpen, setIsOpen] = useState<boolean>(false)
-    const toggle = () => {
-        setIsOpen(!isOpen)
-    }
-    const sendMessage = (message: string) => {
+    const [type, setType] = useState<string>("success")
+    const sendMessage = (message: string, type:string) => {
         setMessage(message)
+        setType(type)
+        setIsOpen(true)
+        setTimeout(() => setIsOpen(false), 2000)
     }
 
     return (
-        <ToastContext.Provider value={{ isOpen, message, sendMessage, toggle }}>
+        <ToastContext.Provider value={{ isOpen, message, type, sendMessage }}>
             {children}
         </ToastContext.Provider>
     )
