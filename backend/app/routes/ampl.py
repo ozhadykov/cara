@@ -3,7 +3,7 @@ from fastapi import APIRouter
 
 
 router = APIRouter(
-    prefix="/ampl",
+    prefix="/api/ampl",
     tags=["ampl"],
     dependencies=[],
     responses={404: {"description": "nothing found in ampl service"}},
