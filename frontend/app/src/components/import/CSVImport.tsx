@@ -3,9 +3,8 @@ import { Upload } from "solar-icon-set"
 import { useToast } from "../../contexts/ToastContext.tsx"
 import Papa from "papaparse"
 
-
 export type CSVImportProps = {
-    importLabel: string,
+    importLabel: string
     sendData: () => void
 }
 
@@ -15,14 +14,13 @@ const CsvImport = (props: CSVImportProps) => {
     const [error, setError] = useState<string>("")
     const { sendMessage, toggle } = useToast()
 
-
     const handleSubmit = (e: FormEvent) => {
         console.log(e)
         e.preventDefault()
         props.sendData()
     }
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        console.log('hi')
+        console.log("hi")
         // reading file
         const file = e.target.files?.[0]
         if (file) {
@@ -35,13 +33,13 @@ const CsvImport = (props: CSVImportProps) => {
 
             const reader = new FileReader()
             reader.onload = (e) => {
-                const content = e.target.result
-
+                const content = e.target!.result
+                //@ts-ignore
                 Papa.parse(content, {
                     header: true,
                     complete: (result) => {
                         setCsvData(result.data)
-                        setCsvCols(result.meta.fields)
+                        setCsvCols(result.meta.fields!)
                     },
                     error: (error) => {
                         console.error(error)
@@ -60,7 +58,9 @@ const CsvImport = (props: CSVImportProps) => {
                         <div className="upload-container flex flex-col gap-6 w-1/3 pr-4 border-r-1 border-gray-300">
                             <div className="upload-header flex flex-col">
                                 <span className="text-lg mb-1">{props.importLabel}</span>
-                                <span className="text-gray-400 flex items-center gap-1"><Upload /> please upload a CSV file, for an import.</span>
+                                <span className="text-gray-400 flex items-center gap-1">
+                                    <Upload /> please upload a CSV file, for an import.
+                                </span>
                             </div>
                             <div className="upload-controls flex flex-col gap-2">
                                 <input
@@ -73,9 +73,7 @@ const CsvImport = (props: CSVImportProps) => {
                         </div>
                         <div className="children-preview grow pl-2">
                             <span className="text-lg">Preview:</span>
-                            <div className="csv-preview">
-
-                            </div>
+                            <div className="csv-preview"></div>
                         </div>
                     </div>
                 </div>

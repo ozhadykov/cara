@@ -1,15 +1,15 @@
-import { createContext, useContext, useState } from "react"
+import { createContext, ReactNode, useContext, useState } from "react"
 
 export type ToastContextTypes = {
-    message: string,
-    isOpen: boolean,
-    toggle: () => void,
-    sendMessage: (message: string) => void,
+    message: string
+    isOpen: boolean
+    toggle: () => void
+    sendMessage: (message: string) => void
 }
 
 const ToastContext = createContext<ToastContextTypes | null>(null)
 
-export const ToastProvider = ({ children }: ToastContextTypes) => {
+export const ToastProvider = ({ children }: { children: ReactNode }) => {
     const [message, setMessage] = useState<string>("")
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const toggle = () => {
@@ -19,7 +19,11 @@ export const ToastProvider = ({ children }: ToastContextTypes) => {
         setMessage(message)
     }
 
-    return <ToastContext.Provider value={{ isOpen, message, sendMessage, toggle }}>{children}</ToastContext.Provider>
+    return (
+        <ToastContext.Provider value={{ isOpen, message, sendMessage, toggle }}>
+            {children}
+        </ToastContext.Provider>
+    )
 }
 
 export const useToast = (): ToastContextTypes => {

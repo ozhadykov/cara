@@ -34,38 +34,38 @@ def read_root(conn = Depends(get_db)):
     result = cursor.fetchone()
     return {"message": result[0]}
 
-@router.post("/assistents")
+@router.post("/assistants")
 def create_assistent(name, family_name, qualification, conn = Depends(get_db)):
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO assistants (name, family_name, qualification) VALUES (?, ?, ?)", (name, family_name, qualification))
+    cursor.execute("INSERT INTO assistants (name, family_name, qualification) VALUES (%s, %s, %s)", (name, family_name, qualification))
     conn.commit()
     return cursor.lastrowid
 
-@router.get("/assistents")
-def get_all_assistents(conn = Depends(get_db)):
+@router.get("/assistants")
+def get_all_assistants(conn = Depends(get_db)):
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM assistants")
 
     return cursor.fetchall()
 
-@router.get("/assistents/{assistent_Id}")
+@router.get("/assistants/{assistent_Id}")
 def get_assistent(id, conn = Depends(get_db)):
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM assistants WHERE id = ?", (id))
+    cursor.execute("SELECT * FROM assistants WHERE id = %s", (id))
 
     return cursor.fetchall()
 
-@router.delete("/assistents/{assistent_Id}")
+@router.delete("/assistants/{assistent_Id}")
 def delete_assistent(id, conn = Depends(get_db)):
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM assistants WHERE id = ?", (id))
+    cursor.execute("DELETE FROM assistants WHERE id = %s", (id))
     conn.commit()
     return cursor.rowcount  # Returns number of rows deleted
 
 @router.post("/children")
 def create_child(name, family_name, required_qualification, conn = Depends(get_db)):
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO children (name, family_name, required_qualification) VALUES (?, ?, ?)", (name, family_name, required_qualification))
+    cursor.execute("INSERT INTO children (name, family_name, required_qualification) VALUES (%s, %s, %s)", (name, family_name, required_qualification))
     conn.commit()
     return cursor.lastrowid
 
@@ -79,14 +79,14 @@ def get_all_children(conn = Depends(get_db)):
 @router.get("/children/{child_Id}")
 def get_child(id, conn = Depends(get_db)):
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM children WHERE id = ?", (id))
+    cursor.execute("SELECT * FROM children WHERE id = %s", (id))
 
     return cursor.fetchall()
 
 @router.delete("/children/{child_Id}")
 def delete_child(id, conn = Depends(get_db)):
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM children WHERE id = ?", (id))
+    cursor.execute("DELETE FROM children WHERE id = %s", (id))
     conn.commit()
     return cursor.rowcount  # Returns number of rows deleted
 
