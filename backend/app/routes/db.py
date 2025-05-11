@@ -1,6 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Body
 import pymysql
 import os
+import pymysql.cursors
+from typing import Dict, Any
 
 router = APIRouter(
     prefix="/api/db",
@@ -14,7 +16,8 @@ def get_db_connection():
         host=os.getenv("DB_HOST"),       # service name of the MySQL container
         user=os.getenv("DB_USER"),
         password=os.getenv("DB_PASSWORD"),
-        database=os.getenv("DB_NAME")
+        database=os.getenv("DB_NAME"),
+        cursorclass=pymysql.cursors.DictCursor
     )
 
     return connection
@@ -49,16 +52,16 @@ def get_all_assistants(conn = Depends(get_db)):
     return cursor.fetchall()
 
 @router.get("/assistants/{assistent_Id}")
-def get_assistent(id, conn = Depends(get_db)):
+def get_assistent(assistent_Id, conn = Depends(get_db)):
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM assistants WHERE id = %s", (id))
+    cursor.execute("SELECT * FROM assistants WHERE id = %s", (assistent_Id))
 
     return cursor.fetchall()
 
 @router.delete("/assistants/{assistent_Id}")
-def delete_assistent(id, conn = Depends(get_db)):
+def delete_assistent(assistent_Id, conn = Depends(get_db)):
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM assistants WHERE id = %s", (id))
+    cursor.execute("DELETE FROM assistants WHERE id = %s", (assistent_Id))
     conn.commit()
     return cursor.rowcount  # Returns number of rows deleted
 
@@ -77,16 +80,18 @@ def get_all_children(conn = Depends(get_db)):
     return cursor.fetchall()
 
 @router.get("/children/{child_Id}")
-def get_child(id, conn = Depends(get_db)):
+def get_child(child_Id, conn = Depends(get_db)):
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM children WHERE id = %s", (id))
+    cursor.execute("SELECT * FROM children WHERE id = %s", (child_Id))
 
     return cursor.fetchall()
 
 @router.delete("/children/{child_Id}")
-def delete_child(id, conn = Depends(get_db)):
+def delete_child(child_Id, conn = Depends(get_db)):
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM children WHERE id = %s", (id))
+    print(id)
+
+    cursor.execute("DELETE FROM children WHERE id = %s", (child_Id))
     conn.commit()
     return cursor.rowcount  # Returns number of rows deleted
 
