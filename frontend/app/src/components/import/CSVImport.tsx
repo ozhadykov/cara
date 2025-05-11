@@ -39,7 +39,7 @@ const CsvImport = (props: CSVImportProps) => {
         if (file) {
             if (file.type !== "text/csv") {
                 sendMessage("Input only accepts csv files", toastTypes.error)
-                setCsvData(null)
+                setCsvData([])
                 return
             }
 
@@ -51,6 +51,7 @@ const CsvImport = (props: CSVImportProps) => {
                     header: true,
                     skipEmptyLines: true,
                     complete: (result) => {
+                        //@ts-ignore
                         setCsvData(result.data)
                         setCsvCols(result.meta.fields!)
                         sendMessage("CSV read successfully", toastTypes.success)
