@@ -18,15 +18,15 @@ const routes: Array<IRoute> = [
         icon: <Widget size={24} color="#333333" />,
     },
     {
-        path: "/children-import",
+        path: "/children",
         component: <ChildrenImport />,
-        label: "Children Import",
+        label: "Children",
         icon: <Document size={24} color="#333333" />,
     },
     {
-        path: "/assistants-import",
+        path: "/assistants",
         component: <AssistantsImport />,
-        label: "Assistant Import",
+        label: "Assistant",
         icon: <Document size={24} color="#333333" />,
     },
     {
