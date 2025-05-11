@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 import pymysql
+import os
 
 router = APIRouter(
     prefix="/api/db",
@@ -10,10 +11,10 @@ router = APIRouter(
 
 def get_db_connection():
     connection = pymysql.connect(
-        host="database",       # service name of the MySQL container
-        user="root",
-        password="strong_password",
-        database="phenix_mysql"
+        host=os.getenv("DB_HOST"),       # service name of the MySQL container
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME")
     )
 
     return connection

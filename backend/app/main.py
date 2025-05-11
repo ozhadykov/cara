@@ -1,12 +1,10 @@
 import os
 import shutil
-from typing import Union
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
-from .routes import ampl
-from .routes import keys
-from .routes import db
+
+from .routes import ampl, keys, db
 
 # creating App
 app = FastAPI()
@@ -18,8 +16,6 @@ app.include_router(db.router)
 
 origins = [
     "http://localhost:80",  # Production Frontend
-    "http://localhost:5173",  # Local Developement Frontend
-    "http://localhost"
 ]
 
 app.add_middleware(

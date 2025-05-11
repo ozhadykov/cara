@@ -11,8 +11,6 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': 'http://localhost:8080',
-      '/keys': 'http://localhost:8080',
-      '/ampl': 'http://localhost:8080'
     }
   }
 })
