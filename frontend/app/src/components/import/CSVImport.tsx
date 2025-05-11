@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useState } from "react"
+import { ChangeEvent, FormEvent, useEffect, useState } from "react"
 import { Upload } from "solar-icon-set"
 import { useToast } from "../../contexts/ToastContext.tsx"
 import { toastTypes } from "../../lib/constants.ts"
@@ -9,11 +9,24 @@ export type CSVImportProps = {
     sendData: () => void
 }
 
+type CsvRow = { [key: string]: string | number }
+
 const CsvImport = (props: CSVImportProps) => {
-    const [csvData, setCsvData] = useState<object | null>(null)
+    const [csvData, setCsvData] = useState<CsvRow[]>([])
     const [csvCols, setCsvCols] = useState<string[]>([])
-    const [error, setError] = useState<string>("")
     const { sendMessage } = useToast()
+
+    useEffect(() => {
+        renderCSVPreview()
+    }, [csvData, csvCols])
+
+    const renderCSVPreview = () => {
+        if (csvData.length && csvCols.length) {
+            console.log("rendering csv")
+            console.log(csvCols)
+            console.log(csvData)
+        }
+    }
 
     const handleSubmit = (e: FormEvent) => {
         console.log(e)
@@ -21,7 +34,6 @@ const CsvImport = (props: CSVImportProps) => {
         props.sendData()
     }
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        console.log("hi")
         // reading file
         const file = e.target.files?.[0]
         if (file) {
@@ -37,13 +49,15 @@ const CsvImport = (props: CSVImportProps) => {
                 //@ts-ignore
                 Papa.parse(content, {
                     header: true,
+                    skipEmptyLines: true,
                     complete: (result) => {
                         setCsvData(result.data)
                         setCsvCols(result.meta.fields!)
                         sendMessage("CSV read successfully", toastTypes.success)
                     },
                     error: (error) => {
-                        console.error(error)
+                        console.error(error.message)
+                        sendMessage("Error reading CSV file", toastTypes.error)
                     },
                 })
             }
@@ -74,7 +88,40 @@ const CsvImport = (props: CSVImportProps) => {
                         </div>
                         <div className="children-preview grow pl-2">
                             <span className="text-lg">Preview:</span>
-                            <div className="csv-preview"></div>
+                            <div className="csv-preview">
+                                {csvData.length && csvCols.length && (
+                                    <div
+                                        className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+                                        <table className="table">
+                                            {/* head */}
+                                            <thead>
+                                            <tr>
+                                                <th></th>
+                                                {csvCols.map((col, idx) => {
+                                                    return (
+                                                        <th key={idx}>{col}</th>
+                                                    )
+                                                })}
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {csvData.map((item, i) => {
+                                                return (
+                                                    <tr key={i}>
+                                                        <th>{i}</th>
+                                                        {Object.keys(item).map((itemKey) => {
+                                                            return (
+                                                                <td key={`${i}_${item[itemKey]}`}>{item[itemKey]}</td>
+                                                            )
+                                                        })}
+                                                    </tr>
+                                                )
+                                            })}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
