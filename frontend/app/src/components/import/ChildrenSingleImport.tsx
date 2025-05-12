@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react"
 import { Child } from "../../lib/models"
 import { deleteRequest } from "../../lib/request"
+import ChildrenRecord from "./ChildRecord"
+import { useChildRecord } from "../../contexts/ChildRecordContext"
 
 const ChildrenSingleImport = () => {
     const [children, setChildren] = useState<Child[]>()
+    const { toggle } = useChildRecord()
 
     const deleteChild = (id: string) => {
         deleteRequest(`/api/db/children/${id}`, {})
@@ -25,11 +28,13 @@ const ChildrenSingleImport = () => {
     return (
         <div>
             <div className="w-full flex justify-end">
-                <button className="btn btn-secondary mb-10">Add Record</button>
+                <button className="btn btn-secondary mb-10" onClick={toggle}>
+                    Add Record
+                </button>
             </div>
 
             <table className="w-full text-left">
-                <thead className="text-gray-500">
+                <thead className="text-gray-500 text-[14px]">
                     <tr>
                         <th>
                             <input type="checkbox" />

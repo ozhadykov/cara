@@ -1,6 +1,6 @@
 import Home from "./Home"
-import AssistantsImport from "./AssistantsImport.tsx"
+import AssistentImport from "./AssistentImport.tsx"
 import ChildrenImport from "./ChildrenImport.tsx"
 import KeyInput from "./KeyInput"
 
-export { Home, AssistantsImport, ChildrenImport, KeyInput }
+export { Home, AssistentImport as AssistantsImport, ChildrenImport, KeyInput }

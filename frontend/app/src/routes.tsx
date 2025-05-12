@@ -26,7 +26,7 @@ const routes: Array<IRoute> = [
     {
         path: "/assistants",
         component: <AssistantsImport />,
-        label: "Assistant",
+        label: "Assistent",
         icon: <Document size={24} color="#333333" />,
     },
     {
