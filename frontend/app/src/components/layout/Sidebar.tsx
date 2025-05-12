@@ -8,7 +8,7 @@ const Sidebar = () => {
 
     return (
         <aside
-            className={`fixed top-0 left-0 z-40 w-fit h-screen pt-20 
+            className={`fixed top-0 left-0 z-30 w-fit h-screen pt-20 
                     border-r border-gray-200 bg-white
                     transition-transform ${isOpen ? " translate-x-0" : "-translate-x-full"}`}
         >
@@ -16,7 +16,11 @@ const Sidebar = () => {
                 <ul className="font-medium flex flex-col px-[10px]">
                     {routes.map((route) => (
                         <NavLink key={route.path} to={route.path}>
-                            <div className={`flex items-center gap-[20px] py-[15px] px-[20px] hover:bg-base-300 rounded-lg ${location.pathname === route.path ? 'bg-base-300' : ''}`}>
+                            <div
+                                className={`flex items-center gap-[20px] py-[15px] px-[20px] hover:bg-base-300 rounded-lg ${
+                                    location.pathname === route.path ? "bg-base-300" : ""
+                                }`}
+                            >
                                 {route.icon}
                                 <label className="text-[16px]">{route.label}</label>
                             </div>

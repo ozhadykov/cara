@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, Body
 import pymysql
 import os
 import pymysql.cursors
-from typing import Dict, Any
+from typing import Dict
+from pydantic import BaseModel
 
 router = APIRouter(
     prefix="/api/db",
@@ -10,6 +11,16 @@ router = APIRouter(
     dependencies=[],
     responses={404: {"description": "nothing found in db service"}},
 )
+
+class Data(BaseModel):
+    name: str
+    family_name: str
+    required_qualification: str
+    street: str
+    city: str
+    zip_code: str
+    requested_hours: int
+
 
 def get_db_connection():
     connection = pymysql.connect(
@@ -66,9 +77,17 @@ def delete_assistent(assistent_Id, conn = Depends(get_db)):
     return cursor.rowcount  # Returns number of rows deleted
 
 @router.post("/children")
-def create_child(name, family_name, required_qualification, conn = Depends(get_db)):
+def create_child(data: Data, conn = Depends(get_db)):
+    print(data)
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO children (name, family_name, required_qualification) VALUES (%s, %s, %s)", (name, family_name, required_qualification))
+    cursor.execute(
+        """
+            INSERT INTO children 
+            (name, family_name, required_qualification, street, city, zip_code, requested_hours) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, 
+        (data.name, data.family_name, data.required_qualification, data.street, data.city, data.zip_code, data.requested_hours)
+    )
     conn.commit()
     return cursor.lastrowid
 

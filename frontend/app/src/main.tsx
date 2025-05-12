@@ -5,15 +5,21 @@ import { SidebarProvider } from "./contexts/SidebarContext.tsx"
 import { ToastProvider } from "./contexts/ToastContext.tsx"
 import "./index.css"
 import App from "./App.tsx"
+import { ChildRecordProvider } from "./contexts/ChildRecordContext.tsx"
+import { AssistentRecordProvider } from "./contexts/AssistentRecordContext.tsx"
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
         <BrowserRouter>
             <SidebarProvider>
                 <ToastProvider>
-                    <App />
+                    <ChildRecordProvider>
+                        <AssistentRecordProvider>
+                            <App />
+                        </AssistentRecordProvider>
+                    </ChildRecordProvider>
                 </ToastProvider>
             </SidebarProvider>
         </BrowserRouter>
-    </StrictMode>,
+    </StrictMode>
 )
