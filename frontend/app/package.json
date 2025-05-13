@@ -15,11 +15,11 @@
     "papaparse": "^5.5.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router": "^7.5.3",
-    "solar-icon-set": "^1.0.0"
+    "react-router": "^7.5.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
+    "@iconify/react": "^6.0.0",
     "@types/papaparse": "^5.3.16",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",

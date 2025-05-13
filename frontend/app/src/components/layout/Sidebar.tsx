@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from "react-router"
 import { useSidebar } from "../../contexts/SidebarContext.tsx"
 import routes from "../../routes.tsx"
+import { Icon } from "@iconify/react/dist/iconify.js"
 
 const Sidebar = () => {
     const { isOpen } = useSidebar()
@@ -17,11 +18,22 @@ const Sidebar = () => {
                     {routes.map((route) => (
                         <NavLink key={route.path} to={route.path}>
                             <div
-                                className={`flex items-center gap-[20px] py-[15px] px-[20px] hover:bg-base-300 rounded-lg ${
+                                className={`flex items-center gap-[20px] py-[15px] px-[20px] hover:bg-base-200 rounded-lg cursor-pointer ${
                                     location.pathname === route.path ? "bg-base-300" : ""
                                 }`}
                             >
-                                {route.icon}
+                                <Icon
+                                    icon={
+                                        location.pathname === route.path
+                                            ? route.fillIcon
+                                            : route.outlineIcon
+                                    }
+                                    style={{
+                                        fontSize: "24px",
+                                        color: location.pathname === route.path ? "" : "#333333",
+                                    }}
+                                />
+
                                 <label className="text-[16px]">{route.label}</label>
                             </div>
                         </NavLink>

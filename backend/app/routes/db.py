@@ -12,7 +12,7 @@ router = APIRouter(
     responses={404: {"description": "nothing found in db service"}},
 )
 
-class Data(BaseModel):
+class Child(BaseModel):
     name: str
     family_name: str
     required_qualification: str
@@ -77,8 +77,7 @@ def delete_assistent(assistent_Id, conn = Depends(get_db)):
     return cursor.rowcount  # Returns number of rows deleted
 
 @router.post("/children")
-def create_child(data: Data, conn = Depends(get_db)):
-    print(data)
+def create_child(data: Child, conn = Depends(get_db)):
     cursor = conn.cursor()
     cursor.execute(
         """

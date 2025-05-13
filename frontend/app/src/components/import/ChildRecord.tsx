@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useChildRecord } from "../../contexts/ChildRecordContext.tsx"
 import { postRequest } from "../../lib/request.ts"
 import { Child } from "../../lib/models.ts"
-import { AddCircle } from "solar-icon-set"
+
 import AddRecordSideBar from "./AddRecordSideBar.tsx"
 
 type InputField = {
@@ -52,7 +52,7 @@ const ChildrenRecord = () => {
     return (
         <AddRecordSideBar isOpen={isOpen} toggle={toggle}>
             <div className="border-b-1 border-gray-200 p-7 flex items-center gap-2 shadow-sm shadow-black/5">
-                <AddCircle size={32} color="#333333" />
+                <></>
                 <h3 className="text-xl font-semibold">Add Child Record</h3>
             </div>
 
