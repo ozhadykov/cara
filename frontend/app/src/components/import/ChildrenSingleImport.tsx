@@ -41,8 +41,12 @@ const ChildrenSingleImport = () => {
                         </th>
                         <th className="py-4">id</th>
                         <th>name</th>
-                        <th>last_name</th>
+                        <th>family_name</th>
                         <th>required_qualification</th>
+                        <th>street</th>
+                        <th>city</th>
+                        <th>zip_code</th>
+                        <th>requested_hours</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -54,8 +58,12 @@ const ChildrenSingleImport = () => {
                             </td>
                             <td className="py-4">{child.id}</td>
                             <td>{child.name}</td>
-                            <td>{child.last_name}</td>
-                            <td></td>
+                            <td>{child.family_name}</td>
+                            <td>{child.required_qualification}</td>
+                            <td>{child.street}</td>
+                            <td>{child.city}</td>
+                            <td>{child.zip_code}</td>
+                            <td>{child.requested_hours}</td>
                             <td>
                                 <button
                                     className="btn btn-error"

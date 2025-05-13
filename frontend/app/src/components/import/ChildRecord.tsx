@@ -1,12 +1,20 @@
 import { useState } from "react"
 import { useChildRecord } from "../../contexts/ChildRecordContext.tsx"
-import { useSidebar } from "../../contexts/SidebarContext.tsx"
 import { postRequest } from "../../lib/request.ts"
+import { Child } from "../../lib/models.ts"
+import { AddCircle } from "solar-icon-set"
+import AddRecordSideBar from "./AddRecordSideBar.tsx"
+
+type InputField = {
+    name: keyof Child
+    type: string
+}
 
 const ChildrenRecord = () => {
-    const { isOpen } = useChildRecord()
+    const { isOpen, toggle } = useChildRecord()
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<Child>({
+        id: "",
         name: "",
         family_name: "",
         required_qualification: "",
@@ -27,74 +35,56 @@ const ChildrenRecord = () => {
 
         try {
             await postRequest("/api/db/children", formData)
+            toggle()
         } catch (error) {}
     }
 
-    return (
-        <aside
-            className={`fixed top-0 right-0 z-30 w-fit h-screen pt-20 
-                    border-r border-gray-200 bg-white
-                    transition-transform ${isOpen ? "translate-x-0" : "translate-x-full"} `}
-        >
-            <form className="h-full px-3 pb-4 overflow-y-auto" onSubmit={handleSubmit}>
-                <ul className="font-medium flex flex-col px-[10px]">
-                    <input
-                        className="input"
-                        placeholder="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                    />
-                    <input
-                        className="input"
-                        placeholder="family_name"
-                        name="family_name"
-                        value={formData.family_name}
-                        onChange={handleChange}
-                    />
-                    <input
-                        className="input"
-                        placeholder="required_qualification"
-                        name="required_qualification"
-                        value={formData.required_qualification}
-                        onChange={handleChange}
-                    />
-                    <input
-                        className="input"
-                        placeholder="street"
-                        name="street"
-                        value={formData.street}
-                        onChange={handleChange}
-                    />
-                    <input
-                        className="input"
-                        placeholder="city"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleChange}
-                    />
-                    <input
-                        className="input"
-                        placeholder="zip_code"
-                        name="zip_code"
-                        value={formData.zip_code}
-                        onChange={handleChange}
-                    />
-                    <input
-                        className="input"
-                        placeholder="requested_hours"
-                        name="requested_hours"
-                        type="number"
-                        value={formData.requested_hours}
-                        onChange={handleChange}
-                    />
-                </ul>
+    const inputFieldData: InputField[] = [
+        { name: "name", type: "text" },
+        { name: "family_name", type: "text" },
+        { name: "required_qualification", type: "text" },
+        { name: "street", type: "text" },
+        { name: "city", type: "text" },
+        { name: "zip_code", type: "text" },
+        { name: "requested_hours", type: "number" },
+    ]
 
-                <button className="btn btn-secondary" type="submit">
-                    Submit
+    return (
+        <AddRecordSideBar isOpen={isOpen} toggle={toggle}>
+            <div className="border-b-1 border-gray-200 p-7 flex items-center gap-2 shadow-sm shadow-black/5">
+                <AddCircle size={32} color="#333333" />
+                <h3 className="text-xl font-semibold">Add Child Record</h3>
+            </div>
+
+            <div className="overflow-auto scrollbar-hide p-7">
+                <form onSubmit={handleSubmit} id="create_record_child">
+                    {inputFieldData.map((inputData) => (
+                        <div className="flex flex-col justify-center bg-gray-200 p-2 rounded-lg w-full mb-8">
+                            <label className="text-xs text-gray-400 mb-1" htmlFor={inputData.name}>
+                                {inputData.name}
+                            </label>
+                            <input
+                                name={inputData.name}
+                                onChange={handleChange}
+                                type={inputData.type}
+                                value={formData[inputData.name]}
+                                className="outline-none text-sm"
+                                id={inputData.name}
+                            />
+                        </div>
+                    ))}
+                </form>
+            </div>
+
+            <div className="flex justify-end gap-6 border-t-1 border-gray-200 p-7 shadow-md shadow-black/5 -translate-y-1">
+                <button className="btn btn-ghost px-9" onClick={toggle}>
+                    Cancel
                 </button>
-            </form>
-        </aside>
+                <button className="btn btn-secondary px-8" type="submit" form="create_record_child">
+                    Create
+                </button>
+            </div>
+        </AddRecordSideBar>
     )
 }
 
