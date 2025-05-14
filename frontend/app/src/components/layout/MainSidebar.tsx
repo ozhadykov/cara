@@ -1,10 +1,10 @@
 import { NavLink, useLocation } from "react-router"
-import { useSidebar } from "../../contexts/SidebarContext.tsx"
+import { useMainSidebar } from "../../contexts/providers/MainSidebarContext.tsx"
 import routes from "../../routes.tsx"
 import { Icon } from "@iconify/react/dist/iconify.js"
 
-const Sidebar = () => {
-    const { isOpen } = useSidebar()
+const MainSidebar = () => {
+    const { isOpen } = useMainSidebar()
     const location = useLocation()
 
     return (
@@ -44,4 +44,4 @@ const Sidebar = () => {
     )
 }
 
-export default Sidebar
+export default MainSidebar

@@ -1,6 +1,6 @@
 import { ReactNode } from "react"
 
-const AddRecordSideBar = ({
+const RecordSidebar = ({
     children,
     isOpen,
     toggle,
@@ -36,4 +36,4 @@ const AddRecordSideBar = ({
     )
 }
 
-export default AddRecordSideBar
+export default RecordSidebar

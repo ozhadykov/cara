@@ -1,9 +1,10 @@
 import { useState } from "react"
-import { useChildRecord } from "../../contexts/ChildRecordContext.tsx"
 import { postRequest } from "../../lib/request.ts"
 import { Child } from "../../lib/models.ts"
 
-import AddRecordSideBar from "./AddRecordSideBar.tsx"
+import RecordSidebar from "./RecordSideBar.tsx"
+import { useRecordSidebar } from "../../contexts/providers/RecordSidebarContext.tsx"
+import { useChildrenData } from "../../contexts/providers/ChildrenDataContext.tsx"
 
 type InputField = {
     name: keyof Child
@@ -11,7 +12,8 @@ type InputField = {
 }
 
 const ChildrenRecord = () => {
-    const { isOpen, toggle } = useChildRecord()
+    const { isOpen, toggle } = useRecordSidebar()
+    const { refreshChildren } = useChildrenData()
 
     const [formData, setFormData] = useState<Child>({
         id: "",
@@ -36,6 +38,7 @@ const ChildrenRecord = () => {
         try {
             await postRequest("/api/db/children", formData)
             toggle()
+            await refreshChildren()
         } catch (error) {}
     }
 
@@ -50,7 +53,7 @@ const ChildrenRecord = () => {
     ]
 
     return (
-        <AddRecordSideBar isOpen={isOpen} toggle={toggle}>
+        <RecordSidebar isOpen={isOpen} toggle={toggle}>
             <div className="border-b-1 border-gray-200 p-7 flex items-center gap-2 shadow-sm shadow-black/5">
                 <></>
                 <h3 className="text-xl font-semibold">Add Child Record</h3>
@@ -59,7 +62,10 @@ const ChildrenRecord = () => {
             <div className="overflow-auto scrollbar-hide p-7">
                 <form onSubmit={handleSubmit} id="create_record_child">
                     {inputFieldData.map((inputData) => (
-                        <div className="flex flex-col justify-center bg-gray-200 p-2 rounded-lg w-full mb-8">
+                        <div
+                            key={inputData.name}
+                            className="flex flex-col justify-center bg-gray-200 p-2 rounded-lg w-full mb-8"
+                        >
                             <label className="text-xs text-gray-400 mb-1" htmlFor={inputData.name}>
                                 {inputData.name}
                             </label>
@@ -84,7 +90,7 @@ const ChildrenRecord = () => {
                     Create
                 </button>
             </div>
-        </AddRecordSideBar>
+        </RecordSidebar>
     )
 }
 

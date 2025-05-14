@@ -1,8 +1,8 @@
 import { Icon } from "@iconify/react"
-import { useSidebar } from "../../contexts/SidebarContext.tsx"
+import { useMainSidebar } from "../../contexts/providers/MainSidebarContext.tsx"
 
 const Navbar = () => {
-    const { toggle, isOpen } = useSidebar()
+    const { toggle, isOpen } = useMainSidebar()
 
     return (
         <div className="fixed top-0 z-40 w-full bg-primary">

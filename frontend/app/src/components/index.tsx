@@ -1,5 +1,5 @@
 import Navbar from "./layout/Navbar"
-import Sidebar from "./layout/Sidebar"
+import MainSidebar from "./layout/MainSidebar.tsx"
 import Footer from "./layout/Footer"
 import CSVImport from "./import/CSVImport.tsx"
 import AssistentSingleImport from "./import/AssistentSingleImport.tsx"
@@ -9,7 +9,7 @@ import Toast from "./feedback/Toast.tsx"
 
 export {
     Navbar,
-    Sidebar,
+    MainSidebar,
     Footer,
     CSVImport,
     AssistentSingleImport,

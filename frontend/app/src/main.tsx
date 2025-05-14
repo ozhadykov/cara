@@ -1,25 +1,16 @@
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 import { BrowserRouter } from "react-router"
-import { SidebarProvider } from "./contexts/SidebarContext.tsx"
-import { ToastProvider } from "./contexts/ToastContext.tsx"
 import "./index.css"
 import App from "./App.tsx"
-import { ChildRecordProvider } from "./contexts/ChildRecordContext.tsx"
-import { AssistentRecordProvider } from "./contexts/AssistentRecordContext.tsx"
+import AppProvider from "./contexts/AppProviders.tsx"
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
         <BrowserRouter>
-            <SidebarProvider>
-                <ToastProvider>
-                    <ChildRecordProvider>
-                        <AssistentRecordProvider>
-                            <App />
-                        </AssistentRecordProvider>
-                    </ChildRecordProvider>
-                </ToastProvider>
-            </SidebarProvider>
+            <AppProvider>
+                <App />
+            </AppProvider>
         </BrowserRouter>
     </StrictMode>
 )

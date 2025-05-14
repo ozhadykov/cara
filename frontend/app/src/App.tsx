@@ -1,13 +1,12 @@
-import { Navbar, Sidebar, Footer, Toast } from "./components"
+import { Navbar, MainSidebar, Footer, Toast } from "./components"
 import { Routes, Route, useLocation } from "react-router"
-import { useSidebar } from "./contexts/SidebarContext.tsx"
+import { useMainSidebar } from "./contexts/providers/MainSidebarContext.tsx"
 import routes from "./routes.tsx"
 import { ReactNode } from "react"
 import ChildrenRecord from "./components/import/ChildRecord.tsx"
-import AssistentRecord from "./components/import/AssistentRecord.tsx"
 
 function App() {
-    const { isOpen } = useSidebar()
+    const { isOpen } = useMainSidebar()
     const location = useLocation()
 
     const routesHTML: Array<ReactNode> = routes.map((route) => {
@@ -17,9 +16,8 @@ function App() {
     return (
         <div className="flex flex-col h-full">
             <Navbar />
-            <Sidebar />
+            <MainSidebar />
             {location.pathname.includes("children") ? <ChildrenRecord /> : <></>}
-            {location.pathname.includes("assistants") ? <AssistentRecord /> : <></>}
 
             <main
                 className={`flex-1 px-9 pt-23 transition-transform ${
