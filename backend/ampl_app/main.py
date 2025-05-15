@@ -62,7 +62,7 @@ def read_root():
     # 5. use amplpy to calculate best pairs
     try:
         ampl = AMPL()
-        ampl.set_option("solver", "cplex")
+        ampl.set_option("solver", "highs")
 
         ampl.eval(
             r"""
