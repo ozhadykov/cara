@@ -1,43 +1,81 @@
 import { useEffect, useState } from "react"
-import { Child } from "../../lib/models"
 import { deleteRequest } from "../../lib/request"
+import { Icon } from "@iconify/react/dist/iconify.js"
+import { useRecordSidebar } from "../../contexts/providers/RecordSidebarContext"
+import { useChildrenData } from "../../contexts/providers/ChildrenDataContext"
 
 const ChildrenSingleImport = () => {
-    const [children, setChildren] = useState<Child[]>()
+    const [isCheckAll, setIsCheckAll] = useState(false)
+    const [checkedItems, setCheckedItems] = useState<string[]>([])
 
-    const deleteChild = (id: string) => {
-        deleteRequest(`/api/db/children/${id}`, {})
+    const { children, refreshChildren } = useChildrenData()
+    const { toggleCreateRecord, toggleEditRecord } = useRecordSidebar()
+
+    const deleteChildren = async () => {
+        try {
+            for (const child_id of checkedItems) {
+                await deleteRequest(`/api/db/children/${child_id}`, {})
+            }
+
+            setCheckedItems([])
+            setIsCheckAll(false)
+            await refreshChildren()
+        } catch (error) {}
+    }
+
+    const handleSelectAll = (e: any) => {
+        setIsCheckAll(!isCheckAll)
+        if (!children) return
+        setCheckedItems(children.map((child) => String(child.id)))
+
+        if (isCheckAll) {
+            setCheckedItems([])
+        }
+    }
+
+    const handleCheck = (e: any) => {
+        const { id, checked } = e.target
+        setCheckedItems([...checkedItems, String(id)])
+
+        if (!checked) {
+            setCheckedItems(checkedItems.filter((item) => item !== id))
+            setIsCheckAll(false)
+        }
     }
 
     useEffect(() => {
-        const getAllChildren = async () => {
-            try {
-                const response = await fetch("/api/db/children")
-                const data = await response.json()
-
-                setChildren(data)
-            } catch (e) {}
-        }
-
-        getAllChildren()
+        refreshChildren()
     }, [])
     if (!children) return <></>
     return (
         <div>
             <div className="w-full flex justify-end">
-                <button className="btn btn-secondary mb-10">Add Record</button>
+                <button className="btn btn-secondary mb-10" onClick={toggleCreateRecord}>
+                    Add Record
+                </button>
             </div>
 
-            <table className="w-full text-left">
-                <thead className="text-gray-500">
-                    <tr>
+            <table className="w-full text-left text-sm">
+                <thead className="text-gray-500 text-xs ">
+                    <tr className="border-b-16 border-transparent">
                         <th>
-                            <input type="checkbox" />
+                            <input
+                                type="checkbox"
+                                className="checkbox checkbox-secondary"
+                                onChange={handleSelectAll}
+                                id="selectAll"
+                                name="selectAll"
+                                checked={isCheckAll}
+                            />
                         </th>
-                        <th className="py-4">id</th>
+                        <th>id</th>
                         <th>name</th>
-                        <th>last_name</th>
+                        <th>family_name</th>
                         <th>required_qualification</th>
+                        <th>street</th>
+                        <th>city</th>
+                        <th>zip_code</th>
+                        <th>requested_hours</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -45,24 +83,52 @@ const ChildrenSingleImport = () => {
                     {children.map((child) => (
                         <tr key={child.id} className="border-gray-200 border-b-1">
                             <td>
-                                <input type="checkbox" />
+                                <input
+                                    id={String(child.id)}
+                                    type="checkbox"
+                                    className="checkbox checkbox-secondary"
+                                    onChange={handleCheck}
+                                    name={child.name}
+                                    checked={checkedItems.includes(String(child.id))}
+                                />
                             </td>
                             <td className="py-4">{child.id}</td>
                             <td>{child.name}</td>
-                            <td>{child.last_name}</td>
-                            <td></td>
+                            <td>{child.family_name}</td>
+                            <td>{child.required_qualification}</td>
+                            <td>{child.street}</td>
+                            <td>{child.city}</td>
+                            <td>{child.zip_code}</td>
+                            <td>{child.requested_hours}</td>
                             <td>
                                 <button
-                                    className="btn btn-error"
-                                    onClick={() => deleteChild(child.id)}
+                                    onClick={() => toggleEditRecord(child)}
+                                    className="btn btn-ghost"
                                 >
-                                    Delete
+                                    <Icon icon="solar:pen-line-duotone" />
                                 </button>
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+
+            <div
+                className={`fixed ${
+                    checkedItems.length === 0 ? "hidden" : "flex"
+                } inset-x-0 bottom-20 bg-white border-1 border-gray-200 w-fit py-2 px-10 m-auto items-center justify-between rounded-3xl shadow-lg gap-30`}
+            >
+                <div className="flex items-center gap-2 text-sm">
+                    <div>
+                        Selected <strong>{checkedItems.length}</strong> records
+                    </div>
+                    <button className="btn btn-ghost btn-xs">Reset</button>
+                </div>
+
+                <button className="btn btn-error text-white btn-xs" onClick={deleteChildren}>
+                    Delete
+                </button>
+            </div>
         </div>
     )
 }

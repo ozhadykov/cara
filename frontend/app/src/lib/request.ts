@@ -5,6 +5,7 @@ export const postRequest = async (url: string, requestBody: Object) => {
             headers: {
                 "Content-Type": "application/json",
             },
+
             body: JSON.stringify(requestBody),
         })
 

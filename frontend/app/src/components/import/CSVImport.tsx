@@ -1,6 +1,6 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react"
-import { Upload } from "solar-icon-set"
-import { useToast } from "../../contexts/ToastContext.tsx"
+import { Icon } from "@iconify/react"
+import { useToast } from "../../contexts/providers/ToastContext.tsx"
 import { toastTypes } from "../../lib/constants.ts"
 import Papa from "papaparse"
 
@@ -75,7 +75,8 @@ const CsvImport = (props: CSVImportProps) => {
                             <div className="upload-header flex flex-col">
                                 <span className="text-lg mb-1">{props.importLabel}</span>
                                 <span className="text-gray-400 flex items-center gap-1">
-                                    <Upload /> please upload a CSV file, for an import.
+                                    <Icon icon="solar-upload-minimalistic-linear" /> please upload a
+                                    CSV file, for an import.
                                 </span>
                             </div>
                             <div className="upload-controls flex flex-col gap-2">
@@ -91,33 +92,34 @@ const CsvImport = (props: CSVImportProps) => {
                             <span className="text-lg">Preview:</span>
                             <div className="csv-preview">
                                 {csvData.length && csvCols.length && (
-                                    <div
-                                        className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+                                    <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
                                         <table className="table">
                                             {/* head */}
                                             <thead>
-                                            <tr>
-                                                <th></th>
-                                                {csvCols.map((col, idx) => {
-                                                    return (
-                                                        <th key={idx}>{col}</th>
-                                                    )
-                                                })}
-                                            </tr>
+                                                <tr>
+                                                    <th></th>
+                                                    {csvCols.map((col, idx) => {
+                                                        return <th key={idx}>{col}</th>
+                                                    })}
+                                                </tr>
                                             </thead>
                                             <tbody>
-                                            {csvData.map((item, i) => {
-                                                return (
-                                                    <tr key={i}>
-                                                        <th>{i}</th>
-                                                        {Object.keys(item).map((itemKey) => {
-                                                            return (
-                                                                <td key={`${i}_${item[itemKey]}`}>{item[itemKey]}</td>
-                                                            )
-                                                        })}
-                                                    </tr>
-                                                )
-                                            })}
+                                                {csvData.map((item, i) => {
+                                                    return (
+                                                        <tr key={i}>
+                                                            <th>{i}</th>
+                                                            {Object.keys(item).map((itemKey) => {
+                                                                return (
+                                                                    <td
+                                                                        key={`${i}_${item[itemKey]}`}
+                                                                    >
+                                                                        {item[itemKey]}
+                                                                    </td>
+                                                                )
+                                                            })}
+                                                        </tr>
+                                                    )
+                                                })}
                                             </tbody>
                                         </table>
                                     </div>

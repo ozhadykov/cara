@@ -1,11 +1,14 @@
-import { Navbar, Sidebar, Footer, Toast } from "./components"
-import { Routes, Route } from "react-router"
-import { useSidebar } from "./contexts/SidebarContext.tsx"
+import { Navbar, MainSidebar, Footer, Toast } from "./components"
+import { Routes, Route, useLocation } from "react-router"
+import { useMainSidebar } from "./contexts/providers/MainSidebarContext.tsx"
 import routes from "./routes.tsx"
 import { ReactNode } from "react"
+import ChildCreate from "./components/import/sidebars/ChildCreate.tsx"
+import RecordSidebar from "./components/import/sidebars/RecordSideBar.tsx"
 
 function App() {
-     const { isOpen } = useSidebar()
+    const { isOpen } = useMainSidebar()
+    const location = useLocation()
 
     const routesHTML: Array<ReactNode> = routes.map((route) => {
         return <Route key={route.path} path={route.path} element={route.component}></Route>
@@ -14,8 +17,19 @@ function App() {
     return (
         <div className="flex flex-col h-full">
             <Navbar />
-            <Sidebar />
-            <main className={`flex-1 px-9 pt-23 transition-transform ${isOpen ? "translate-x-64 w-[calc(100%-var(--spacing)*64)]" : ""}`}>
+            <MainSidebar />
+            {location.pathname.includes("children") ? <RecordSidebar pageType="children" /> : <></>}
+            {location.pathname.includes("assistants") ? (
+                <RecordSidebar pageType="assistants" />
+            ) : (
+                <></>
+            )}
+
+            <main
+                className={`flex-1 px-9 pt-23 transition-transform ${
+                    isOpen ? "translate-x-64 w-[calc(100%-var(--spacing)*64)]" : ""
+                }`}
+            >
                 <Routes>{routesHTML}</Routes>
             </main>
             <Toast />
