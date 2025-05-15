@@ -6,14 +6,19 @@ import { useChildrenData } from "../../contexts/providers/ChildrenDataContext"
 
 const ChildrenSingleImport = () => {
     const [isCheckAll, setIsCheckAll] = useState(false)
-    const [isCheck, setIsCheck] = useState<string[]>([])
+    const [checkedItems, setCheckedItems] = useState<string[]>([])
 
     const { children, refreshChildren } = useChildrenData()
-    const { toggle } = useRecordSidebar()
+    const { toggleCreateRecord, toggleEditRecord } = useRecordSidebar()
 
-    const deleteChild = async (id: string) => {
+    const deleteChildren = async () => {
         try {
-            await deleteRequest(`/api/db/children/${id}`, {})
+            for (const child_id of checkedItems) {
+                await deleteRequest(`/api/db/children/${child_id}`, {})
+            }
+
+            setCheckedItems([])
+            setIsCheckAll(false)
             await refreshChildren()
         } catch (error) {}
     }
@@ -21,17 +26,19 @@ const ChildrenSingleImport = () => {
     const handleSelectAll = (e: any) => {
         setIsCheckAll(!isCheckAll)
         if (!children) return
-        setIsCheck(children.map((li) => "checkbox:" + li.id))
+        setCheckedItems(children.map((child) => String(child.id)))
+
         if (isCheckAll) {
-            setIsCheck([])
+            setCheckedItems([])
         }
     }
 
     const handleCheck = (e: any) => {
         const { id, checked } = e.target
-        setIsCheck([...isCheck, id])
+        setCheckedItems([...checkedItems, String(id)])
+
         if (!checked) {
-            setIsCheck(isCheck.filter((item) => item !== id))
+            setCheckedItems(checkedItems.filter((item) => item !== id))
             setIsCheckAll(false)
         }
     }
@@ -42,8 +49,15 @@ const ChildrenSingleImport = () => {
     if (!children) return <></>
     return (
         <div>
-            <div className="w-full flex justify-end">
-                <button className="btn btn-secondary mb-10" onClick={toggle}>
+            <div className="w-full flex justify-between">
+                {checkedItems.length !== 0 ? (
+                    <button className="btn btn-error mb-10 text-white" onClick={deleteChildren}>
+                        Delete {checkedItems.length} Record
+                    </button>
+                ) : (
+                    <div />
+                )}
+                <button className="btn btn-secondary mb-10" onClick={toggleCreateRecord}>
                     Add Record
                 </button>
             </div>
@@ -74,15 +88,15 @@ const ChildrenSingleImport = () => {
                 </thead>
                 <tbody>
                     {children.map((child) => (
-                        <tr key={child.id} className="border-gray-200 border-b-1">
+                        <tr key={child.id} className={"border-gray-200 border-b-1"}>
                             <td>
                                 <input
-                                    id={"checkbox:" + child.id}
+                                    id={String(child.id)}
                                     type="checkbox"
                                     className="checkbox checkbox-secondary"
                                     onChange={handleCheck}
-                                    name={"checkbox:" + child.name}
-                                    checked={isCheck.includes("checkbox:" + child.id)}
+                                    name={child.name}
+                                    checked={checkedItems.includes(String(child.id))}
                                 />
                             </td>
                             <td className="py-4">{child.id}</td>
@@ -95,7 +109,7 @@ const ChildrenSingleImport = () => {
                             <td>{child.requested_hours}</td>
                             <td>
                                 <button
-                                    onClick={() => deleteChild(child.id)}
+                                    onClick={() => toggleEditRecord(child)}
                                     className="btn btn-ghost"
                                 >
                                     <Icon icon="solar:pen-line-duotone" />

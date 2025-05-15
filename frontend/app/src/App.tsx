@@ -3,7 +3,8 @@ import { Routes, Route, useLocation } from "react-router"
 import { useMainSidebar } from "./contexts/providers/MainSidebarContext.tsx"
 import routes from "./routes.tsx"
 import { ReactNode } from "react"
-import ChildrenRecord from "./components/import/ChildRecord.tsx"
+import ChildCreate from "./components/import/sidebars/ChildCreate.tsx"
+import RecordSidebar from "./components/import/sidebars/RecordSideBar.tsx"
 
 function App() {
     const { isOpen } = useMainSidebar()
@@ -17,7 +18,12 @@ function App() {
         <div className="flex flex-col h-full">
             <Navbar />
             <MainSidebar />
-            {location.pathname.includes("children") ? <ChildrenRecord /> : <></>}
+            {location.pathname.includes("children") ? <RecordSidebar pageType="children" /> : <></>}
+            {location.pathname.includes("assistants") ? (
+                <RecordSidebar pageType="assistants" />
+            ) : (
+                <></>
+            )}
 
             <main
                 className={`flex-1 px-9 pt-23 transition-transform ${

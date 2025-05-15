@@ -1,6 +1,5 @@
 export const postRequest = async (url: string, requestBody: Object) => {
     try {
-        console.log(requestBody)
         const response = await fetch(url, {
             method: "POST",
             headers: {

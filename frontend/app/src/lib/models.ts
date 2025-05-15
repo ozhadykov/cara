@@ -1,5 +1,5 @@
 export interface Child {
-    id: string
+    id: number
     name: string
     family_name: string
     required_qualification: string

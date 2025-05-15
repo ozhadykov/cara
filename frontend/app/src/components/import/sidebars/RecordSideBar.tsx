@@ -1,14 +1,22 @@
-import { ReactNode } from "react"
+import { Mode, useRecordSidebar } from "../../../contexts/providers/RecordSidebarContext"
+import ChildCreate from "./ChildCreate"
+import ChildEdit from "./ChildEdit"
+import AssistentEdit from "./AssistentEdit"
+import AssistentCreate from "./AssistentCreate"
 
-const RecordSidebar = ({
-    children,
-    isOpen,
-    toggle,
-}: {
-    children: ReactNode
-    isOpen: boolean
-    toggle: () => void
-}) => {
+type PageType = "assistants" | "children"
+
+const RecordSidebar = ({ pageType }: { pageType: PageType }) => {
+    const { isOpen, toggle, mode } = useRecordSidebar()
+
+    const renderContent = () => {
+        if (pageType === "children" && mode === Mode.EDIT) return <ChildEdit />
+        if (pageType === "children" && mode === Mode.CREATE) return <ChildCreate />
+        if (pageType === "assistants" && mode === Mode.EDIT) return <AssistentEdit />
+        if (pageType === "assistants" && mode === Mode.CREATE) return <AssistentCreate />
+        return null
+    }
+
     return (
         <div
             className={`flex fixed w-full h-screen z-30 ${
@@ -30,7 +38,7 @@ const RecordSidebar = ({
                         isOpen ? "translate-x-0" : "translate-x-full"
                     } border-l-1 shadow-md shadow-black/5 -translate-x-1`}
             >
-                {children}
+                {renderContent()}
             </aside>
         </div>
     )

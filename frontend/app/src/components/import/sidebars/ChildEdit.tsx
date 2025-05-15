@@ -1,29 +1,28 @@
 import { useState } from "react"
-import { postRequest } from "../../lib/request.ts"
-import { Child } from "../../lib/models.ts"
+import { postRequest } from "../../../lib/request.ts"
+import { Child } from "../../../lib/models.ts"
 
-import RecordSidebar from "./RecordSideBar.tsx"
-import { useRecordSidebar } from "../../contexts/providers/RecordSidebarContext.tsx"
-import { useChildrenData } from "../../contexts/providers/ChildrenDataContext.tsx"
+import { useRecordSidebar } from "../../../contexts/providers/RecordSidebarContext.tsx"
+import { useChildrenData } from "../../../contexts/providers/ChildrenDataContext.tsx"
 
 type InputField = {
     name: keyof Child
     type: string
 }
 
-const ChildrenRecord = () => {
-    const { isOpen, toggle } = useRecordSidebar()
+const ChildEdit = () => {
+    const { toggle, selectedData } = useRecordSidebar()
     const { refreshChildren } = useChildrenData()
 
     const [formData, setFormData] = useState<Child>({
-        id: "",
-        name: "",
-        family_name: "",
-        required_qualification: "",
-        street: "",
-        city: "",
-        zip_code: "",
-        requested_hours: 0,
+        id: selectedData.id,
+        name: selectedData.name,
+        family_name: selectedData.family_name,
+        required_qualification: selectedData.required_qualification,
+        street: selectedData.street,
+        city: selectedData.city,
+        zip_code: selectedData.zip_code,
+        requested_hours: selectedData.requested_hours,
     })
 
     const handleChange = (event: any) => {
@@ -53,14 +52,13 @@ const ChildrenRecord = () => {
     ]
 
     return (
-        <RecordSidebar isOpen={isOpen} toggle={toggle}>
+        <>
             <div className="border-b-1 border-gray-200 p-7 flex items-center gap-2 shadow-sm shadow-black/5">
-                <></>
-                <h3 className="text-xl font-semibold">Add Child Record</h3>
+                <h3 className="text-xl font-semibold">Edit Child Record</h3>
             </div>
 
             <div className="overflow-auto scrollbar-hide p-7">
-                <form onSubmit={handleSubmit} id="create_record_child">
+                <form onSubmit={handleSubmit} id="edit_record_child">
                     {inputFieldData.map((inputData) => (
                         <div
                             key={inputData.name}
@@ -86,12 +84,12 @@ const ChildrenRecord = () => {
                 <button className="btn btn-ghost px-9" onClick={toggle}>
                     Cancel
                 </button>
-                <button className="btn btn-secondary px-8" type="submit" form="create_record_child">
-                    Create
+                <button className="btn btn-neutral px-8" type="submit" form="edit_record_child">
+                    Save Changes
                 </button>
             </div>
-        </RecordSidebar>
+        </>
     )
 }
 
-export default ChildrenRecord
+export default ChildEdit
