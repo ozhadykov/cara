@@ -35,7 +35,7 @@ const ChildEdit = () => {
         e.preventDefault()
 
         try {
-            await postRequest("/api/db/children", formData)
+            await postRequest(`/api/db/children/${selectedData.id}`, formData)
             toggle()
             await refreshChildren()
         } catch (error) {}
