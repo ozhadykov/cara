@@ -72,8 +72,9 @@ const ChildEdit = () => {
                                 onChange={handleChange}
                                 type={inputData.type}
                                 value={formData[inputData.name]}
-                                className="outline-none text-sm"
+                                className="outline-none text-sm validator"
                                 id={inputData.name}
+                                required
                             />
                         </div>
                     ))}
