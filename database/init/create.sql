@@ -41,3 +41,13 @@ CREATE TABLE pairs (
     FOREIGN KEY (assistant_id) REFERENCES assistants(id) ON DELETE CASCADE,
     UNIQUE KEY unique_pair (child_id, assistant_id)
 );
+
+CREATE TABLE apiKeys (
+    id VARCHAR(255) NOT NULL PRIMARY KEY,
+    apiKey VARCHAR(255) NOT NULL
+);
+
+INSERT INTO apiKeys (id, apiKey)
+VALUES
+    ('googleapi', ''),
+    ('amplkey', '');

@@ -10,7 +10,7 @@ services:
     environment:
       DB_HOST: db
       DB_USER: root
-      DB_PASSWORD: 'strong_password'
+      DB_PASSWORD: 'strong'
       DB_NAME: phenix_mysql
     volumes:
       - ./backend/app:/backend/app
@@ -37,7 +37,7 @@ services:
       dockerfile: Dockerfile.database
     environment:
       MYSQL_DATABASE: phenix_mysql
-      MYSQL_ROOT_PASSWORD: 'strong_password'
+      MYSQL_ROOT_PASSWORD: 'strong'
     volumes:
       - ./database/db_data:/var/lib/mysql
     restart: always
