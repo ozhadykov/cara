@@ -14,7 +14,7 @@ const ChildCreate = () => {
     const { toggle } = useRecordSidebar()
     const { refreshChildren } = useChildrenData()
 
-    const [formData, setFormData] = useState<Child>({
+    const initialFormData = {
         id: 0,
         name: "",
         family_name: "",
@@ -23,7 +23,8 @@ const ChildCreate = () => {
         city: "",
         zip_code: "",
         requested_hours: 0,
-    })
+    }
+    const [formData, setFormData] = useState<Child>(initialFormData)
 
     const handleChange = (event: any) => {
         const name = event.target.name
@@ -38,6 +39,7 @@ const ChildCreate = () => {
             await postRequest("/api/db/children", formData)
             toggle()
             await refreshChildren()
+            setFormData(initialFormData)
         } catch (error) {}
     }
 
@@ -72,7 +74,8 @@ const ChildCreate = () => {
                                 onChange={handleChange}
                                 type={inputData.type}
                                 value={formData[inputData.name]}
-                                className="outline-none text-sm"
+                                className="outline-none text-sm validator"
+                                required
                                 id={inputData.name}
                             />
                         </div>

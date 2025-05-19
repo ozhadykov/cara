@@ -49,22 +49,15 @@ const ChildrenSingleImport = () => {
     if (!children) return <></>
     return (
         <div>
-            <div className="w-full flex justify-between">
-                {checkedItems.length !== 0 ? (
-                    <button className="btn btn-error mb-10 text-white" onClick={deleteChildren}>
-                        Delete {checkedItems.length} Record
-                    </button>
-                ) : (
-                    <div />
-                )}
+            <div className="w-full flex justify-end">
                 <button className="btn btn-secondary mb-10" onClick={toggleCreateRecord}>
                     Add Record
                 </button>
             </div>
 
-            <table className="w-full text-left">
-                <thead className="text-gray-500 text-[14px]">
-                    <tr>
+            <table className="w-full text-left text-sm">
+                <thead className="text-gray-500 text-xs ">
+                    <tr className="border-b-16 border-transparent">
                         <th>
                             <input
                                 type="checkbox"
@@ -75,7 +68,7 @@ const ChildrenSingleImport = () => {
                                 checked={isCheckAll}
                             />
                         </th>
-                        <th className="py-4">id</th>
+                        <th>id</th>
                         <th>name</th>
                         <th>family_name</th>
                         <th>required_qualification</th>
@@ -88,7 +81,7 @@ const ChildrenSingleImport = () => {
                 </thead>
                 <tbody>
                     {children.map((child) => (
-                        <tr key={child.id} className={"border-gray-200 border-b-1"}>
+                        <tr key={child.id} className="border-gray-200 border-b-1">
                             <td>
                                 <input
                                     id={String(child.id)}
@@ -119,6 +112,23 @@ const ChildrenSingleImport = () => {
                     ))}
                 </tbody>
             </table>
+
+            <div
+                className={`fixed ${
+                    checkedItems.length === 0 ? "hidden" : "flex"
+                } inset-x-0 bottom-20 bg-white border-1 border-gray-200 w-fit py-2 px-10 m-auto items-center justify-between rounded-3xl shadow-lg gap-30`}
+            >
+                <div className="flex items-center gap-2 text-sm">
+                    <div>
+                        Selected <strong>{checkedItems.length}</strong> records
+                    </div>
+                    <button className="btn btn-ghost btn-xs">Reset</button>
+                </div>
+
+                <button className="btn btn-error text-white btn-xs" onClick={deleteChildren}>
+                    Delete
+                </button>
+            </div>
         </div>
     )
 }

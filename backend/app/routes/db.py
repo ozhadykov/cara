@@ -90,6 +90,28 @@ def create_child(data: Child, conn = Depends(get_db)):
     conn.commit()
     return cursor.lastrowid
 
+@router.post("/children/{child_id}")
+def update_child(data: Child, child_id,conn = Depends(get_db)):
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+            UPDATE children
+            SET 
+                name = %s, 
+                family_name = %s, 
+                required_qualification = %s, 
+                street = %s, 
+                city = %s, 
+                zip_code = %s, 
+                requested_hours = %s
+            WHERE id = %s;
+        """, 
+        (data.name, data.family_name, data.required_qualification, data.street, data.city, data.zip_code, data.requested_hours, child_id)
+    )
+    conn.commit()
+    return cursor.lastrowid
+
+
 @router.get("/children")
 def get_all_children(conn = Depends(get_db)):
     cursor = conn.cursor()
