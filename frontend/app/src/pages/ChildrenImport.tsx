@@ -1,9 +1,22 @@
 import { Icon } from "@iconify/react"
 import { CSVImport, ChildrenSingleImport } from "../components"
+import { CsvRow } from "../components/import/CSVImport"
+import { postRequest } from "../lib/request"
+
+export enum eCSVImport {
+    Children = 'children', 
+    Assistats = 'assistants'
+}
 
 const ChildrenImport = () => {
-    const sendData = () => {
+    const sendData = (data: CsvRow[], type: eCSVImport) => {
         console.log("Sending data...")
+        const url = '/api/children'
+        const requestBody = {
+            type,
+            data
+        }
+        postRequest(url, requestBody)
     }
 
     return (
@@ -31,7 +44,7 @@ const ChildrenImport = () => {
                         CSV Import
                     </label>
                     <div className="tab-content bg-base-100 border-base-300 p-6">
-                        <CSVImport importLabel={"Children Import"} sendData={sendData} />
+                        <CSVImport importLabel={"Children Import"} sendData={sendData} dataType={eCSVImport.Children}/>
                     </div>
                 </div>
             </div>
