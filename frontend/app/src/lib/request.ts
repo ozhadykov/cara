@@ -2,7 +2,7 @@ import { toastTypes } from "./constants"
 
 export const postRequest = async (
     url: string,
-    requestBody: Object,
+    requestBody: object,
     sendMessage: (message: string, type: string) => void
 ) => {
     try {
@@ -27,7 +27,7 @@ export const postRequest = async (
     }
 }
 
-export const deleteRequest = async (url: string, requestBody: Object) => {
+export const deleteRequest = async (url: string, requestBody: object) => {
     try {
         const response = await fetch(url, {
             method: "DELETE",
