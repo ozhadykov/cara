@@ -3,20 +3,16 @@ import { CSVImport, ChildrenSingleImport } from "../components"
 import { CsvRow } from "../components/import/CSVImport"
 import { postRequest } from "../lib/request"
 
-export enum eCSVImport {
-    Children = 'children', 
-    Assistats = 'assistants'
-}
-
 const ChildrenImport = () => {
-    const sendData = (data: CsvRow[], type: eCSVImport) => {
+    const sendData = async (dataCols: string[], dataRows: CsvRow[]) => {
         console.log("Sending data...")
-        const url = '/api/children'
+        const url = "/api/db/children"
         const requestBody = {
-            type,
-            data
+            dataCols,
+            dataRows,
         }
-        postRequest(url, requestBody)
+        const response = await postRequest(url, requestBody)
+        console.log(response)
     }
 
     return (
@@ -44,7 +40,7 @@ const ChildrenImport = () => {
                         CSV Import
                     </label>
                     <div className="tab-content bg-base-100 border-base-300 p-6">
-                        <CSVImport importLabel={"Children Import"} sendData={sendData} dataType={eCSVImport.Children}/>
+                        <CSVImport importLabel={"Children Import"} sendData={sendData} />
                     </div>
                 </div>
             </div>

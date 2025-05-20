@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Body
 import pymysql
 import os
 import pymysql.cursors
-from typing import Dict
+from typing import List
 from pydantic import BaseModel
 
 router = APIRouter(
@@ -20,6 +20,20 @@ class Child(BaseModel):
     city: str
     zip_code: str
     requested_hours: int
+
+class ChildImport(BaseModel):
+    dataCols: List[str]
+    dataRows: List[Child]
+
+baseChildCols = [
+    'name',
+    'family_name',
+    'required_qualification',
+    'street',
+    'city',
+    'zip_code',
+    'requested_hours'
+]
 
 
 def get_db_connection():
@@ -40,13 +54,9 @@ def get_db():
     finally:
         connection.close()
 
-@router.get("/dev")
-def read_root(conn = Depends(get_db)):
-    cursor = conn.cursor()
-    cursor.execute("SHOW TABLES")
-
-    result = cursor.fetchone()
-    return {"message": result[0]}
+##########################################
+# Assistants logic
+##########################################
 
 @router.post("/assistants")
 def create_assistent(name, family_name, qualification, conn = Depends(get_db)):
@@ -76,19 +86,29 @@ def delete_assistent(assistent_Id, conn = Depends(get_db)):
     conn.commit()
     return cursor.rowcount  # Returns number of rows deleted
 
+##########################################
+# Children logic
+##########################################
+
 @router.post("/children")
-def create_child(data: Child, conn = Depends(get_db)):
-    cursor = conn.cursor()
-    cursor.execute(
-        """
-            INSERT INTO children 
-            (name, family_name, required_qualification, street, city, zip_code, requested_hours) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, 
-        (data.name, data.family_name, data.required_qualification, data.street, data.city, data.zip_code, data.requested_hours)
-    )
-    conn.commit()
-    return cursor.lastrowid
+def create_child(data: ChildImport, conn = Depends(get_db)):
+    print("HELL YEAH")
+    print(data)
+    cols = data.dataCols
+    if not cols.__len__: 
+        cols = baseChildCols 
+    rows = data.dataRows
+    # cursor = conn.cursor()
+    # cursor.execute(
+    #     """
+    #         INSERT INTO children 
+    #         (name, family_name, required_qualification, street, city, zip_code, requested_hours) 
+    #         VALUES (%s, %s, %s, %s, %s, %s, %s)
+    #     """, 
+    #     (data.name, data.family_name, data.required_qualification, data.street, data.city, data.zip_code, data.requested_hours)
+    # )
+    # conn.commit()
+    # return cursor.lastrowid
 
 @router.post("/children/{child_id}")
 def update_child(data: Child, child_id,conn = Depends(get_db)):

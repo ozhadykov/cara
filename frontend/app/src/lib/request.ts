@@ -13,7 +13,8 @@ export const postRequest = async (url: string, requestBody: Object) => {
             throw new Error(`Server returned ${response.status}`)
         }
 
-        await response.json()
+        const data = await response.json()
+        return data
     } catch (error) {
         console.error("Fehler beim Senden:", error)
     }

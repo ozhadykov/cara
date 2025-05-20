@@ -3,12 +3,10 @@ import { Icon } from "@iconify/react"
 import { useToast } from "../../contexts/providers/ToastContext.tsx"
 import { toastTypes } from "../../lib/constants.ts"
 import Papa from "papaparse"
-import { eCSVImport } from "../../pages/ChildrenImport.tsx"
 
 export type CSVImportProps = {
     importLabel: string
-    sendData: (data: CsvRow[], type: eCSVImport) => void
-    dataType: eCSVImport
+    sendData: (dataCols: string[], dataRows: CsvRow[]) => void
 }
 
 export type CsvRow = { [key: string]: string | number }
@@ -19,9 +17,9 @@ const CsvImport = (props: CSVImportProps) => {
     const { sendMessage } = useToast()
 
     const handleSubmit = (e: FormEvent) => {
-        console.log(e)
+        console.log(csvCols)
         e.preventDefault()
-        props.sendData(csvData, props.dataType)
+        props.sendData(csvCols, csvData)
     }
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         // reading file
