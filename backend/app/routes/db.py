@@ -16,6 +16,19 @@ router = APIRouter(
     responses={404: {"description": "nothing found in db service"}},
 )
 
+class Child(BaseModel):
+    name: str
+    family_name: str
+    required_qualification: str
+    street: str
+    city: str
+    zip_code: str
+    requested_hours: int
+
+class ApiKey(BaseModel):
+    apiKey: str
+
+
 def get_db_connection():
     connection = pymysql.connect(
         host=os.getenv("DB_HOST"),       # service name of the MySQL container
@@ -190,3 +203,24 @@ def delete_child(child_Id, conn = Depends(get_db)):
     conn.commit()
     return cursor.rowcount  # Returns number of rows deleted
 
+@router.post("/apiKey/{id}")
+def update_apiKey(data: ApiKey, id, conn = Depends(get_db)):
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+            UPDATE apiKeys
+            SET 
+                apiKey = %s
+            WHERE id = %s;
+        """, 
+        (data.apiKey, id)
+    )
+    conn.commit()
+    return cursor.lastrowid
+
+@router.get("/apiKey/{id}")
+def get_apiKey(id, conn = Depends(get_db)):
+    cursor = conn.cursor()
+    cursor.execute("SELECT apiKey FROM apiKeys WHERE id = %s", (id))
+
+    return cursor.fetchone()

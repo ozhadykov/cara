@@ -4,14 +4,13 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 
-from .routes import ampl, keys, db
+from .routes import ampl, db
 
 # creating App
 app = FastAPI()
 
 # registering routers
 app.include_router(ampl.router)
-app.include_router(keys.router)
 app.include_router(db.router)
 
 origins = [

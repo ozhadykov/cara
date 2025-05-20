@@ -17,17 +17,17 @@ const KeyInput = () => {
     useEffect(() => {
         // dev only
         const getGoogleKeyData = async () => {
-            const response = await fetch("/api/keys/getGoogleApiKey")
+            const response = await fetch("/api/db/apiKey/googleapi")
             const data = await response.json()
             if (response.ok) {
-                setApiKey(data.data)
+                setApiKey(data.apiKey)
             }
         }
         const getAmplKeyData = async () => {
-            const response = await fetch("/api/keys/getAmplKey")
+            const response = await fetch("/api/db/apiKey/amplkey")
             const data = await response.json()
             if (response.ok) {
-                setAmplKey(data.data)
+                setAmplKey(data.apiKey)
             }
         }
 
