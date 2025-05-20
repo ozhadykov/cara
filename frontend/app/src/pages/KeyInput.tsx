@@ -1,7 +1,9 @@
 import { ChangeEvent, useEffect, useState } from "react"
 import { postRequest } from "../lib/request"
+import { useToast } from "../contexts/providers/ToastContext"
 
 const KeyInput = () => {
+    const { sendMessage } = useToast()
     const [googleApiKey, setApiKey] = useState("")
     const [amplKey, setAmplKey] = useState("")
 
@@ -46,7 +48,11 @@ const KeyInput = () => {
                 <button
                     className="btn btn-secondary"
                     onClick={() =>
-                        postRequest("/api/keys/googleApiKey", { googleApiKey: googleApiKey })
+                        postRequest(
+                            "/api/keys/googleApiKey",
+                            { googleApiKey: googleApiKey },
+                            sendMessage
+                        )
                     }
                 >
                     Send
@@ -63,7 +69,9 @@ const KeyInput = () => {
                 />
                 <button
                     className="btn btn-secondary"
-                    onClick={() => postRequest("/api/keys/amplKey", { amplKey: amplKey })}
+                    onClick={() =>
+                        postRequest("/api/keys/amplKey", { amplKey: amplKey }, sendMessage)
+                    }
                 >
                     Send
                 </button>

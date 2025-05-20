@@ -1,4 +1,10 @@
-export const postRequest = async (url: string, requestBody: Object) => {
+import { toastTypes } from "./constants"
+
+export const postRequest = async (
+    url: string,
+    requestBody: Object,
+    sendMessage: (message: string, type: string) => void
+) => {
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -10,6 +16,7 @@ export const postRequest = async (url: string, requestBody: Object) => {
         })
 
         if (!response.ok) {
+            sendMessage(`Server returned ${response.status}`, toastTypes.error)
             throw new Error(`Server returned ${response.status}`)
         }
 

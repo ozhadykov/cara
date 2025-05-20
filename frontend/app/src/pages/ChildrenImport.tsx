@@ -2,17 +2,26 @@ import { Icon } from "@iconify/react"
 import { CSVImport, ChildrenSingleImport } from "../components"
 import { CsvRow } from "../components/import/CSVImport"
 import { postRequest } from "../lib/request"
+import { useToast } from "../contexts/providers/ToastContext"
+import { toastTypes } from "../lib/constants"
+import { useState } from "react"
 
 const ChildrenImport = () => {
+    const { sendMessage } = useToast()
+    const [refreshChildren, setRefreshChildren] = useState(false)
+
     const sendData = async (dataCols: string[], dataRows: CsvRow[]) => {
         console.log("Sending data...")
-        const url = "/api/db/children"
+        const url = "/api/db/children?multiple=1"
         const requestBody = {
             dataCols,
             dataRows,
         }
-        const response = await postRequest(url, requestBody)
-        console.log(response)
+        const response = await postRequest(url, requestBody, sendMessage)
+        if (response)
+            sendMessage(response.message, response.success ? toastTypes.success : toastTypes.error)
+
+        if (response.success) setRefreshChildren(!refreshChildren)
     }
 
     return (
@@ -32,7 +41,7 @@ const ChildrenImport = () => {
                         <span className="ml-1">Single Import</span>
                     </label>
                     <div className="tab-content bg-base-100 border-base-300 p-6">
-                        <ChildrenSingleImport />
+                        <ChildrenSingleImport refresh={refreshChildren} />
                     </div>
                     <label className="tab">
                         <input type="radio" name="my_tabs_4" />

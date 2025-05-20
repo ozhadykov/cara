@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Body
 import pymysql
 import os
 import pymysql.cursors
-from typing import List
+from typing import List, Optional, Union
 from pydantic import BaseModel
 
 ##########################################
@@ -48,9 +48,6 @@ baseChildCols = [
 # Models
 ##########################################
 
-class Response(BaseModel):
-    
-
 class Child(BaseModel):
     name: str
     family_name: str
@@ -61,8 +58,13 @@ class Child(BaseModel):
     requested_hours: int
 
 class ChildImport(BaseModel):
-    dataCols: List[str]
+    dataCols: Optional[List[str]] = None
     dataRows: List[Child]
+
+class Response(BaseModel):
+    success: bool
+    message: str
+    data: Optional[Union[ChildImport]] = None
 
 
 ##########################################
@@ -101,33 +103,47 @@ def delete_assistent(assistent_Id, conn = Depends(get_db)):
 # Children logic
 ##########################################
 
+def insertChildInDB(data, conn):
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+                INSERT INTO children 
+                (name, family_name, required_qualification, street, city, zip_code, requested_hours) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, 
+            (data.name, data.family_name, data.required_qualification, data.street, data.city, data.zip_code, data.requested_hours)
+        )
+        conn.commit()
+        return cursor.lastrowid
+    except Exception as e:
+        conn.rollback()
+        return None
+
 @router.post("/children")
-def create_child(data: ChildImport, conn = Depends(get_db)):
-    cols = data.dataCols
-    if not cols.__len__: 
-        cols = baseChildCols
-    else:
-        # validate cols
-        for col in cols:
-            if col not in baseChildCols:
-                return
-
+def create_child(data: ChildImport, multiple: bool | None = None,  conn = Depends(get_db)):
+    # if this is single import
+    if not multiple and len(data.dataRows): 
+        childData = data.dataRows[0]
+        insertedChildId = insertChildInDB(childData, conn)
+        if insertedChildId is not None: 
+            return Response(success=True, message=f"Child is successfully added with id {insertedChildId}")
+        return Response(success=False, message="Child could not be added to Darabase")
+    
+    # if this is multiple bulk import
     rows = data.dataRows
-
+    failed = []
 
     # insert rows
-
-    # cursor = conn.cursor()
-    # cursor.execute(
-    #     """
-    #         INSERT INTO children 
-    #         (name, family_name, required_qualification, street, city, zip_code, requested_hours) 
-    #         VALUES (%s, %s, %s, %s, %s, %s, %s)
-    #     """, 
-    #     (data.name, data.family_name, data.required_qualification, data.street, data.city, data.zip_code, data.requested_hours)
-    # )
-    # conn.commit()
-    # return cursor.lastrowid
+    for row in rows:
+        childData = row
+        insertedChildId = insertChildInDB(childData, conn)
+        if insertedChildId is None:
+            failed.append(row)
+        
+    if len(failed):
+        return Response(success=False, message=f"{len(failed)} children could not be saved in data base")
+    return Response(success=True, message=f"{len(rows)} children are saved in data base")
 
 @router.post("/children/{child_id}")
 def update_child(data: Child, child_id,conn = Depends(get_db)):

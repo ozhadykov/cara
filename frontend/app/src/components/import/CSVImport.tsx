@@ -17,7 +17,6 @@ const CsvImport = (props: CSVImportProps) => {
     const { sendMessage } = useToast()
 
     const handleSubmit = (e: FormEvent) => {
-        console.log(csvCols)
         e.preventDefault()
         props.sendData(csvCols, csvData)
     }
