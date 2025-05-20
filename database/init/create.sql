@@ -15,6 +15,7 @@ CREATE TABLE children (
     family_name VARCHAR(255) NOT NULL,
     required_qualification VARCHAR(255),
     street VARCHAR(255),
+    street_number INT,
     city VARCHAR(255),
     zip_code VARCHAR(20), 
     requested_hours INT
@@ -28,6 +29,7 @@ CREATE TABLE assistants (
     qualification VARCHAR(255),
     capacity INT, -- e.g., number of children they can assist
     street VARCHAR(255),
+    street_number INT,
     city VARCHAR(255),
     zip_code VARCHAR(20)
 );

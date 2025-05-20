@@ -1,3 +1,4 @@
+import httpx
 from fastapi import APIRouter, Depends, Body
 import pymysql
 import os
@@ -118,6 +119,17 @@ def delete_assistent(assistent_Id, conn = Depends(get_db)):
 
 def insertChildInDB(data, conn):
     try:
+        print ("yes")
+        #r1 = httpx.get("/api/db/apikeys/googleapi")
+        #apikey = r1.json()
+        street_number = 10
+        BASE_URL = f"https://api.opencagedata.com/geocode/v1/json?q={data.street}+10%2C+{data.zip_code}+{data.city}%2C+Germany&key=6da9170c0e0a4676bd4045ba2697dc9a" # streetnumber u key wieder einfügen
+        print(BASE_URL)
+        r = httpx.get(BASE_URL)
+        print(r.status_code)
+        resultdata = r.json()
+        coordinates = resultdata["results"][0]["geometry"]["lat"]
+        print(coordinates)
         cursor = conn.cursor()
         cursor.execute(
             """
