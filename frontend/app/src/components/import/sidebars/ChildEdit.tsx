@@ -4,6 +4,7 @@ import { Child } from "../../../lib/models.ts"
 
 import { useRecordSidebar } from "../../../contexts/providers/RecordSidebarContext.tsx"
 import { useChildrenData } from "../../../contexts/providers/ChildrenDataContext.tsx"
+import { useToast } from "../../../contexts/providers/ToastContext.tsx"
 
 type InputField = {
     name: keyof Child
@@ -11,6 +12,7 @@ type InputField = {
 }
 
 const ChildEdit = () => {
+    const { sendMessage } = useToast()
     const { toggle, selectedData } = useRecordSidebar()
     const { refreshChildren } = useChildrenData()
 
@@ -35,7 +37,7 @@ const ChildEdit = () => {
         e.preventDefault()
 
         try {
-            await postRequest(`/api/db/children/${selectedData.id}`, formData)
+            await postRequest(`/api/db/children/${selectedData.id}`, formData, sendMessage)
             toggle()
             await refreshChildren()
         } catch (error) {}

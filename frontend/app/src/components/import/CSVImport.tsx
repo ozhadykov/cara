@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from "react"
+import { ChangeEvent, FormEvent, useState } from "react"
 import { Icon } from "@iconify/react"
 import { useToast } from "../../contexts/providers/ToastContext.tsx"
 import { toastTypes } from "../../lib/constants.ts"
@@ -6,32 +6,19 @@ import Papa from "papaparse"
 
 export type CSVImportProps = {
     importLabel: string
-    sendData: () => void
+    sendData: (dataCols: string[], dataRows: CsvRow[]) => void
 }
 
-type CsvRow = { [key: string]: string | number }
+export type CsvRow = { [key: string]: string | number }
 
 const CsvImport = (props: CSVImportProps) => {
     const [csvData, setCsvData] = useState<CsvRow[]>([])
     const [csvCols, setCsvCols] = useState<string[]>([])
     const { sendMessage } = useToast()
 
-    useEffect(() => {
-        renderCSVPreview()
-    }, [csvData, csvCols])
-
-    const renderCSVPreview = () => {
-        if (csvData.length && csvCols.length) {
-            console.log("rendering csv")
-            console.log(csvCols)
-            console.log(csvData)
-        }
-    }
-
     const handleSubmit = (e: FormEvent) => {
-        console.log(e)
         e.preventDefault()
-        props.sendData()
+        props.sendData(csvCols, csvData)
     }
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         // reading file
@@ -85,7 +72,9 @@ const CsvImport = (props: CSVImportProps) => {
                                     className="file-input file-input-secondary w-full"
                                     onChange={handleFileChange}
                                 />
-                                <button className="btn">upload</button>
+                                <button type="submit" className="btn">
+                                    upload
+                                </button>
                             </div>
                         </div>
                         <div className="children-preview grow pl-2">
@@ -128,9 +117,6 @@ const CsvImport = (props: CSVImportProps) => {
                         </div>
                     </div>
                 </div>
-                <button type="submit" className="btn btn-xl btn-secondary">
-                    Save
-                </button>
             </form>
         </>
     )

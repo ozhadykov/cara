@@ -8,3 +8,9 @@ export interface Child {
     zip_code: string
     requested_hours: number
 }
+
+
+export type TChildImport = {
+    dataCols?: string[],
+    dataRows: Child[]
+}

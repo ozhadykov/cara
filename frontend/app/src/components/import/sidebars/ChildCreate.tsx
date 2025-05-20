@@ -1,9 +1,11 @@
 import { useState } from "react"
 import { postRequest } from "../../../lib/request.ts"
-import { Child } from "../../../lib/models.ts"
+import { Child, TChildImport } from "../../../lib/models.ts"
 
 import { useRecordSidebar } from "../../../contexts/providers/RecordSidebarContext.tsx"
 import { useChildrenData } from "../../../contexts/providers/ChildrenDataContext.tsx"
+import { useToast } from "../../../contexts/providers/ToastContext.tsx"
+import { toastTypes } from "../../../lib/constants.ts"
 
 type InputField = {
     name: keyof Child
@@ -13,6 +15,7 @@ type InputField = {
 const ChildCreate = () => {
     const { toggle } = useRecordSidebar()
     const { refreshChildren } = useChildrenData()
+    const { sendMessage } = useToast()
 
     const initialFormData = {
         id: 0,
@@ -32,15 +35,21 @@ const ChildCreate = () => {
         setFormData((values) => ({ ...values, [name]: value }))
     }
 
-    const handleSubmit = async (e: any) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
         try {
-            await postRequest("/api/db/children", formData)
+            const requestBody: TChildImport = {
+                dataRows: [formData],
+            }
+            const response = await postRequest("/api/db/children", requestBody, sendMessage)
+            if (response) sendMessage(response.message, toastTypes.primary)
             toggle()
             await refreshChildren()
             setFormData(initialFormData)
-        } catch (error) {}
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     const inputFieldData: InputField[] = [

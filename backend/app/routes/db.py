@@ -2,8 +2,12 @@ from fastapi import APIRouter, Depends, Body
 import pymysql
 import os
 import pymysql.cursors
-from typing import Dict
+from typing import List, Optional, Union
 from pydantic import BaseModel
+
+##########################################
+# Global
+##########################################
 
 router = APIRouter(
     prefix="/api/db",
@@ -43,13 +47,42 @@ def get_db():
     finally:
         connection.close()
 
-@router.get("/dev")
-def read_root(conn = Depends(get_db)):
-    cursor = conn.cursor()
-    cursor.execute("SHOW TABLES")
+baseChildCols = [
+    'name',
+    'family_name',
+    'required_qualification',
+    'street',
+    'city',
+    'zip_code',
+    'requested_hours'
+]
 
-    result = cursor.fetchone()
-    return {"message": result[0]}
+##########################################
+# Models
+##########################################
+
+class Child(BaseModel):
+    name: str
+    family_name: str
+    required_qualification: str
+    street: str
+    city: str
+    zip_code: str
+    requested_hours: int
+
+class ChildImport(BaseModel):
+    dataCols: Optional[List[str]] = None
+    dataRows: List[Child]
+
+class Response(BaseModel):
+    success: bool
+    message: str
+    data: Optional[Union[ChildImport]] = None
+
+
+##########################################
+# Assistants logic
+##########################################
 
 @router.post("/assistants")
 def create_assistent(name, family_name, qualification, conn = Depends(get_db)):
@@ -79,19 +112,51 @@ def delete_assistent(assistent_Id, conn = Depends(get_db)):
     conn.commit()
     return cursor.rowcount  # Returns number of rows deleted
 
+##########################################
+# Children logic
+##########################################
+
+def insertChildInDB(data, conn):
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+                INSERT INTO children 
+                (name, family_name, required_qualification, street, city, zip_code, requested_hours) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, 
+            (data.name, data.family_name, data.required_qualification, data.street, data.city, data.zip_code, data.requested_hours)
+        )
+        conn.commit()
+        return cursor.lastrowid
+    except Exception as e:
+        conn.rollback()
+        return None
+
 @router.post("/children")
-def create_child(data: Child, conn = Depends(get_db)):
-    cursor = conn.cursor()
-    cursor.execute(
-        """
-            INSERT INTO children 
-            (name, family_name, required_qualification, street, city, zip_code, requested_hours) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, 
-        (data.name, data.family_name, data.required_qualification, data.street, data.city, data.zip_code, data.requested_hours)
-    )
-    conn.commit()
-    return cursor.lastrowid
+def create_child(data: ChildImport, multiple: bool | None = None,  conn = Depends(get_db)):
+    # if this is single import
+    if not multiple and len(data.dataRows): 
+        childData = data.dataRows[0]
+        insertedChildId = insertChildInDB(childData, conn)
+        if insertedChildId is not None: 
+            return Response(success=True, message=f"Child is successfully added with id {insertedChildId}")
+        return Response(success=False, message="Child could not be added to Darabase")
+    
+    # if this is multiple bulk import
+    rows = data.dataRows
+    failed = []
+
+    # insert rows
+    for row in rows:
+        childData = row
+        insertedChildId = insertChildInDB(childData, conn)
+        if insertedChildId is None:
+            failed.append(row)
+        
+    if len(failed):
+        return Response(success=False, message=f"{len(failed)} children could not be saved in data base")
+    return Response(success=True, message=f"{len(rows)} children are saved in data base")
 
 @router.post("/children/{child_id}")
 def update_child(data: Child, child_id,conn = Depends(get_db)):

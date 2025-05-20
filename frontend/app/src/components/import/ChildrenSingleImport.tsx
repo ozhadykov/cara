@@ -4,7 +4,7 @@ import { Icon } from "@iconify/react/dist/iconify.js"
 import { useRecordSidebar } from "../../contexts/providers/RecordSidebarContext"
 import { useChildrenData } from "../../contexts/providers/ChildrenDataContext"
 
-const ChildrenSingleImport = () => {
+const ChildrenSingleImport = ({ refresh }: {refresh: boolean}) => {
     const [isCheckAll, setIsCheckAll] = useState(false)
     const [checkedItems, setCheckedItems] = useState<string[]>([])
 
@@ -45,7 +45,7 @@ const ChildrenSingleImport = () => {
 
     useEffect(() => {
         refreshChildren()
-    }, [])
+    }, [refresh])
     if (!children) return <></>
     return (
         <div>

@@ -1,4 +1,10 @@
-export const postRequest = async (url: string, requestBody: Object) => {
+import { toastTypes } from "./constants"
+
+export const postRequest = async (
+    url: string,
+    requestBody: object,
+    sendMessage: (message: string, type: string) => void
+) => {
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -10,16 +16,18 @@ export const postRequest = async (url: string, requestBody: Object) => {
         })
 
         if (!response.ok) {
+            sendMessage(`Server returned ${response.status}`, toastTypes.error)
             throw new Error(`Server returned ${response.status}`)
         }
 
-        await response.json()
+        const data = await response.json()
+        return data
     } catch (error) {
         console.error("Fehler beim Senden:", error)
     }
 }
 
-export const deleteRequest = async (url: string, requestBody: Object) => {
+export const deleteRequest = async (url: string, requestBody: object) => {
     try {
         const response = await fetch(url, {
             method: "DELETE",

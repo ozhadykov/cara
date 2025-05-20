@@ -18,6 +18,15 @@ const AssistentImport = () => {
             <div className="tab-container shadow-md">
                 <div className="tabs tabs-lift">
                     <label className="tab">
+                        <input type="radio" name="my_tabs_4" defaultChecked />
+                        <Icon icon="solar:smile-circle-linear" />
+                        <span className="ml-1">Single Import</span>
+                    </label>
+                    <div className="tab-content bg-base-100 border-base-300 p-6">
+                        <AssistentSingleImport />
+                    </div>
+                    
+                    <label className="tab">
                         <input type="radio" name="my_tabs_4" />
                         <Icon icon="solar:import-linear" />
                         CSV Import
@@ -26,14 +35,6 @@ const AssistentImport = () => {
                         <CSVImport importLabel={"Assistent Import"} sendData={sendData} />
                     </div>
 
-                    <label className="tab">
-                        <input type="radio" name="my_tabs_4" defaultChecked />
-                        <Icon icon="solar:smile-circle-linear" />
-                        <span className="ml-1">Single Import</span>
-                    </label>
-                    <div className="tab-content bg-base-100 border-base-300 p-6">
-                        <AssistentSingleImport />
-                    </div>
                 </div>
             </div>
         </div>
