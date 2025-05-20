@@ -5,36 +5,16 @@ import pymysql.cursors
 from typing import List
 from pydantic import BaseModel
 
+##########################################
+# Global
+##########################################
+
 router = APIRouter(
     prefix="/api/db",
     tags=["db"],
     dependencies=[],
     responses={404: {"description": "nothing found in db service"}},
 )
-
-class Child(BaseModel):
-    name: str
-    family_name: str
-    required_qualification: str
-    street: str
-    city: str
-    zip_code: str
-    requested_hours: int
-
-class ChildImport(BaseModel):
-    dataCols: List[str]
-    dataRows: List[Child]
-
-baseChildCols = [
-    'name',
-    'family_name',
-    'required_qualification',
-    'street',
-    'city',
-    'zip_code',
-    'requested_hours'
-]
-
 
 def get_db_connection():
     connection = pymysql.connect(
@@ -53,6 +33,37 @@ def get_db():
         yield connection
     finally:
         connection.close()
+
+baseChildCols = [
+    'name',
+    'family_name',
+    'required_qualification',
+    'street',
+    'city',
+    'zip_code',
+    'requested_hours'
+]
+
+##########################################
+# Models
+##########################################
+
+class Response(BaseModel):
+    
+
+class Child(BaseModel):
+    name: str
+    family_name: str
+    required_qualification: str
+    street: str
+    city: str
+    zip_code: str
+    requested_hours: int
+
+class ChildImport(BaseModel):
+    dataCols: List[str]
+    dataRows: List[Child]
+
 
 ##########################################
 # Assistants logic
@@ -92,12 +103,20 @@ def delete_assistent(assistent_Id, conn = Depends(get_db)):
 
 @router.post("/children")
 def create_child(data: ChildImport, conn = Depends(get_db)):
-    print("HELL YEAH")
-    print(data)
     cols = data.dataCols
     if not cols.__len__: 
-        cols = baseChildCols 
+        cols = baseChildCols
+    else:
+        # validate cols
+        for col in cols:
+            if col not in baseChildCols:
+                return
+
     rows = data.dataRows
+
+
+    # insert rows
+
     # cursor = conn.cursor()
     # cursor.execute(
     #     """
