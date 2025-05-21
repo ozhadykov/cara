@@ -1,0 +1,21 @@
+first_name,family_name,required_qualification,street,street_number,city,zip_code,requested_hours,time_start,time_end
+Lena,Meyer,QHK,Lessingstraße,10,"Halle (Saale)",06114,20,09:00:00,12:00:00
+Paul,Schmidt,HK,Goethestraße,5,"Halle (Saale)",06110,25,14:00:00,17:00:00
+Sophie,Weber,FK,Hallorenring,1,"Halle (Saale)",06108,15,10:00:00,11:30:00
+Max,Fischer,QHK,Merseburger Straße,50,"Halle (Saale)",06112,30,08:30:00,13:30:00
+Anna,Müller,HK,Bernburger Straße,100,"Halle (Saale)",06108,18,15:00:00,17:30:00
+Felix,Schulz,FK,Dessauer Straße,120,"Halle (Saale)",06118,22,09:30:00,12:30:00
+Mia,Wagner,QHK,Leipziger Straße,70,"Halle (Saale)",06108,28,13:00:00,16:00:00
+Ben,Becker,HK,Magdeburger Straße,30,"Halle (Saale)",06112,16,11:00:00,13:00:00
+Emilia,Hoffmann,FK,Neustädter Passage,5,"Halle (Saale)",06122,24,16:00:00,18:00:00
+Noah,Richter,QHK,Große Steinstraße,80,"Halle (Saale)",06108,21,08:00:00,11:00:00
+Clara,Klein,HK,Kröllwitzer Straße,110,"Halle (Saale)",06120,26,14:30:00,17:30:00
+Finn,Wolf,FK,Wörmlitzer Straße,88,"Halle (Saale)",06110,19,10:30:00,12:00:00
+Hanna,Neumann,QHK,Charlottenstraße,20,"Halle (Saale)",06108,29,12:30:00,15:30:00
+Leon,Schwarz,HK,Fährstraße,15,"Halle (Saale)",06114,17,15:30:00,17:00:00
+Lea,Zimmermann,FK,Blumenstraße,25,"Halle (Saale)",06108,23,09:00:00,12:00:00
+Tim,Braun,QHK,Dieselstraße,55,"Halle (Saale)",06130,27,13:30:00,16:30:00
+Marie,Krüger,HK,Jacobstraße,12,"Halle (Saale)",06108,20,11:30:00,13:30:00
+Jonas,Hartmann,FK,Gimritzer Damm,18,"Halle (Saale)",06120,25,16:30:00,19:00:00
+Laura,Lang,QHK,Weststraße,30,"Halle (Saale)",06114,22,08:30:00,11:30:00
+David,Schröder,HK,Mansfelder Straße,40,"Halle (Saale)",06108,18,14:00:00,16:30:00

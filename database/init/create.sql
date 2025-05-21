@@ -9,6 +9,18 @@ DROP TABLE IF EXISTS address;
 DROP TABLE IF EXISTS children;
 DROP TABLE IF EXISTS assistants;
 DROP TABLE IF EXISTS apiKeys;
+DROP TABLE IF EXISTS qualifications;
+
+CREATE TABLE qualifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    qualification_text VARCHAR(10) NOT NULL
+);
+
+INSERT INTO qualifications (qualification_text)
+VALUES
+    ('QHK'),
+    ('FK'),
+    ('HK');
 
 
 CREATE TABLE address (
@@ -28,6 +40,8 @@ CREATE TABLE children (
     family_name VARCHAR(255) NOT NULL,
     required_qualification VARCHAR(255) NOT NULL,
     requested_hours INT NOT NULL,
+    time_start TIME NOT NULL,
+    time_end TIME NOT NULL,
     address_id INT NOT NULL,
 
     FOREIGN KEY (address_id) REFERENCES address(id) ON DELETE CASCADE
@@ -39,7 +53,9 @@ CREATE TABLE assistants (
     first_name VARCHAR(255) NOT NULL,
     family_name VARCHAR(255) NOT NULL,
     qualification VARCHAR(255),
-    capacity INT NOT NULL, -- e.g., number of children they can assist
+    time_start TIME NOT NULL,
+    time_end TIME NOT NULL,
+    capacity INT NOT NULL,
     address_id INT NOT NULL,
 
     FOREIGN KEY(address_id) REFERENCES address(id) ON DELETE CASCADE

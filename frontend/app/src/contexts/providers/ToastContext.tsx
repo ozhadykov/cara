@@ -4,7 +4,7 @@ export type ToastContextTypes = {
     message: string
     type: string
     isOpen: boolean
-    sendMessage: (message: string, type:string) => void
+    sendMessage: (message: string, type: string) => void
 }
 
 const ToastContext = createContext<ToastContextTypes | null>(null)
@@ -13,11 +13,11 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
     const [message, setMessage] = useState<string>("")
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [type, setType] = useState<string>("success")
-    const sendMessage = (message: string, type:string) => {
+    const sendMessage = (message: string, type: string) => {
         setMessage(message)
         setType(type)
         setIsOpen(true)
-        setTimeout(() => setIsOpen(false), 2000)
+        setTimeout(() => setIsOpen(false), 4000)
     }
 
     return (

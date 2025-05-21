@@ -1,9 +1,27 @@
 import { Icon } from "@iconify/react"
 import { CSVImport, AssistentSingleImport } from "../components"
+import { CsvRow } from "../components/import/CSVImport"
+import { postRequest } from "../lib/request"
+import { useToast } from "../contexts/providers/ToastContext"
+import { toastTypes } from "../lib/constants"
+import { useState } from "react"
 
 const AssistentImport = () => {
-    const sendData = () => {
+    const { sendMessage } = useToast()
+    const [refreshAssistants, setrefreshAssistants] = useState(false)
+
+    const sendData = async (dataCols: string[], dataRows: CsvRow[]) => {
         console.log("Sending data...")
+        const url = "/api/db/assistants?multiple=1"
+        const requestBody = {
+            dataCols,
+            dataRows,
+        }
+        const response = await postRequest(url, requestBody, sendMessage)
+        if (response)
+            sendMessage(response.message, response.success ? toastTypes.success : toastTypes.error)
+
+        if (response.success) setrefreshAssistants(!refreshAssistants)
     }
 
     return (
@@ -25,7 +43,7 @@ const AssistentImport = () => {
                     <div className="tab-content bg-base-100 border-base-300 p-6">
                         <AssistentSingleImport />
                     </div>
-                    
+
                     <label className="tab">
                         <input type="radio" name="my_tabs_4" />
                         <Icon icon="solar:import-linear" />
@@ -34,7 +52,6 @@ const AssistentImport = () => {
                     <div className="tab-content bg-base-100 border-base-300 p-6">
                         <CSVImport importLabel={"Assistent Import"} sendData={sendData} />
                     </div>
-
                 </div>
             </div>
         </div>

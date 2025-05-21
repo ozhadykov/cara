@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from geopy.distance import geodesic
 
 ##########################################
-# Global
+# region Global
 ##########################################
 
 router = APIRouter(
@@ -25,7 +25,7 @@ class ApiKey(BaseModel):
 
 def get_db_connection():
     connection = pymysql.connect(
-        host=os.getenv("DB_HOST"),       # service name of the MySQL container
+        host=os.getenv("DB_HOST"),  # service name of the MySQL container
         user=os.getenv("DB_USER"),
         password=os.getenv("DB_PASSWORD"),
         database=os.getenv("DB_NAME"),
@@ -34,12 +34,14 @@ def get_db_connection():
 
     return connection
 
+
 def get_db():
     connection = get_db_connection()
     try:
         yield connection
     finally:
         connection.close()
+
 
 baseChildCols = [
     'first_name',
@@ -51,96 +53,45 @@ baseChildCols = [
     'requested_hours'
 ]
 
-def get_key(id, conn): 
+
+def get_key(id, conn):
     cursor = conn.cursor()
     cursor.execute("SELECT apiKey FROM apiKeys WHERE id = %s", (id))
 
     return cursor.fetchone()
 
-def calc_distance(adr1, adr2):
-    return geodesic(adr1, adr2).kilometers
-
-##########################################
-# Models
-##########################################
-
-class Child(BaseModel):
-    first_name: str
-    family_name: str
-    required_qualification: str
-    requested_hours: int
-
-    street: str
-    street_number: str
-    city: str
-    zip_code: str
-
-class ChildImport(BaseModel):
-    dataCols: Optional[List[str]] = None
-    dataRows: List[Child]
-
-class Response(BaseModel):
-    success: bool
-    message: str
-    data: Optional[Union[ChildImport]] = None
-
-
-##########################################
-# Assistants logic
-##########################################
-
-@router.post("/assistants")
-def create_assistent(name, family_name, qualification, conn = Depends(get_db)):
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO assistants (name, family_name, qualification) VALUES (%s, %s, %s)", (name, family_name, qualification))
-    conn.commit()
-    return cursor.lastrowid
-
-@router.get("/assistants")
-def get_all_assistants(conn = Depends(get_db)):
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM assistants")
-
-    return cursor.fetchall()
-
-@router.get("/assistants/{assistent_Id}")
-def get_assistent(assistent_Id, conn = Depends(get_db)):
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM assistants WHERE id = %s", (assistent_Id))
-
-    return cursor.fetchall()
-
-@router.delete("/assistants/{assistent_Id}")
-def delete_assistent(assistent_Id, conn = Depends(get_db)):
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM assistants WHERE id = %s", (assistent_Id))
-    conn.commit()
-    return cursor.rowcount  # Returns number of rows deleted
-
-##########################################
-# Children logic
-##########################################
 
 def getCoordinatesFromStreetName(street, street_number, zip_code, city, conn):
-    keyData = get_key("opencagekey", conn)
-    url = f"https://api.opencagedata.com/geocode/v1/json?q={street}+{street_number}%2C+{zip_code}+{city}%2C+Germany&key={keyData["apiKey"]}" # streetnumber u key wieder einfügen
+    key_data = get_key("opencagekey", conn)
+    url = f"https://api.opencagedata.com/geocode/v1/json?q={street}+{street_number}%2C+{zip_code}+{city}%2C+Germany&key={key_data["apiKey"]}"  # streetnumber u key wieder einfügen
 
     r = httpx.get(url)
 
-    resultData = r.json()
-    if not resultData["results"]:
+    if r.status_code == 401:
+        return Response(success=False, message="API Key is invalid")
+
+    result_data = r.json()
+    if not result_data["results"]:
         raise ValueError("No results returned from geocoding API")
 
-    geometry = resultData["results"][0]["geometry"]
+    geometry = result_data["results"][0]["geometry"]
     return geometry["lat"], geometry["lng"]
 
-def insertChildInDB(data, conn):
+
+def calc_distance(adr1, adr2):
+    return geodesic(adr1, adr2).kilometers
+
+
+def insert_address(data, conn):
     try:
-        data.street = data.street.replace(" ","+")
-        data.street_number = data.street_number.replace(" ","+")
-        data.city = data.city.replace(" ","+")
+        data.street = data.street.replace(" ", "+")
+        data.street_number = data.street_number.replace(" ", "+")
+        data.city = data.city.replace(" ", "+")
 
         coordinates = getCoordinatesFromStreetName(data.street, data.street_number, data.zip_code, data.city, conn)
+        if isinstance(coordinates, Response) and not coordinates.success:
+            return coordinates
+
         latitude, longitude = coordinates
         cursor = conn.cursor()
         cursor.execute(
@@ -150,15 +101,83 @@ def insertChildInDB(data, conn):
             """,
             (data.street, data.street_number, data.city, data.zip_code, latitude, longitude)
         )
-        address_id = cursor.lastrowid
+        return cursor.lastrowid
+    except Exception as e:
+        return None
+
+
+# endregion
+
+##########################################
+# region Models
+##########################################
+
+#### Global models ####
+
+class Person(BaseModel):
+    first_name: str
+    family_name: str
+    time_start: str
+    time_end: str
+    street: str
+    street_number: str
+    city: str
+    zip_code: str
+
+
+#### Children Models ####
+
+class Child(Person):
+    required_qualification: str
+    requested_hours: int
+
+
+class ChildImport(BaseModel):
+    dataCols: Optional[List[str]] = None
+    dataRows: List[Child]
+
+
+#### Assistants Models #####
+
+class Assistant(Person):
+    qualification: str
+    capacity: int
+
+
+class AssistantImport(BaseModel):
+    dataCols: Optional[List[str]] = None
+    dataRows: List[Assistant]
+
+
+class Response(BaseModel):
+    success: bool
+    message: str
+    data: Optional[Union[List[Union[Child, Assistant, str, object]]]] = None
+
+
+# endregion
+##########################################
+
+
+##########################################
+# region Assistants logic
+##########################################
+
+def insert_assistant_in_db(data: Assistant, conn):
+    try:
+        cursor = conn.cursor()
+        address_id = insert_address(data, conn)
+        if address_id is None:
+            return Response(success=False,
+                            message=f"address:{data.street} {data.street_number}, {data.city}  is invalid")
 
         cursor.execute(
             """
-                INSERT INTO children 
-                (first_name, family_name, required_qualification, requested_hours, address_id) 
+                INSERT INTO assistants 
+                (first_name, family_name, qualification, capacity, address_id) 
                 VALUES (%s, %s, %s, %s, %s)
-            """, 
-            (data.first_name, data.family_name, data.required_qualification, data.requested_hours, address_id)
+            """,
+            (data.first_name, data.family_name, data.qualification, data.capacity, address_id)
         )
         conn.commit()
         return cursor.lastrowid
@@ -166,39 +185,130 @@ def insertChildInDB(data, conn):
         conn.rollback()
         return None
 
-@router.post("/children")
-def create_child(data: ChildImport, multiple: bool | None = None,  conn = Depends(get_db)):
 
+@router.post("/assistants")
+def create_assistant(data: AssistantImport, multiple: bool | None = None, conn=Depends(get_db)):
     # if this is single import
-    if not multiple and len(data.dataRows): 
-        childData = data.dataRows[0]
-        insertedChildId = insertChildInDB(childData, conn)
-        if insertedChildId is not None: 
-            return Response(success=True, message=f"Child is successfully added with id {insertedChildId}")
+    if not multiple and len(data.dataRows):
+        assistant_data = data.dataRows[0]
+        inserted_assistant_id = insert_assistant_in_db(assistant_data, conn)
+        if inserted_assistant_id is not None:
+            return Response(success=True, message=f"Child is successfully added with id {inserted_assistant_id}")
         return Response(success=False, message="Child could not be added to Darabase")
-    
+
     # if this is multiple bulk import
     rows = data.dataRows
     failed = []
 
     # insert rows
     for row in rows:
-        childData = row
-        insertedChildId = insertChildInDB(childData, conn)
-        if insertedChildId is None:
+        assistant_data = row
+        inserted_assistant_id = insert_assistant_in_db(assistant_data, conn)
+        if inserted_assistant_id is None:
             failed.append(row)
-        
+
+    if len(failed):
+        return Response(success=False, message=f"{len(failed)} assistants could not be saved in data base")
+    return Response(success=True, message=f"{len(rows)} assistants are saved in data base")
+
+
+@router.get("/assistants")
+def get_all_assistants(conn=Depends(get_db)):
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM assistants")
+
+    return cursor.fetchall()
+
+
+@router.get("/assistants/{assistent_Id}")
+def get_assistant(assistent_Id, conn=Depends(get_db)):
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM assistants WHERE id = %s", (assistent_Id))
+
+    return cursor.fetchall()
+
+
+@router.delete("/assistants/{assistent_Id}")
+def delete_assistant(assistent_Id, conn=Depends(get_db)):
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM assistants WHERE id = %s", (assistent_Id))
+    conn.commit()
+    return cursor.rowcount  # Returns number of rows deleted
+
+
+# endregion
+##########################################
+
+##########################################
+# Children logic
+##########################################
+
+def insert_child_in_db(data: Child, conn):
+    try:
+        address_id = insert_address(data, conn)
+        if address_id is None:
+            return Response(success=False,
+                            message=f"Cannot find address or address: {data.street} {data.street_number}, {data.city}  is invalid")
+        if isinstance(address_id, Response) and not address_id.success:
+            return address_id
+
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+                INSERT INTO children 
+                (first_name, family_name, required_qualification, requested_hours, time_start, time_end, address_id) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """,
+            (data.first_name, data.family_name, data.required_qualification, data.requested_hours, data.time_start,
+             data.time_end, address_id)
+        )
+        conn.commit()
+        return cursor.lastrowid
+    except pymysql.err.Error as e:
+        print(f"Database error during child insertion: {e}")  # Replace with your logging mechanism
+        conn.rollback()
+        return None
+    except Exception as e:
+        print(f"An unexpected error occurred during child insertion: {e}")  # Catch other potential errors
+        conn.rollback()
+        return None
+
+
+@router.post("/children")
+def create_child(data: ChildImport, multiple: bool | None = None, conn=Depends(get_db)):
+    # if this is single import
+    if not multiple and len(data.dataRows):
+        child_data = data.dataRows[0]
+        inserted_child_id = insert_child_in_db(child_data, conn)
+        if inserted_child_id is not None:
+            return Response(success=True, message=f"Child is successfully added with id {inserted_child_id}")
+        return Response(success=False, message="Child could not be added to Darabase")
+
+    # if this is multiple bulk import
+    rows = data.dataRows
+    failed = []
+
+    # insert rows
+    for row in rows:
+        child_data = row
+        inserted_child_id = insert_child_in_db(child_data, conn)
+        if inserted_child_id is None:
+            failed.append(row)
+        if isinstance(inserted_child_id, Response) and not inserted_child_id.success:
+            return inserted_child_id
+
     if len(failed):
         return Response(success=False, message=f"{len(failed)} children could not be saved in data base")
     return Response(success=True, message=f"{len(rows)} children are saved in data base")
 
+
 @router.post("/children/{child_id}")
-def update_child(data: Child, child_id,conn = Depends(get_db)):
-    data.street = data.street.replace(" ","+")
-    data.street_number = data.street_number.replace(" ","+")
-    data.city = data.city.replace(" ","+")
+def update_child(data: Child, child_id, conn=Depends(get_db)):
+    data.street = data.street.replace(" ", "+")
+    data.street_number = data.street_number.replace(" ", "+")
+    data.city = data.city.replace(" ", "+")
     coordinates = getCoordinatesFromStreetName(data.street, data.street_number, data.zip_code, data.city, conn)
-    latitude, longitude = coordinates   
+    latitude, longitude = coordinates
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -209,7 +319,7 @@ def update_child(data: Child, child_id,conn = Depends(get_db)):
                 required_qualification = %s,  
                 requested_hours = %s
             WHERE id = %s;
-        """, 
+        """,
         (data.first_name, data.family_name, data.required_qualification, data.requested_hours, child_id)
     )
     cursor.execute(
@@ -233,7 +343,7 @@ def update_child(data: Child, child_id,conn = Depends(get_db)):
 
 
 @router.get("/children")
-def get_all_children(conn = Depends(get_db)):
+def get_all_children(conn=Depends(get_db)):
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -254,24 +364,34 @@ def get_all_children(conn = Depends(get_db)):
 
     return cursor.fetchall()
 
-#TODO
+
+# TODO
 @router.get("/children/{child_Id}")
-def get_child(child_Id, conn = Depends(get_db)):
+def get_child(child_Id, conn=Depends(get_db)):
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM children WHERE id = %s", (child_Id))
 
     return cursor.fetchall()
 
+
 @router.delete("/children/{child_Id}")
-def delete_child(child_Id, conn = Depends(get_db)):
+def delete_child(child_Id, conn=Depends(get_db)):
     cursor = conn.cursor()
 
     cursor.execute("DELETE FROM children WHERE id = %s", (child_Id))
     conn.commit()
     return cursor.rowcount  # Returns number of rows deleted
 
+
+# endregion
+##########################################
+
+##########################################
+# Keys logic
+##########################################
+
 @router.post("/apiKey/{id}")
-def update_apiKey(data: ApiKey, id, conn = Depends(get_db)):
+def update_apiKey(data: ApiKey, id, conn=Depends(get_db)):
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -279,12 +399,13 @@ def update_apiKey(data: ApiKey, id, conn = Depends(get_db)):
             SET 
                 apiKey = %s
             WHERE id = %s;
-        """, 
+        """,
         (data.apiKey, id)
     )
     conn.commit()
     return cursor.lastrowid
 
+
 @router.get("/apiKey/{id}")
-def get_apiKey(id, conn = Depends(get_db)):
+def get_apiKey(id, conn=Depends(get_db)):
     return get_key(id, conn)
