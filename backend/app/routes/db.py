@@ -17,14 +17,6 @@ router = APIRouter(
     responses={404: {"description": "nothing found in db service"}},
 )
 
-class Child(BaseModel):
-    name: str
-    family_name: str
-    required_qualification: str
-    street: str
-    city: str
-    zip_code: str
-    requested_hours: int
 
 class ApiKey(BaseModel):
     apiKey: str
@@ -49,7 +41,7 @@ def get_db():
         connection.close()
 
 baseChildCols = [
-    'name',
+    'first_name',
     'family_name',
     'required_qualification',
     'street',
@@ -63,13 +55,15 @@ baseChildCols = [
 ##########################################
 
 class Child(BaseModel):
-    name: str
+    first_name: str
     family_name: str
     required_qualification: str
+    requested_hours: int
+
     street: str
+    street_number: str
     city: str
     zip_code: str
-    requested_hours: int
 
 class ChildImport(BaseModel):
     dataCols: Optional[List[str]] = None
@@ -117,27 +111,40 @@ def delete_assistent(assistent_Id, conn = Depends(get_db)):
 # Children logic
 ##########################################
 
+def getCoordinatesFromStreetName(street, street_number, zip_code, city):
+    url = f"https://api.opencagedata.com/geocode/v1/json?q={street}+{street_number}%2C+{zip_code}+{city}%2C+Germany&key=6da9170c0e0a4676bd4045ba2697dc9a" # streetnumber u key wieder einfügen
+
+    r = httpx.get(url)
+
+    resultData = r.json()
+    if not resultData["results"]:
+        raise ValueError("No results returned from geocoding API")
+
+    geometry = resultData["results"][0]["geometry"]
+    return geometry["lat"], geometry["lng"]
+
 def insertChildInDB(data, conn):
     try:
-        print ("yes")
-        #r1 = httpx.get("/api/db/apikeys/googleapi")
-        #apikey = r1.json()
-        street_number = 10
-        BASE_URL = f"https://api.opencagedata.com/geocode/v1/json?q={data.street}+10%2C+{data.zip_code}+{data.city}%2C+Germany&key=6da9170c0e0a4676bd4045ba2697dc9a" # streetnumber u key wieder einfügen
-        print(BASE_URL)
-        r = httpx.get(BASE_URL)
-        print(r.status_code)
-        resultdata = r.json()
-        coordinates = resultdata["results"][0]["geometry"]["lat"]
+        coordinates = getCoordinatesFromStreetName(data.street, data.street_number, data.zip_code, data.city)
+        latitude, longitude = coordinates
         print(coordinates)
         cursor = conn.cursor()
         cursor.execute(
             """
+            INSERT INTO address (street, street_number, city, zip_code, latitude, longitude)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            """,
+            (data.street.replace(" ", "+"), data.street_number.replace(" ", "+"), data.city.replace(" ", "+"), data.zip_code, latitude, longitude)
+        )
+        address_id = cursor.lastrowid
+
+        cursor.execute(
+            """
                 INSERT INTO children 
-                (name, family_name, required_qualification, street, city, zip_code, requested_hours) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                (first_name, family_name, required_qualification, requested_hours, address_id) 
+                VALUES (%s, %s, %s, %s, %s)
             """, 
-            (data.name, data.family_name, data.required_qualification, data.street, data.city, data.zip_code, data.requested_hours)
+            (data.first_name, data.family_name, data.required_qualification, data.requested_hours, address_id)
         )
         conn.commit()
         return cursor.lastrowid
@@ -147,6 +154,7 @@ def insertChildInDB(data, conn):
 
 @router.post("/children")
 def create_child(data: ChildImport, multiple: bool | None = None,  conn = Depends(get_db)):
+    print(data)
     # if this is single import
     if not multiple and len(data.dataRows): 
         childData = data.dataRows[0]
@@ -195,10 +203,26 @@ def update_child(data: Child, child_id,conn = Depends(get_db)):
 @router.get("/children")
 def get_all_children(conn = Depends(get_db)):
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM children")
+    cursor.execute(
+        """
+            SELECT 
+                c.id AS id, 
+                c.first_name AS first_name, 
+                c.family_name AS family_name, 
+                c.required_qualification AS required_qualification, 
+                c.requested_hours AS requested_hours, 
+                REPLACE(a.street, '+', ' ') AS street, 
+                REPLACE(a.street_number, '+', ' ') AS street_number, 
+                REPLACE(a.city, '+', ' ') AS city, 
+                a.zip_code AS zip_code 
+            FROM children c, address a 
+            WHERE c.address_id = a.id
+        """
+    )
 
     return cursor.fetchall()
 
+#TODO
 @router.get("/children/{child_Id}")
 def get_child(child_Id, conn = Depends(get_db)):
     cursor = conn.cursor()

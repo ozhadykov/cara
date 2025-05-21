@@ -49,8 +49,8 @@ const KeyInput = () => {
                     className="btn btn-secondary"
                     onClick={() =>
                         postRequest(
-                            "/api/keys/googleApiKey",
-                            { googleApiKey: googleApiKey },
+                            "/api/db/apiKey/googleapi",
+                            { apiKey: googleApiKey },
                             sendMessage
                         )
                     }
@@ -70,7 +70,7 @@ const KeyInput = () => {
                 <button
                     className="btn btn-secondary"
                     onClick={() =>
-                        postRequest("/api/keys/amplKey", { amplKey: amplKey }, sendMessage)
+                        postRequest("/api/db/apiKey/amplKey", { apiKey: amplKey }, sendMessage)
                     }
                 >
                     Send

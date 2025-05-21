@@ -4,7 +4,7 @@ import { Icon } from "@iconify/react/dist/iconify.js"
 import { useRecordSidebar } from "../../contexts/providers/RecordSidebarContext"
 import { useChildrenData } from "../../contexts/providers/ChildrenDataContext"
 
-const ChildrenSingleImport = ({ refresh }: {refresh: boolean}) => {
+const ChildrenSingleImport = ({ refresh }: { refresh: boolean }) => {
     const [isCheckAll, setIsCheckAll] = useState(false)
     const [checkedItems, setCheckedItems] = useState<string[]>([])
 
@@ -88,12 +88,12 @@ const ChildrenSingleImport = ({ refresh }: {refresh: boolean}) => {
                                     type="checkbox"
                                     className="checkbox checkbox-secondary"
                                     onChange={handleCheck}
-                                    name={child.name}
+                                    name={child.first_name}
                                     checked={checkedItems.includes(String(child.id))}
                                 />
                             </td>
                             <td className="py-4">{child.id}</td>
-                            <td>{child.name}</td>
+                            <td>{child.first_name}</td>
                             <td>{child.family_name}</td>
                             <td>{child.required_qualification}</td>
                             <td>{child.street}</td>
