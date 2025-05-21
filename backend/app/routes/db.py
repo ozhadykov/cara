@@ -5,6 +5,7 @@ import os
 import pymysql.cursors
 from typing import List, Optional, Union
 from pydantic import BaseModel
+from geopy.distance import geodesic
 
 ##########################################
 # Global
@@ -56,6 +57,8 @@ def get_key(id, conn):
 
     return cursor.fetchone()
 
+def calc_distance(adr1, adr2):
+    return geodesic(adr1, adr2).kilometers
 
 ##########################################
 # Models
@@ -133,6 +136,10 @@ def getCoordinatesFromStreetName(street, street_number, zip_code, city, conn):
 
 def insertChildInDB(data, conn):
     try:
+        data.street = data.street.replace(" ","+")
+        data.street_number = data.street_number.replace(" ","+")
+        data.city = data.city.replace(" ","+")
+
         coordinates = getCoordinatesFromStreetName(data.street, data.street_number, data.zip_code, data.city, conn)
         latitude, longitude = coordinates
         cursor = conn.cursor()
@@ -187,21 +194,39 @@ def create_child(data: ChildImport, multiple: bool | None = None,  conn = Depend
 
 @router.post("/children/{child_id}")
 def update_child(data: Child, child_id,conn = Depends(get_db)):
+    data.street = data.street.replace(" ","+")
+    data.street_number = data.street_number.replace(" ","+")
+    data.city = data.city.replace(" ","+")
+    coordinates = getCoordinatesFromStreetName(data.street, data.street_number, data.zip_code, data.city, conn)
+    latitude, longitude = coordinates   
     cursor = conn.cursor()
     cursor.execute(
         """
             UPDATE children
             SET 
-                name = %s, 
+                first_name = %s, 
                 family_name = %s, 
-                required_qualification = %s, 
-                street = %s, 
-                city = %s, 
-                zip_code = %s, 
+                required_qualification = %s,  
                 requested_hours = %s
             WHERE id = %s;
         """, 
-        (data.name, data.family_name, data.required_qualification, data.street, data.city, data.zip_code, data.requested_hours, child_id)
+        (data.first_name, data.family_name, data.required_qualification, data.requested_hours, child_id)
+    )
+    cursor.execute(
+        """
+            UPDATE address
+            SET
+                street = %s,
+                street_number = %s,
+                zip_code = %s,
+                city = %s,
+                latitude = %s,
+                longitude = %s
+            WHERE
+            id = (SELECT address_id FROM children WHERE id = %s);
+
+        """,
+        (data.street, data.street_number, data.zip_code, data.city, latitude, longitude, child_id)
     )
     conn.commit()
     return cursor.lastrowid
