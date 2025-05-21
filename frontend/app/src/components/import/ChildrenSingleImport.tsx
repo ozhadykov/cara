@@ -73,8 +73,9 @@ const ChildrenSingleImport = ({ refresh }: { refresh: boolean }) => {
                         <th>family_name</th>
                         <th>required_qualification</th>
                         <th>street</th>
-                        <th>city</th>
+                        <th>street_number</th>
                         <th>zip_code</th>
+                        <th>city</th>
                         <th>requested_hours</th>
                         <th></th>
                     </tr>
@@ -97,8 +98,9 @@ const ChildrenSingleImport = ({ refresh }: { refresh: boolean }) => {
                             <td>{child.family_name}</td>
                             <td>{child.required_qualification}</td>
                             <td>{child.street}</td>
-                            <td>{child.city}</td>
+                            <td>{child.street_number}</td>
                             <td>{child.zip_code}</td>
+                            <td>{child.city}</td>
                             <td>{child.requested_hours}</td>
                             <td>
                                 <button

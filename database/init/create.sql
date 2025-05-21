@@ -63,5 +63,5 @@ CREATE TABLE apiKeys (
 
 INSERT INTO apiKeys (id, apiKey)
 VALUES
-    ('googleapi', ''),
+    ('opencagekey', ''),
     ('amplkey', '');

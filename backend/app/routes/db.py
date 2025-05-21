@@ -50,6 +50,13 @@ baseChildCols = [
     'requested_hours'
 ]
 
+def get_key(id, conn): 
+    cursor = conn.cursor()
+    cursor.execute("SELECT apiKey FROM apiKeys WHERE id = %s", (id))
+
+    return cursor.fetchone()
+
+
 ##########################################
 # Models
 ##########################################
@@ -111,8 +118,9 @@ def delete_assistent(assistent_Id, conn = Depends(get_db)):
 # Children logic
 ##########################################
 
-def getCoordinatesFromStreetName(street, street_number, zip_code, city):
-    url = f"https://api.opencagedata.com/geocode/v1/json?q={street}+{street_number}%2C+{zip_code}+{city}%2C+Germany&key=6da9170c0e0a4676bd4045ba2697dc9a" # streetnumber u key wieder einfügen
+def getCoordinatesFromStreetName(street, street_number, zip_code, city, conn):
+    keyData = get_key("opencagekey", conn)
+    url = f"https://api.opencagedata.com/geocode/v1/json?q={street}+{street_number}%2C+{zip_code}+{city}%2C+Germany&key={keyData["apiKey"]}" # streetnumber u key wieder einfügen
 
     r = httpx.get(url)
 
@@ -125,16 +133,15 @@ def getCoordinatesFromStreetName(street, street_number, zip_code, city):
 
 def insertChildInDB(data, conn):
     try:
-        coordinates = getCoordinatesFromStreetName(data.street, data.street_number, data.zip_code, data.city)
+        coordinates = getCoordinatesFromStreetName(data.street, data.street_number, data.zip_code, data.city, conn)
         latitude, longitude = coordinates
-        print(coordinates)
         cursor = conn.cursor()
         cursor.execute(
             """
             INSERT INTO address (street, street_number, city, zip_code, latitude, longitude)
             VALUES (%s, %s, %s, %s, %s, %s)
             """,
-            (data.street.replace(" ", "+"), data.street_number.replace(" ", "+"), data.city.replace(" ", "+"), data.zip_code, latitude, longitude)
+            (data.street, data.street_number, data.city, data.zip_code, latitude, longitude)
         )
         address_id = cursor.lastrowid
 
@@ -154,7 +161,7 @@ def insertChildInDB(data, conn):
 
 @router.post("/children")
 def create_child(data: ChildImport, multiple: bool | None = None,  conn = Depends(get_db)):
-    print(data)
+
     # if this is single import
     if not multiple and len(data.dataRows): 
         childData = data.dataRows[0]
@@ -233,7 +240,6 @@ def get_child(child_Id, conn = Depends(get_db)):
 @router.delete("/children/{child_Id}")
 def delete_child(child_Id, conn = Depends(get_db)):
     cursor = conn.cursor()
-    print(id)
 
     cursor.execute("DELETE FROM children WHERE id = %s", (child_Id))
     conn.commit()
@@ -256,7 +262,4 @@ def update_apiKey(data: ApiKey, id, conn = Depends(get_db)):
 
 @router.get("/apiKey/{id}")
 def get_apiKey(id, conn = Depends(get_db)):
-    cursor = conn.cursor()
-    cursor.execute("SELECT apiKey FROM apiKeys WHERE id = %s", (id))
-
-    return cursor.fetchone()
+    return get_key(id, conn)
