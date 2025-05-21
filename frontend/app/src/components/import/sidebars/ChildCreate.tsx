@@ -19,10 +19,11 @@ const ChildCreate = () => {
 
     const initialFormData = {
         id: 0,
-        name: "",
+        first_name: "",
         family_name: "",
         required_qualification: "",
         street: "",
+        street_number: "",
         city: "",
         zip_code: "",
         requested_hours: 0,
@@ -53,12 +54,13 @@ const ChildCreate = () => {
     }
 
     const inputFieldData: InputField[] = [
-        { name: "name", type: "text" },
+        { name: "first_name", type: "text" },
         { name: "family_name", type: "text" },
         { name: "required_qualification", type: "text" },
         { name: "street", type: "text" },
-        { name: "city", type: "text" },
+        { name: "street_number", type: "text" },
         { name: "zip_code", type: "text" },
+        { name: "city", type: "text" },
         { name: "requested_hours", type: "number" },
     ]
 

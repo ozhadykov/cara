@@ -18,10 +18,11 @@ const ChildEdit = () => {
 
     const [formData, setFormData] = useState<Child>({
         id: selectedData.id,
-        name: selectedData.name,
+        first_name: selectedData.first_name,
         family_name: selectedData.family_name,
         required_qualification: selectedData.required_qualification,
         street: selectedData.street,
+        street_number: selectedData.street_number,
         city: selectedData.city,
         zip_code: selectedData.zip_code,
         requested_hours: selectedData.requested_hours,
@@ -44,12 +45,13 @@ const ChildEdit = () => {
     }
 
     const inputFieldData: InputField[] = [
-        { name: "name", type: "text" },
+        { name: "first_name", type: "text" },
         { name: "family_name", type: "text" },
         { name: "required_qualification", type: "text" },
         { name: "street", type: "text" },
-        { name: "city", type: "text" },
+        { name: "street_number", type: "text" },
         { name: "zip_code", type: "text" },
+        { name: "city", type: "text" },
         { name: "requested_hours", type: "number" },
     ]
 

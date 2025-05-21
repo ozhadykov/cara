@@ -11,3 +11,4 @@ mysql-connector-python
 httpx
 pymysql
 cryptography
+geopy
