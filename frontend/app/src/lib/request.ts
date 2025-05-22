@@ -3,9 +3,11 @@ import { toastTypes } from "./constants"
 export const postRequest = async (
     url: string,
     requestBody: object,
-    sendMessage: (message: string, type: string) => void
+    sendMessage: (message: string, type: string) => void,
+    toggleLoading?: (state: boolean) => void,
 ) => {
     try {
+        toggleLoading?.(true)
         const response = await fetch(url, {
             method: "POST",
             headers: {
@@ -14,6 +16,7 @@ export const postRequest = async (
 
             body: JSON.stringify(requestBody),
         })
+        toggleLoading?.(false)
 
         if (!response.ok) {
             sendMessage(`Server returned ${response.status}`, toastTypes.error)

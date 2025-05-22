@@ -1,9 +1,8 @@
-import { Navbar, MainSidebar, Footer, Toast } from "./components"
+import { Navbar, MainSidebar, Footer, Toast, Loading } from "./components"
 import { Routes, Route, useLocation } from "react-router"
 import { useMainSidebar } from "./contexts/providers/MainSidebarContext.tsx"
 import routes from "./routes.tsx"
 import { ReactNode } from "react"
-import ChildCreate from "./components/import/sidebars/ChildCreate.tsx"
 import RecordSidebar from "./components/import/sidebars/RecordSideBar.tsx"
 
 function App() {
@@ -33,6 +32,7 @@ function App() {
                 <Routes>{routesHTML}</Routes>
             </main>
             <Toast />
+            <Loading />
             <Footer />
         </div>
     )

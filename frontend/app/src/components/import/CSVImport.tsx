@@ -57,8 +57,8 @@ const CsvImport = (props: CSVImportProps) => {
         <>
             <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
                 <div className="card shadow-md children-import-form gap-5">
-                    <div className="card-body flex-row">
-                        <div className="upload-container flex flex-col gap-6 w-1/3 pr-4 border-r-1 border-gray-300">
+                    <div className="card-body flex-row overflow-x-hidden">
+                        <div className="upload-container flex flex-col gap-6 w-1/3 flex-none pr-4 border-r-1 border-gray-300">
                             <div className="upload-header flex flex-col">
                                 <span className="text-lg mb-1">{props.importLabel}</span>
                                 <span className="text-gray-400 flex items-center gap-1">
@@ -77,11 +77,11 @@ const CsvImport = (props: CSVImportProps) => {
                                 </button>
                             </div>
                         </div>
-                        <div className="children-preview grow pl-2">
+                        <div className="children-preview grow pl-2 overflow-x-scroll">
                             <span className="text-lg">Preview:</span>
                             <div className="csv-preview">
                                 {csvData.length && csvCols.length && (
-                                    <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+                                    <div className="overflow-x-scroll rounded-box border border-base-content/5 bg-base-100">
                                         <table className="table">
                                             {/* head */}
                                             <thead>
