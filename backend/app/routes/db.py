@@ -216,7 +216,20 @@ def create_assistant(data: AssistantImport, multiple: bool | None = None, conn=D
 @router.get("/assistants")
 def get_all_assistants(conn=Depends(get_db)):
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM assistants")
+    cursor.execute("""
+        SELECT 
+            ast.id AS id, 
+            ast.first_name AS first_name, 
+            ast.family_name AS family_name, 
+            ast.qualification AS required_qualification, 
+            ast.capacity AS capacity, 
+            REPLACE(a.street, '+', ' ') AS street, 
+            REPLACE(a.street_number, '+', ' ') AS street_number, 
+            REPLACE(a.city, '+', ' ') AS city, 
+            a.zip_code AS zip_code 
+        FROM assistants ast, address a 
+        WHERE ast.address_id = a.id
+    """)
 
     return cursor.fetchall()
 
