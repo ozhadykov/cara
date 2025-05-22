@@ -2,13 +2,14 @@ import { Icon } from "@iconify/react"
 import { CSVImport, AssistentSingleImport } from "../components"
 import { CsvRow } from "../components/import/CSVImport"
 import { postRequest } from "../lib/request"
-import { useToast } from "../contexts/providers/ToastContext"
 import { toastTypes } from "../lib/constants"
+import { useLoading, useToast } from "../contexts"
 import { useState } from "react"
 
 const AssistentImport = () => {
     const { sendMessage } = useToast()
-    const [refreshAssistants, setrefreshAssistants] = useState(false)
+    const { toggleLoading } = useLoading()
+    const [refreshAssistants, setRefreshAssistants] = useState(false)
 
     const sendData = async (dataCols: string[], dataRows: CsvRow[]) => {
         console.log("Sending data...")
@@ -17,11 +18,11 @@ const AssistentImport = () => {
             dataCols,
             dataRows,
         }
-        const response = await postRequest(url, requestBody, sendMessage)
+        const response = await postRequest(url, requestBody, sendMessage, toggleLoading)
         if (response)
             sendMessage(response.message, response.success ? toastTypes.success : toastTypes.error)
 
-        if (response.success) setrefreshAssistants(!refreshAssistants)
+        if (response.success) setRefreshAssistants(!refreshAssistants)
     }
 
     return (

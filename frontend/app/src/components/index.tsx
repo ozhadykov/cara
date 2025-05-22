@@ -6,6 +6,7 @@ import AssistentSingleImport from "./import/AssistentSingleImport.tsx"
 import ChildrenSingleImport from "./import/ChildrenSingleImport.tsx"
 import Alert from "./feedback/Alert.tsx"
 import Toast from "./feedback/Toast.tsx"
+import Loading from "./feedback/Loading.tsx";
 
 export {
     Navbar,
@@ -16,4 +17,5 @@ export {
     ChildrenSingleImport,
     Alert,
     Toast,
+    Loading,
 }

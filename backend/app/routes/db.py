@@ -174,10 +174,11 @@ def insert_assistant_in_db(data: Assistant, conn):
         cursor.execute(
             """
                 INSERT INTO assistants 
-                (first_name, family_name, qualification, capacity, address_id) 
-                VALUES (%s, %s, %s, %s, %s)
+                (first_name, family_name, qualification, capacity, time_start, time_end, address_id) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
             """,
-            (data.first_name, data.family_name, data.qualification, data.capacity, address_id)
+            (data.first_name, data.family_name, data.qualification, data.capacity, data.time_start,
+             data.time_end, address_id)
         )
         conn.commit()
         return cursor.lastrowid

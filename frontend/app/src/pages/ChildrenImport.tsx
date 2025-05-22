@@ -2,12 +2,13 @@ import { Icon } from "@iconify/react"
 import { CSVImport, ChildrenSingleImport } from "../components"
 import { CsvRow } from "../components/import/CSVImport"
 import { postRequest } from "../lib/request"
-import { useToast } from "../contexts/providers/ToastContext"
 import { toastTypes } from "../lib/constants"
 import { useState } from "react"
+import { useLoading, useToast } from "../contexts"
 
 const ChildrenImport = () => {
     const { sendMessage } = useToast()
+    const { toggleLoading } = useLoading()
     const [refreshChildren, setRefreshChildren] = useState(false)
 
     const sendData = async (dataCols: string[], dataRows: CsvRow[]) => {
@@ -17,7 +18,7 @@ const ChildrenImport = () => {
             dataCols,
             dataRows,
         }
-        const response = await postRequest(url, requestBody, sendMessage)
+        const response = await postRequest(url, requestBody, sendMessage, toggleLoading)
         if (response)
             sendMessage(response.message, response.success ? toastTypes.success : toastTypes.error)
 
