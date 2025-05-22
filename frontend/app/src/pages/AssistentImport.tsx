@@ -42,7 +42,7 @@ const AssistentImport = () => {
                         <span className="ml-1">Single Import</span>
                     </label>
                     <div className="tab-content bg-base-100 border-base-300 p-6">
-                        <AssistentSingleImport />
+                        <AssistentSingleImport refresh={refreshAssistants} />
                     </div>
 
                     <label className="tab">

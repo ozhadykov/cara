@@ -26,6 +26,8 @@ const ChildCreate = () => {
         street_number: "",
         city: "",
         zip_code: "",
+        time_start: "",
+        time_end: "",
         requested_hours: 0,
     }
     const [formData, setFormData] = useState<Child>(initialFormData)
