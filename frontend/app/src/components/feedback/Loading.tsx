@@ -7,7 +7,7 @@ const Loading = () => {
     if (isLoading)
         return (
             <div
-                className="absolute bg-white opacity-80 z-10 w-full h-full flex gap-5 items-center justify-center overflow-hidden text-black">
+                className="fixed top-0 left-0 bg-white opacity-80 z-50 w-full h-full flex gap-5 items-center justify-center overflow-hidden text-black" style={{overflow: "hidden !important"}}>
                 <span className="text-xl">Loading...</span>
                 <span className="loading loading-spinner loading-xl"></span>
             </div>

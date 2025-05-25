@@ -1,6 +1,6 @@
-import { ChangeEvent, FormEvent, useState } from "react"
+import { ChangeEvent, FormEvent, useState, useEffect } from "react"
 import { Icon } from "@iconify/react"
-import { useToast } from "../../contexts/providers/ToastContext.tsx"
+import { useToast } from "../../contexts"
 import { toastTypes } from "../../lib/constants.ts"
 import Papa from "papaparse"
 
@@ -14,15 +14,22 @@ export type CsvRow = { [key: string]: string | number }
 const CsvImport = (props: CSVImportProps) => {
     const [csvData, setCsvData] = useState<CsvRow[]>([])
     const [csvCols, setCsvCols] = useState<string[]>([])
+    const [file, setFile] = useState<File | null>(null)
     const { sendMessage } = useToast()
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
-        props.sendData(csvCols, csvData)
+        await props.sendData(csvCols, csvData)
+        setCsvData([])
+        setCsvCols([])
     }
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         // reading file
-        const file = e.target.files?.[0]
+        const fileFromInput = e.target.files?.[0] ?? null
+        setFile(fileFromInput)
+    }
+
+    useEffect(() => {
         if (file) {
             if (file.type !== "text/csv") {
                 sendMessage("Input only accepts csv files", toastTypes.error)
@@ -51,7 +58,7 @@ const CsvImport = (props: CSVImportProps) => {
             }
             reader.readAsText(file)
         }
-    }
+    }, [file])
 
     return (
         <>

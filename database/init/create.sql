@@ -36,12 +36,10 @@ CREATE TABLE address (
 -- Create the children table
 CREATE TABLE children (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    first_name VARCHAR(255) NOT NULL,
-    family_name VARCHAR(255) NOT NULL,
+    first_name VARCHAR(255) NOT NULL CHECK (LENGTH(first_name) > 1),
+    family_name VARCHAR(255) NOT NULL CHECK (LENGTH(family_name) > 1),
     required_qualification VARCHAR(255) NOT NULL,
     requested_hours INT NOT NULL,
-    time_start TIME NOT NULL,
-    time_end TIME NOT NULL,
     address_id INT NOT NULL,
 
     FOREIGN KEY (address_id) REFERENCES address(id) ON DELETE CASCADE
@@ -50,11 +48,9 @@ CREATE TABLE children (
 -- Create the assistants table
 CREATE TABLE assistants (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    first_name VARCHAR(255) NOT NULL,
-    family_name VARCHAR(255) NOT NULL,
+    first_name VARCHAR(255) NOT NULL CHECK (LENGTH(first_name) > 1),
+    family_name VARCHAR(255) NOT NULL CHECK (LENGTH(family_name) > 1),
     qualification VARCHAR(255),
-    time_start TIME NOT NULL,
-    time_end TIME NOT NULL,
     capacity INT NOT NULL,
     address_id INT NOT NULL,
 

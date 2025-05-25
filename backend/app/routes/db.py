@@ -117,8 +117,6 @@ def insert_address(data, conn):
 class Person(BaseModel):
     first_name: str
     family_name: str
-    time_start: str
-    time_end: str
     street: str
     street_number: str
     city: str
@@ -152,7 +150,7 @@ class AssistantImport(BaseModel):
 class Response(BaseModel):
     success: bool
     message: str
-    data: Optional[Union[List[Union[Child, Assistant, str, object]]]] = None
+    data: Optional[Union[List[Union[Child, Assistant, str, object]], int]] = None
 
 
 # endregion
@@ -174,14 +172,13 @@ def insert_assistant_in_db(data: Assistant, conn):
         cursor.execute(
             """
                 INSERT INTO assistants 
-                (first_name, family_name, qualification, capacity, time_start, time_end, address_id) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                (first_name, family_name, qualification, capacity, address_id) 
+                VALUES (%s, %s, %s, %s, %s)
             """,
-            (data.first_name, data.family_name, data.qualification, data.capacity, data.time_start,
-             data.time_end, address_id)
+            (data.first_name, data.family_name, data.qualification, data.capacity, address_id)
         )
         conn.commit()
-        return cursor.lastrowid
+        return Response(success=True, message=f"Assistant is successfully added with id {cursor.lastrowid}", data=cursor.lastrowid)
     except Exception as e:
         conn.rollback()
         return None
@@ -221,7 +218,7 @@ def get_all_assistants(conn=Depends(get_db)):
             ast.id AS id, 
             ast.first_name AS first_name, 
             ast.family_name AS family_name, 
-            ast.qualification AS required_qualification, 
+            ast.qualification AS qualification, 
             ast.capacity AS capacity, 
             REPLACE(a.street, '+', ' ') AS street, 
             REPLACE(a.street_number, '+', ' ') AS street_number, 
@@ -257,9 +254,10 @@ def delete_assistant(assistent_Id, conn=Depends(get_db)):
 # Children logic
 ##########################################
 
-def insert_child_in_db(data: Child, conn):
+def insert_child_in_db(data: Child, conn) -> Response | None:
     try:
         address_id = insert_address(data, conn)
+        print(address_id)
         if address_id is None:
             return Response(success=False,
                             message=f"Cannot find address or address: {data.street} {data.street_number}, {data.city}  is invalid")
@@ -270,20 +268,19 @@ def insert_child_in_db(data: Child, conn):
         cursor.execute(
             """
                 INSERT INTO children 
-                (first_name, family_name, required_qualification, requested_hours, time_start, time_end, address_id) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                (first_name, family_name, required_qualification, requested_hours, address_id) 
+                VALUES (%s, %s, %s, %s, %s)
             """,
-            (data.first_name, data.family_name, data.required_qualification, data.requested_hours, data.time_start,
-             data.time_end, address_id)
+            (data.first_name, data.family_name, data.required_qualification, data.requested_hours, address_id)
         )
         conn.commit()
-        return cursor.lastrowid
+        return Response(success=True, message=f"Child is successfully added with id {cursor.lastrowid}", data=cursor.lastrowid)
     except pymysql.err.Error as e:
-        print(f"Database error during child insertion: {e}")  # Replace with your logging mechanism
+        print(f"Database error during child insertion: {e}")
         conn.rollback()
         return None
     except Exception as e:
-        print(f"An unexpected error occurred during child insertion: {e}")  # Catch other potential errors
+        print(f"An unexpected error occurred during child insertion: {e}") 
         conn.rollback()
         return None
 
@@ -294,9 +291,10 @@ def create_child(data: ChildImport, multiple: bool | None = None, conn=Depends(g
     if not multiple and len(data.dataRows):
         child_data = data.dataRows[0]
         inserted_child_id = insert_child_in_db(child_data, conn)
-        if inserted_child_id is not None:
-            return Response(success=True, message=f"Child is successfully added with id {inserted_child_id}")
-        return Response(success=False, message="Child could not be added to Darabase")
+        if inserted_child_id is None:
+            return Response(success=False, message="Child could not be added to Darabase")
+        if isinstance(inserted_child_id, Response):
+            return inserted_child_id
 
     # if this is multiple bulk import
     rows = data.dataRows
@@ -401,7 +399,7 @@ def delete_child(child_Id, conn=Depends(get_db)):
 ##########################################
 
 ##########################################
-# Keys logic
+# region Keys logic
 ##########################################
 
 @router.post("/apiKey/{id}")
@@ -423,3 +421,6 @@ def update_apiKey(data: ApiKey, id, conn=Depends(get_db)):
 @router.get("/apiKey/{id}")
 def get_apiKey(id, conn=Depends(get_db)):
     return get_key(id, conn)
+
+# endregion
+##########################################
