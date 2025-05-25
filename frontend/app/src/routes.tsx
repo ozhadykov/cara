@@ -1,7 +1,6 @@
-import { Home, AssistantsImport, ChildrenImport, KeyInput } from "./pages"
+import { Home, AssistantsImport, ChildrenImport, KeyInput, PairGenerator } from "./pages"
 import AmplData from "./pages/AmplData.tsx"
 import { ReactElement } from "react"
-import { Icon } from "@iconify/react"
 
 interface IRoute {
     path: string
@@ -14,7 +13,7 @@ interface IRoute {
 const routes: Array<IRoute> = [
     {
         path: "/",
-        component: <Home />,
+        component: <AmplData />,
         label: "Home",
         fillIcon: "solar:widget-bold-duotone",
         outlineIcon: "solar:widget-line-duotone",
@@ -41,9 +40,9 @@ const routes: Array<IRoute> = [
         outlineIcon: "solar:settings-line-duotone",
     },
     {
-        path: "/dashboard",
-        component: <AmplData />,
-        label: "Ampl Data",
+        path: "/pairs",
+        component: <PairGenerator />,
+        label: "Calculate pairs",
         fillIcon: "solar:transfer-horizontal-bold-duotone",
         outlineIcon: "solar:transfer-horizontal-line-duotone",
     },
