@@ -26,10 +26,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 # Create uploads directory if it doesn't exist
 UPLOAD_DIR = Path("/backend/app/uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
+
 
 @app.post("/api/upload")
 async def upload_file(file: UploadFile = File(...)):

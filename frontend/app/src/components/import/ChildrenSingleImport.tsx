@@ -14,7 +14,7 @@ const ChildrenSingleImport = ({ refresh }: { refresh: boolean }) => {
     const deleteChildren = async () => {
         try {
             for (const child_id of checkedItems) {
-                await deleteRequest(`/api/db/children/${child_id}`, {})
+                await deleteRequest(`/api/children/${child_id}`, {})
             }
 
             setCheckedItems([])

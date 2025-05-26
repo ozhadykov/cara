@@ -178,7 +178,8 @@ def insert_assistant_in_db(data: Assistant, conn):
             (data.first_name, data.family_name, data.qualification, data.capacity, address_id)
         )
         conn.commit()
-        return Response(success=True, message=f"Assistant is successfully added with id {cursor.lastrowid}", data=cursor.lastrowid)
+        return Response(success=True, message=f"Assistant is successfully added with id {cursor.lastrowid}",
+                        data=cursor.lastrowid)
     except Exception as e:
         conn.rollback()
         return None
@@ -274,13 +275,14 @@ def insert_child_in_db(data: Child, conn) -> Response | None:
             (data.first_name, data.family_name, data.required_qualification, data.requested_hours, address_id)
         )
         conn.commit()
-        return Response(success=True, message=f"Child is successfully added with id {cursor.lastrowid}", data=cursor.lastrowid)
+        return Response(success=True, message=f"Child is successfully added with id {cursor.lastrowid}",
+                        data=cursor.lastrowid)
     except pymysql.err.Error as e:
         print(f"Database error during child insertion: {e}")
         conn.rollback()
         return None
     except Exception as e:
-        print(f"An unexpected error occurred during child insertion: {e}") 
+        print(f"An unexpected error occurred during child insertion: {e}")
         conn.rollback()
         return None
 
@@ -421,6 +423,7 @@ def update_apiKey(data: ApiKey, id, conn=Depends(get_db)):
 @router.get("/apiKey/{id}")
 def get_apiKey(id, conn=Depends(get_db)):
     return get_key(id, conn)
+
 
 # endregion
 ##########################################
