@@ -17,7 +17,7 @@ const KeyInput = () => {
     useEffect(() => {
         // dev only
         const getOpenCageKey = async () => {
-            const response = await fetch("/api/db/apiKey/opencagekey")
+            const response = await fetch("/api/keys/opencagekey")
             const data = await response.json()
             if (response.ok) {
                 setOpenCageKey(data.apiKey)
@@ -49,7 +49,7 @@ const KeyInput = () => {
                     className="btn btn-secondary"
                     onClick={() =>
                         postRequest(
-                            "/api/db/apiKey/opencagekey",
+                            "/api/keys/opencagekey",
                             { apiKey: openCageKey },
                             sendMessage
                         )
