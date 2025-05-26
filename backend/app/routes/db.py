@@ -107,6 +107,7 @@ def insert_address(data, conn):
 
 
 # endregion
+##########################################
 
 ##########################################
 # region Models
@@ -155,7 +156,6 @@ class Response(BaseModel):
 
 # endregion
 ##########################################
-
 
 ##########################################
 # region Assistants logic
@@ -251,7 +251,7 @@ def delete_assistant(assistent_Id, conn=Depends(get_db)):
 ##########################################
 
 ##########################################
-# Children logic
+# region Children logic
 ##########################################
 
 def insert_child_in_db(data: Child, conn) -> Response | None:
@@ -422,5 +422,18 @@ def update_apiKey(data: ApiKey, id, conn=Depends(get_db)):
 def get_apiKey(id, conn=Depends(get_db)):
     return get_key(id, conn)
 
+# endregion
+##########################################
+
+##########################################
+# region Pair generator logic
+##########################################
+
+@router.get("/pair_generator")
+def get_init_data_for_generator(conn=Depends(get_db)):
+    # get all children
+    # get all assistants
+    # get all pairs
+    return Response(success=True, message="Initial data generator is working")
 # endregion
 ##########################################

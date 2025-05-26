@@ -1,7 +1,22 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Icon } from "@iconify/react"
+import { Assistant, Child } from "../lib/models.ts"
 
 const PairGenerator = () => {
+    const [children, setChildren] = useState<Child[]>([])
+    const [assistants, setAssistants] = useState<Assistant[]>([])
+    const [pairs, setPairs] = useState([])
+
+    useEffect(() => {
+        const getInitData = async () => {
+            const url = '/api/db/pair_generator'
+            const response = await fetch(url)
+            const data = await response.json()
+            console.log(data)
+        }
+
+        getInitData()
+    }, [])
 
     // overview of existent pairs?
 

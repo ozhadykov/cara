@@ -6,8 +6,6 @@ interface Person {
     street_number: string
     city: string
     zip_code: string,
-    time_start: string,
-    time_end: string
 }
 
 export interface Child extends Person {
