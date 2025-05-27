@@ -2,7 +2,7 @@ from fastapi import Depends
 from pymysql.connections import Connection
 import pymysql.cursors
 from ..database.database import get_db
-from ..schemas.children import ChildrenIn
+from ..schemas.children import ChildrenIn, Child
 from ..schemas.address import Address
 from ..schemas.Response import Response
 from ..services.distance_service import DistanceService
@@ -49,6 +49,54 @@ class ChildrenService:
         if len(failed) > 0:
             return Response(success=False, message=f"{len(failed)} children failed to insert in Database")
         return Response(success=True, message="All children successfully inserted")
+
+    async def update_child(self, child: Child, child_id: int, distance_service: DistanceService):
+        child.street = child.street.replace(" ", "+")
+        child.street_number = child.street_number.replace(" ", "+")
+        child.city = child.city.replace(" ", "+")
+        address = Address(
+            street=child.street,
+            street_number=child.street_number,
+            city=child.city,
+            zip_code=child.zip_code
+        )
+        coordinates_response = await distance_service.get_coordinates_from_street_name(address)
+        latitude, longitude = coordinates_response
+        try:
+            cursor = self.db.cursor()
+            cursor.execute(
+                """
+                    UPDATE children
+                    SET 
+                        first_name = %s, 
+                        family_name = %s, 
+                        required_qualification = %s,  
+                        requested_hours = %s
+                    WHERE id = %s;
+                """,
+                (child.first_name, child.family_name, child.required_qualification, child.requested_hours, child_id)
+            )
+            cursor.execute(
+                """
+                    UPDATE address
+                    SET
+                        street = %s,
+                        street_number = %s,
+                        zip_code = %s,
+                        city = %s,
+                        latitude = %s,
+                        longitude = %s
+                    WHERE
+                    id = (SELECT address_id FROM children WHERE id = %s);
+    
+                """,
+                (child.street, child.street_number, child.zip_code, child.city, latitude, longitude, child_id)
+            )
+            self.db.commit()
+            return Response(success=True, message=f"Child with ID: {cursor.lastrowid} is successfully updated")
+        except pymysql.err.Error as e:
+            print(f"Database error during child insertion: {e}")
+            return
 
     async def get_all_children(self):
         with self.db.cursor(pymysql.cursors.DictCursor) as cursor:

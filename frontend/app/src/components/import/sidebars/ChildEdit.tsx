@@ -23,8 +23,6 @@ const ChildEdit = () => {
         required_qualification: selectedData.required_qualification,
         street: selectedData.street,
         street_number: selectedData.street_number,
-        time_start: selectedData.time_start,
-        time_end: selectedData.time_end,
         city: selectedData.city,
         zip_code: selectedData.zip_code,
         requested_hours: selectedData.requested_hours,
@@ -40,7 +38,7 @@ const ChildEdit = () => {
         e.preventDefault()
 
         try {
-            await postRequest(`/api/db/children/${selectedData.id}`, formData, sendMessage)
+            await postRequest(`/api/children/${selectedData.id}`, formData, sendMessage)
             toggle()
             await refreshChildren()
         } catch (error) {}
