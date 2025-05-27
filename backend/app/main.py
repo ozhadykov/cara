@@ -4,18 +4,15 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 
-from .routes import ampl, db, children
+from .routes import ampl, db, children, keys
 
 # creating App
 app = FastAPI()
 
-# registering routers
-app.include_router(ampl.router)
-app.include_router(db.router)
-app.include_router(children.router)
-
 origins = [
     "http://localhost:80",  # Production Frontend
+    "http://localhost:5173",
+    "http://localhost:5174",
 ]
 
 app.add_middleware(
@@ -25,6 +22,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# registering routers
+app.include_router(ampl.router)
+app.include_router(db.router)
+app.include_router(children.router)
+app.include_router(keys.router)
 
 # Create uploads directory if it doesn't exist
 UPLOAD_DIR = Path("/backend/app/uploads")

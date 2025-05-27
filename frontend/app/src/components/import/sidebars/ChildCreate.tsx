@@ -43,9 +43,9 @@ const ChildCreate = () => {
 
         try {
             const requestBody: TChildImport = {
-                dataRows: [formData],
+                children: [formData],
             }
-            const response = await postRequest("/api/db/children", requestBody, sendMessage)
+            const response = await postRequest("/api/children", requestBody, sendMessage)
             if (response)
                 sendMessage(response.message, response.success ? toastTypes.success : toastTypes.error)
             toggle()

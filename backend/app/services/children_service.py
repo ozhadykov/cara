@@ -3,15 +3,16 @@ from pymysql.connections import Connection
 import pymysql.cursors
 from ..database.database import get_db
 from ..schemas.children import ChildrenIn
-from ..services.distance_service import DistanceService
 from ..schemas.address import Address
+from ..schemas.Response import Response
+from ..services.distance_service import DistanceService
 
 
 class ChildrenService:
     def __init__(self, db: Connection = Depends(get_db)):
         self.db = db
 
-    async def create_children(self, children_in: ChildrenIn, distance_service: DistanceService = Depends()):
+    async def create_children(self, children_in: ChildrenIn, distance_service: DistanceService):
         for child in children_in.children:
             address = Address(
                 street=child.street,
@@ -20,11 +21,14 @@ class ChildrenService:
                 zip_code=child.zip_code
             )
             address_response = await distance_service.insert_address(address)
+            if isinstance(address_response, Response) and not address_response.success:
+                return address_response
+            print(address_response)
         return "importing children"
 
     async def get_all_children(self):
-        async with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
-            await cursor.execute(
+        with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute(
                 """
                     SELECT
                         c.id AS id,
@@ -40,11 +44,11 @@ class ChildrenService:
                     WHERE c.address_id = a.id
                 """
             )
-            return await cursor.fetchall()
+            return cursor.fetchall()
 
     async def get_child(self, child_id: int):
-        async with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
-            await cursor.execute(
+        with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute(
                 """
                     SELECT
                         children.*,
@@ -59,7 +63,7 @@ class ChildrenService:
                         children.id = %s
                 """, (child_id)
             )
-            return await cursor.fetchall()
+            return cursor.fetchall()
 
     async def delete_child(self, child_id: int):
         async with self.db.cursor() as cursor:

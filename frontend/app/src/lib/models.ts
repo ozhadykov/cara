@@ -14,8 +14,7 @@ export interface Child extends Person {
 }
 
 export type TChildImport = {
-    dataCols?: string[]
-    dataRows: Child[]
+    children: Child[]
 }
 
 export interface Assistant extends Person {

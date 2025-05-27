@@ -10,13 +10,14 @@ class KeysService:
         self.db = db
 
     async def get_api_key(self, id: str):
-        async with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
-            await cursor.execute("SELECT apiKey FROM apiKeys WHERE id = %s", id)
-            return await cursor.fetchone()
+        print("getting key")
+        with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("SELECT apiKey FROM apiKeys WHERE id = %s", id)
+            return cursor.fetchone()
 
     async def update_api_key(self, data: ApiKey, key_id: str):
-        async with self.db.cursor() as cursor:
-            await cursor.execute(
+        with self.db.cursor() as cursor:
+            cursor.execute(
                 """
                     UPDATE apiKeys
                     SET
@@ -25,5 +26,5 @@ class KeysService:
                 """,
                 (data.apiKey, key_id)
             )
-            await self.db.commit()
+            self.db.commit()
             return cursor.rowcount

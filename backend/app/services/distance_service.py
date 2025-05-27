@@ -6,14 +6,16 @@ from ..schemas.address import Address
 from ..schemas.Response import Response
 from pymysql.connections import Connection
 from ..services.keys_service import KeysService
+
+
 class DistanceService:
-    def __init__(self, db: Connection = Depends(get_db)):
+    def __init__(self, db: Connection = Depends(get_db), keys_service: KeysService = Depends()):
         self.db = db
+        self.keys_service = keys_service
 
-    async def _get_coordinates_from_street_name(self, address: Address, keys_service: KeysService = Depends()):
-        key_data = keys_service.get_api_key("opencagekey")
+    async def _get_coordinates_from_street_name(self, address: Address):
+        key_data = await self.keys_service.get_api_key("opencagekey")
         url = f"https://api.opencagedata.com/geocode/v1/json?q={address.street}+{address.street_number}%2C+{address.zip_code}+{address.city}%2C+Germany&key={key_data["apiKey"]}"  # streetnumber u key wieder einfügen
-
         r = httpx.get(url)
 
         if r.status_code == 401:
@@ -32,11 +34,11 @@ class DistanceService:
             address.street_number = address.street_number.replace(" ", "+")
             address.city = address.city.replace(" ", "+")
 
-            coordinates = self._get_coordinates_from_street_name(address)
-            if isinstance(coordinates, Response) and not coordinates.success:
-                return coordinates
+            coordinates_response = await self._get_coordinates_from_street_name(address)
+            if isinstance(coordinates_response, Response) and not coordinates_response.success:
+                return coordinates_response
 
-            latitude, longitude = coordinates
+            latitude, longitude = coordinates_response
             cursor = self.db.cursor()
             cursor.execute(
                 """
@@ -48,5 +50,3 @@ class DistanceService:
             return cursor.lastrowid
         except Exception as e:
             return None
-
-        return "inserting address"

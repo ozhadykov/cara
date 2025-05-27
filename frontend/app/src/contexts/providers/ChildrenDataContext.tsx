@@ -13,7 +13,7 @@ export const ChildrenDataProvider = ({ children }: { children: ReactNode }) => {
     const [childData, setChildData] = useState<Child[]>([])
 
     const refreshChildren = async () => {
-        const res = await fetch("/api/db/children")
+        const res = await fetch("/api/children")
         const data = await res.json()
         setChildData([...data])
     }

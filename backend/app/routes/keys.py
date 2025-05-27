@@ -6,7 +6,7 @@ router = APIRouter(
     prefix="/api/keys",
     tags=["db"],
     dependencies=[],
-    responses={404: {"description": "nothing found in children service"}},
+    responses={404: {"description": "nothing found in key service"}},
 )
 
 

@@ -24,7 +24,7 @@ const KeyInput = () => {
             }
         }
         const getAmplKey = async () => {
-            const response = await fetch("/api/db/apiKey/amplkey")
+            const response = await fetch("/api/keys/amplkey")
             const data = await response.json()
             if (response.ok) {
                 setAmplKey(data.apiKey)
@@ -70,7 +70,7 @@ const KeyInput = () => {
                 <button
                     className="btn btn-secondary"
                     onClick={() =>
-                        postRequest("/api/db/apiKey/amplKey", { apiKey: amplKey }, sendMessage)
+                        postRequest("/api/keys/amplKey", { apiKey: amplKey }, sendMessage)
                     }
                 >
                     Send
