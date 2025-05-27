@@ -28,7 +28,7 @@ class DistanceService:
         geometry = result_data["results"][0]["geometry"]
         return geometry["lat"], geometry["lng"]
 
-    async def insert_address(self, address: Address):
+    async def insert_address(self, address: Address) -> Response:
         try:
             address.street = address.street.replace(" ", "+")
             address.street_number = address.street_number.replace(" ", "+")
@@ -47,6 +47,12 @@ class DistanceService:
                 """,
                 (address.street, address.street_number, address.city, address.zip_code, latitude, longitude)
             )
-            return cursor.lastrowid
+            return Response(success=True, message="Address inserted successfully", data=cursor.lastrowid)
+        except pymysql.err.Error as e:
+            print(f"Database error during child insertion: {e}")
+            self.db.rollback()
+            return Response(success=False, message="Database error")
         except Exception as e:
-            return None
+            print(f"Database error during child insertion: {e}")
+            self.db.rollback()
+            return Response(success=False, message="Database error")
