@@ -3,17 +3,17 @@ import { Icon } from "@iconify/react"
 import { useToast } from "../../contexts"
 import { toastTypes } from "../../lib/constants.ts"
 import Papa from "papaparse"
-import {Child} from "../../lib/models.ts";
+import { Person } from "../../lib/models.ts"
 
 export type CSVImportProps = {
     importLabel: string
-    sendData: (children: Child[]) => void
+    sendData: (data: Person[]) => void
 }
 
 export type CsvRow = { [key: string]: string | number }
 
 const CsvImport = (props: CSVImportProps) => {
-    const [csvData, setCsvData] = useState<Child[]>([])
+    const [csvData, setCsvData] = useState<Person[]>([])
     const [csvCols, setCsvCols] = useState<string[]>([])
     const [file, setFile] = useState<File | null>(null)
     const { sendMessage } = useToast()
@@ -101,19 +101,21 @@ const CsvImport = (props: CSVImportProps) => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {csvData.map((item, i) => {
+                                                {csvData.map((item: Person, i) => {
                                                     return (
                                                         <tr key={i}>
                                                             <th>{i}</th>
-                                                            {Object.keys(item).map((itemKey) => {
-                                                                return (
-                                                                    <td
-                                                                        key={`${i}_${item[itemKey]}`}
-                                                                    >
-                                                                        {item[itemKey]}
-                                                                    </td>
-                                                                )
-                                                            })}
+                                                            {Object.entries(item).map(
+                                                                ([key, value], idx) => {
+                                                                    return (
+                                                                        <td
+                                                                            key={`${i}_${key}_${idx}`}
+                                                                        >
+                                                                            {value}
+                                                                        </td>
+                                                                    )
+                                                                }
+                                                            )}
                                                         </tr>
                                                     )
                                                 })}

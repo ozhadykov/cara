@@ -1,11 +1,11 @@
-interface Person {
+export interface Person {
     id: number
     first_name: string
     family_name: string
     street: string
     street_number: string
     city: string
-    zip_code: string,
+    zip_code: string
 }
 
 export interface Child extends Person {
@@ -18,7 +18,6 @@ export type TChildImport = {
 }
 
 export interface Assistant extends Person {
-    qualification: string,
-    capacity: number,
+    qualification: string
+    capacity: number
 }
-

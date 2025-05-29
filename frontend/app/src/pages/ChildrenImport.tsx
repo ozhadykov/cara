@@ -4,7 +4,7 @@ import { postRequest } from "../lib/request"
 import { toastTypes } from "../lib/constants"
 import { useState } from "react"
 import { useLoading, useToast } from "../contexts"
-import {Child, TChildImport} from "../lib/models.ts";
+import { Child, TChildImport } from "../lib/models.ts"
 
 const ChildrenImport = () => {
     const { sendMessage } = useToast()
@@ -13,7 +13,7 @@ const ChildrenImport = () => {
 
     const sendData = async (children: Child[]) => {
         const url = "/api/children"
-        const requestBody:TChildImport = {
+        const requestBody: TChildImport = {
             children,
         }
         const response = await postRequest(url, requestBody, sendMessage, toggleLoading)
@@ -48,7 +48,7 @@ const ChildrenImport = () => {
                         CSV Import
                     </label>
                     <div className="tab-content bg-base-100 border-base-300 p-6">
-                        <CSVImport importLabel={"Children Import"} sendData={sendData} />
+                        <CSVImport importLabel={"Children Import"} sendData={() => sendData} />
                     </div>
                 </div>
             </div>
