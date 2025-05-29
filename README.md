@@ -62,7 +62,7 @@ Our milestones:
 4. Working with "non assigned"
 
    - after a new plan is created, create a list with children and assitents who don't have a pair
-   - add to pool new requests from children and new apllications from assistents
+   - add to pool new requests from children and new apllications from assistants
    - use model to find "new possible" pairs
 
 5. Working with edge cases

@@ -28,7 +28,7 @@ const routes: Array<IRoute> = [
     {
         path: "/assistants",
         component: <AssistantsImport />,
-        label: "Assistent",
+        label: "Assistants",
         fillIcon: "solar:documents-bold-duotone",
         outlineIcon: "solar:documents-line-duotone",
     },

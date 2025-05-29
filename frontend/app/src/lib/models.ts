@@ -13,11 +13,16 @@ export interface Child extends Person {
     requested_hours: number
 }
 
+export interface Assistant extends Person {
+    qualification: string
+    min_capacity: number
+    max_capacity: number
+}
+
 export type TChildImport = {
     children: Child[]
 }
 
-export interface Assistant extends Person {
-    qualification: string
-    capacity: number
+export type TAssistantImport = {
+    assistants: Assistant[]
 }

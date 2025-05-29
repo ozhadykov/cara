@@ -9,7 +9,7 @@ const PairGenerator = () => {
 
     useEffect(() => {
         const getInitData = async () => {
-            const url = '/api/db/pair_generator'
+            const url = "/api/db/pair_generator"
             const response = await fetch(url)
             const data = await response.json()
             console.log(data)
@@ -50,9 +50,7 @@ const PairGenerator = () => {
                             </ul>
                         </div>
                     </div>
-                    <div className="generator-step-content pl-4 h-full">
-                        Hell yeah
-                    </div>
+                    <div className="generator-step-content pl-4 h-full">Hell yeah</div>
                 </div>
             </div>
         </div>

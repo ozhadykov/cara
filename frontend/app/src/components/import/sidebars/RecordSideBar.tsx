@@ -1,8 +1,8 @@
 import { Mode, useRecordSidebar } from "../../../contexts/providers/RecordSidebarContext"
 import ChildCreate from "./ChildCreate"
 import ChildEdit from "./ChildEdit"
-import AssistentEdit from "./AssistentEdit"
-import AssistentCreate from "./AssistentCreate"
+import AssistantEdit from "./AssistantEdit"
+import AssistantCreate from "./AssistantCreate"
 
 type PageType = "assistants" | "children"
 
@@ -12,8 +12,8 @@ const RecordSidebar = ({ pageType }: { pageType: PageType }) => {
     const renderContent = () => {
         if (pageType === "children" && mode === Mode.EDIT) return <ChildEdit />
         if (pageType === "children" && mode === Mode.CREATE) return <ChildCreate />
-        if (pageType === "assistants" && mode === Mode.EDIT) return <AssistentEdit />
-        if (pageType === "assistants" && mode === Mode.CREATE) return <AssistentCreate />
+        if (pageType === "assistants" && mode === Mode.EDIT) return <AssistantEdit />
+        if (pageType === "assistants" && mode === Mode.CREATE) return <AssistantCreate />
         return null
     }
 

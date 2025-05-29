@@ -51,7 +51,8 @@ CREATE TABLE assistants (
     first_name VARCHAR(255) NOT NULL CHECK (LENGTH(first_name) > 1),
     family_name VARCHAR(255) NOT NULL CHECK (LENGTH(family_name) > 1),
     qualification VARCHAR(255),
-    capacity INT NOT NULL,
+    min_capacity INT NOT NULL CHECK(min_capacity >= 0),
+    max_capacity INT NOT NULL CHECK(max_capacity >= 0),
     address_id INT NOT NULL,
 
     FOREIGN KEY(address_id) REFERENCES address(id) ON DELETE CASCADE
