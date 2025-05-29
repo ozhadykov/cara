@@ -6,10 +6,7 @@ import { useRecordSidebar } from "../../../contexts/providers/RecordSidebarConte
 import { useToast } from "../../../contexts/providers/ToastContext.tsx"
 import { toastTypes } from "../../../lib/constants.ts"
 import { useAssistantData } from "../../../contexts/providers/AssistantDataContext.tsx"
-type InputField = {
-    name: keyof Assistant
-    type: string
-}
+import AssistantsForm from "./forms/AssistantsForm.tsx"
 
 const AssistantCreate = () => {
     const { toggle } = useRecordSidebar()
@@ -20,7 +17,7 @@ const AssistantCreate = () => {
         id: 0,
         first_name: "",
         family_name: "",
-        qualification: "",
+        qualification: -1,
         street: "",
         street_number: "",
         city: "",
@@ -41,6 +38,11 @@ const AssistantCreate = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
+        if (formData.qualification === -1) {
+            sendMessage("Please select a required qualification", toastTypes.error)
+            return
+        }
+
         try {
             const requestBody: TAssistantImport = {
                 assistants: [formData],
@@ -59,47 +61,18 @@ const AssistantCreate = () => {
         }
     }
 
-    const inputFieldData: InputField[] = [
-        { name: "first_name", type: "text" },
-        { name: "family_name", type: "text" },
-        { name: "qualification", type: "text" },
-        { name: "street", type: "text" },
-        { name: "street_number", type: "text" },
-        { name: "zip_code", type: "text" },
-        { name: "city", type: "text" },
-        { name: "min_capacity", type: "number" },
-        { name: "max_capacity", type: "number" },
-    ]
-
     return (
         <>
             <div className="border-b-1 border-gray-200 p-7 flex items-center gap-2 shadow-sm shadow-black/5">
                 <h3 className="text-xl font-semibold">Add Assistant Record</h3>
             </div>
 
-            <div className="overflow-auto scrollbar-hide p-7">
-                <form onSubmit={handleSubmit} id="create_record_assistant">
-                    {inputFieldData.map((inputData) => (
-                        <div
-                            key={inputData.name}
-                            className="flex flex-col justify-center bg-gray-200 p-2 rounded-lg w-full mb-8"
-                        >
-                            <label className="text-xs text-gray-400 mb-1" htmlFor={inputData.name}>
-                                {inputData.name}
-                            </label>
-                            <input
-                                name={inputData.name}
-                                onChange={handleChange}
-                                type={inputData.type}
-                                value={formData[inputData.name]}
-                                className="outline-none text-sm validator"
-                                required
-                                id={inputData.name}
-                            />
-                        </div>
-                    ))}
-                </form>
-            </div>
+            <AssistantsForm
+                handleChange={handleChange}
+                handleSubmit={handleSubmit}
+                formData={formData}
+                formName="create_record_assistant"
+            />
 
             <div className="flex justify-end gap-6 border-t-1 border-gray-200 p-7 shadow-md shadow-black/5 -translate-y-1">
                 <button className="btn btn-ghost px-9" onClick={toggle}>

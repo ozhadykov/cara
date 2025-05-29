@@ -32,7 +32,7 @@ const RecordSidebar = ({ pageType }: { pageType: PageType }) => {
                 onClick={toggle}
             />
             <aside
-                className={`fixed top-0 right-0 w-md h-full pt-20 flex flex-col justify-between
+                className={`fixed top-0 right-0 w-lg h-full pt-20 flex flex-col justify-between
                     border-gray-200 bg-white 
                     transition-transform  ${
                         isOpen ? "translate-x-0" : "translate-x-full"

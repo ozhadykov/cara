@@ -9,12 +9,12 @@ export interface Person {
 }
 
 export interface Child extends Person {
-    required_qualification: string
+    required_qualification: number
     requested_hours: number
 }
 
 export interface Assistant extends Person {
-    qualification: string
+    qualification: number
     min_capacity: number
     max_capacity: number
 }
