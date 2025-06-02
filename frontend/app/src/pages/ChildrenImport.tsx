@@ -1,22 +1,20 @@
 import { Icon } from "@iconify/react"
 import { CSVImport, ChildrenSingleImport } from "../components"
-import { CsvRow } from "../components/import/CSVImport"
 import { postRequest } from "../lib/request"
 import { toastTypes } from "../lib/constants"
 import { useState } from "react"
 import { useLoading, useToast } from "../contexts"
+import { Child, TChildImport } from "../lib/models.ts"
 
 const ChildrenImport = () => {
     const { sendMessage } = useToast()
     const { toggleLoading } = useLoading()
     const [refreshChildren, setRefreshChildren] = useState(false)
 
-    const sendData = async (dataCols: string[], dataRows: CsvRow[]) => {
-        console.log("Sending data...")
-        const url = "/api/db/children?multiple=1"
-        const requestBody = {
-            dataCols,
-            dataRows,
+    const sendData = async (children: Child[]) => {
+        const url = "/api/children"
+        const requestBody: TChildImport = {
+            children,
         }
         const response = await postRequest(url, requestBody, sendMessage, toggleLoading)
         if (response)
@@ -50,7 +48,7 @@ const ChildrenImport = () => {
                         CSV Import
                     </label>
                     <div className="tab-content bg-base-100 border-base-300 p-6">
-                        <CSVImport importLabel={"Children Import"} sendData={sendData} />
+                        <CSVImport importLabel={"Children Import"} sendData={() => sendData} />
                     </div>
                 </div>
             </div>

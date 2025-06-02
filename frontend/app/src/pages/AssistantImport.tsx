@@ -1,22 +1,21 @@
 import { Icon } from "@iconify/react"
-import { CSVImport, AssistentSingleImport } from "../components"
-import { CsvRow } from "../components/import/CSVImport"
+import { CSVImport, AssistantSingleImport } from "../components"
 import { postRequest } from "../lib/request"
 import { toastTypes } from "../lib/constants"
 import { useLoading, useToast } from "../contexts"
 import { useState } from "react"
+import { Assistant } from "../lib/models"
 
-const AssistentImport = () => {
+const AssistantImport = () => {
     const { sendMessage } = useToast()
     const { toggleLoading } = useLoading()
     const [refreshAssistants, setRefreshAssistants] = useState(false)
 
-    const sendData = async (dataCols: string[], dataRows: CsvRow[]) => {
+    const sendData = async (assistant: Assistant[]) => {
         console.log("Sending data...")
         const url = "/api/db/assistants?multiple=1"
         const requestBody = {
-            dataCols,
-            dataRows,
+            assistant,
         }
         const response = await postRequest(url, requestBody, sendMessage, toggleLoading)
         if (response)
@@ -28,7 +27,7 @@ const AssistentImport = () => {
     return (
         <div className="data-import flex flex-col gap-3 w-full h-full">
             <div className="data-import-header mb-5">
-                <h1 className="text-3xl font-semibold">Assistent Import</h1>
+                <h1 className="text-3xl font-semibold">Assistant Import</h1>
                 <span className="mt-1 text-sm text-gray-400 flex items-center gap-1">
                     <Icon icon="solar:info-circle-linear" /> Here you can import data with csv or
                     single input
@@ -42,7 +41,7 @@ const AssistentImport = () => {
                         <span className="ml-1">Single Import</span>
                     </label>
                     <div className="tab-content bg-base-100 border-base-300 p-6">
-                        <AssistentSingleImport refresh={refreshAssistants} />
+                        <AssistantSingleImport refresh={refreshAssistants} />
                     </div>
 
                     <label className="tab">
@@ -51,7 +50,7 @@ const AssistentImport = () => {
                         CSV Import
                     </label>
                     <div className="tab-content bg-base-100 border-base-300 p-6">
-                        <CSVImport importLabel={"Assistent Import"} sendData={sendData} />
+                        <CSVImport importLabel={"Assistant Import"} sendData={() => sendData} />
                     </div>
                 </div>
             </div>
@@ -59,4 +58,4 @@ const AssistentImport = () => {
     )
 }
 
-export default AssistentImport
+export default AssistantImport

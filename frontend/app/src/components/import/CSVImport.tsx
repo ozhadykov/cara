@@ -3,23 +3,24 @@ import { Icon } from "@iconify/react"
 import { useToast } from "../../contexts"
 import { toastTypes } from "../../lib/constants.ts"
 import Papa from "papaparse"
+import { Person } from "../../lib/models.ts"
 
 export type CSVImportProps = {
     importLabel: string
-    sendData: (dataCols: string[], dataRows: CsvRow[]) => void
+    sendData: (data: Person[]) => void
 }
 
 export type CsvRow = { [key: string]: string | number }
 
 const CsvImport = (props: CSVImportProps) => {
-    const [csvData, setCsvData] = useState<CsvRow[]>([])
+    const [csvData, setCsvData] = useState<Person[]>([])
     const [csvCols, setCsvCols] = useState<string[]>([])
     const [file, setFile] = useState<File | null>(null)
     const { sendMessage } = useToast()
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
-        await props.sendData(csvCols, csvData)
+        await props.sendData(csvData)
         setCsvData([])
         setCsvCols([])
     }
@@ -100,19 +101,21 @@ const CsvImport = (props: CSVImportProps) => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {csvData.map((item, i) => {
+                                                {csvData.map((item: Person, i) => {
                                                     return (
                                                         <tr key={i}>
                                                             <th>{i}</th>
-                                                            {Object.keys(item).map((itemKey) => {
-                                                                return (
-                                                                    <td
-                                                                        key={`${i}_${item[itemKey]}`}
-                                                                    >
-                                                                        {item[itemKey]}
-                                                                    </td>
-                                                                )
-                                                            })}
+                                                            {Object.entries(item).map(
+                                                                ([key, value], idx) => {
+                                                                    return (
+                                                                        <td
+                                                                            key={`${i}_${key}_${idx}`}
+                                                                        >
+                                                                            {value}
+                                                                        </td>
+                                                                    )
+                                                                }
+                                                            )}
                                                         </tr>
                                                     )
                                                 })}

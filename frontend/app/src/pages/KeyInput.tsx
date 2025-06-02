@@ -17,14 +17,14 @@ const KeyInput = () => {
     useEffect(() => {
         // dev only
         const getOpenCageKey = async () => {
-            const response = await fetch("/api/db/apiKey/opencagekey")
+            const response = await fetch("/api/keys/opencagekey")
             const data = await response.json()
             if (response.ok) {
                 setOpenCageKey(data.apiKey)
             }
         }
         const getAmplKey = async () => {
-            const response = await fetch("/api/db/apiKey/amplkey")
+            const response = await fetch("/api/keys/amplkey")
             const data = await response.json()
             if (response.ok) {
                 setAmplKey(data.apiKey)
@@ -49,7 +49,7 @@ const KeyInput = () => {
                     className="btn btn-secondary"
                     onClick={() =>
                         postRequest(
-                            "/api/db/apiKey/opencagekey",
+                            "/api/keys/opencagekey",
                             { apiKey: openCageKey },
                             sendMessage
                         )
@@ -70,7 +70,7 @@ const KeyInput = () => {
                 <button
                     className="btn btn-secondary"
                     onClick={() =>
-                        postRequest("/api/db/apiKey/amplKey", { apiKey: amplKey }, sendMessage)
+                        postRequest("/api/keys/amplKey", { apiKey: amplKey }, sendMessage)
                     }
                 >
                     Send

@@ -1,32 +1,28 @@
 import { useState } from "react"
 import { postRequest } from "../../../lib/request.ts"
-import { Child } from "../../../lib/models.ts"
+import { Assistant } from "../../../lib/models.ts"
 
 import { useRecordSidebar } from "../../../contexts/providers/RecordSidebarContext.tsx"
-import { useChildrenData } from "../../../contexts/providers/ChildrenDataContext.tsx"
 import { useToast } from "../../../contexts/providers/ToastContext.tsx"
-import ChildrenForm from "./forms/ChildrenForm.tsx"
+import { useAssistantData } from "../../../contexts/providers/AssistantDataContext.tsx"
+import AssistantsForm from "./forms/AssistantsForm.tsx"
 
-type InputField = {
-    name: keyof Child
-    type: string
-}
-
-const ChildEdit = () => {
+const AssistantEdit = () => {
     const { sendMessage } = useToast()
     const { toggle, selectedData } = useRecordSidebar()
-    const { refreshChildren } = useChildrenData()
+    const { refreshAssistants } = useAssistantData()
 
-    const [formData, setFormData] = useState<Child>({
+    const [formData, setFormData] = useState<Assistant>({
         id: selectedData.id,
         first_name: selectedData.first_name,
         family_name: selectedData.family_name,
-        required_qualification: selectedData.required_qualification,
+        qualification: selectedData.qualification,
         street: selectedData.street,
         street_number: selectedData.street_number,
         city: selectedData.city,
         zip_code: selectedData.zip_code,
-        requested_hours: selectedData.requested_hours,
+        min_capacity: selectedData.min_capacity,
+        max_capacity: selectedData.max_capacity,
     })
 
     const handleChange = (event: any) => {
@@ -39,30 +35,29 @@ const ChildEdit = () => {
         e.preventDefault()
 
         try {
-            await postRequest(`/api/children/${selectedData.id}`, formData, sendMessage)
+            await postRequest(`/api/assistants/${selectedData.id}`, formData, sendMessage)
             toggle()
-            await refreshChildren()
+            await refreshAssistants()
         } catch (error) {}
     }
 
     return (
         <>
             <div className="border-b-1 border-gray-200 p-7 flex items-center gap-2 shadow-sm shadow-black/5">
-                <h3 className="text-xl font-semibold">Edit Child Record</h3>
+                <h3 className="text-xl font-semibold">Edit Assistant Record</h3>
             </div>
 
-            <ChildrenForm
+            <AssistantsForm
                 handleChange={handleChange}
                 handleSubmit={handleSubmit}
                 formData={formData}
-                formName="edit_record_child"
+                formName="edit_record_assistant"
             />
-
             <div className="flex justify-end gap-6 border-t-1 border-gray-200 p-7 shadow-md shadow-black/5 -translate-y-1">
                 <button className="btn btn-ghost px-9" onClick={toggle}>
                     Cancel
                 </button>
-                <button className="btn btn-neutral px-8" type="submit" form="edit_record_child">
+                <button className="btn btn-neutral px-8" type="submit" form="edit_record_assistant">
                     Save Changes
                 </button>
             </div>
@@ -70,4 +65,4 @@ const ChildEdit = () => {
     )
 }
 
-export default ChildEdit
+export default AssistantEdit

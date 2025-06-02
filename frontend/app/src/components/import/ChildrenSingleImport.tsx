@@ -14,13 +14,14 @@ const ChildrenSingleImport = ({ refresh }: { refresh: boolean }) => {
     const deleteChildren = async () => {
         try {
             for (const child_id of checkedItems) {
-                await deleteRequest(`/api/db/children/${child_id}`, {})
+                await deleteRequest(`/api/children/${child_id}`, {})
             }
 
             setCheckedItems([])
             setIsCheckAll(false)
             await refreshChildren()
-        } catch (error) {}
+        } catch (error) {
+        }
     }
 
     const handleSelectAll = (e: any) => {
@@ -54,10 +55,11 @@ const ChildrenSingleImport = ({ refresh }: { refresh: boolean }) => {
                     Add Record
                 </button>
             </div>
+            <div className="overflow-x-scroll rounded-box border border-base-content/5 bg-base-100">
 
-            <table className="w-full text-left text-sm">
-                <thead className="text-gray-500 text-xs ">
-                    <tr className="border-b-16 border-transparent">
+                <table className="table">
+                    <thead>
+                    <tr>
                         <th>
                             <input
                                 type="checkbox"
@@ -79,8 +81,8 @@ const ChildrenSingleImport = ({ refresh }: { refresh: boolean }) => {
                         <th>requested_hours</th>
                         <th></th>
                     </tr>
-                </thead>
-                <tbody>
+                    </thead>
+                    <tbody>
                     {children.map((child) => (
                         <tr key={child.id} className="border-gray-200 border-b-1">
                             <td>
@@ -93,7 +95,7 @@ const ChildrenSingleImport = ({ refresh }: { refresh: boolean }) => {
                                     checked={checkedItems.includes(String(child.id))}
                                 />
                             </td>
-                            <td className="py-4">{child.id}</td>
+                            <td className="font-bold">{child.id}</td>
                             <td>{child.first_name}</td>
                             <td>{child.family_name}</td>
                             <td>{child.required_qualification}</td>
@@ -112,8 +114,9 @@ const ChildrenSingleImport = ({ refresh }: { refresh: boolean }) => {
                             </td>
                         </tr>
                     ))}
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
 
             <div
                 className={`fixed ${

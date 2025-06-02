@@ -1,8 +1,8 @@
 import { Mode, useRecordSidebar } from "../../../contexts/providers/RecordSidebarContext"
 import ChildCreate from "./ChildCreate"
 import ChildEdit from "./ChildEdit"
-import AssistentEdit from "./AssistentEdit"
-import AssistentCreate from "./AssistentCreate"
+import AssistantEdit from "./AssistantEdit"
+import AssistantCreate from "./AssistantCreate"
 
 type PageType = "assistants" | "children"
 
@@ -12,8 +12,8 @@ const RecordSidebar = ({ pageType }: { pageType: PageType }) => {
     const renderContent = () => {
         if (pageType === "children" && mode === Mode.EDIT) return <ChildEdit />
         if (pageType === "children" && mode === Mode.CREATE) return <ChildCreate />
-        if (pageType === "assistants" && mode === Mode.EDIT) return <AssistentEdit />
-        if (pageType === "assistants" && mode === Mode.CREATE) return <AssistentCreate />
+        if (pageType === "assistants" && mode === Mode.EDIT) return <AssistantEdit />
+        if (pageType === "assistants" && mode === Mode.CREATE) return <AssistantCreate />
         return null
     }
 
@@ -32,7 +32,7 @@ const RecordSidebar = ({ pageType }: { pageType: PageType }) => {
                 onClick={toggle}
             />
             <aside
-                className={`fixed top-0 right-0 w-md h-full pt-20 flex flex-col justify-between
+                className={`fixed top-0 right-0 w-lg h-full pt-20 flex flex-col justify-between
                     border-gray-200 bg-white 
                     transition-transform  ${
                         isOpen ? "translate-x-0" : "translate-x-full"

@@ -1,27 +1,28 @@
-interface Person {
+export interface Person {
     id: number
     first_name: string
     family_name: string
     street: string
     street_number: string
     city: string
-    zip_code: string,
-    time_start: string,
-    time_end: string
+    zip_code: string
 }
 
 export interface Child extends Person {
-    required_qualification: string
+    required_qualification: number
     requested_hours: number
 }
 
-export type TChildImport = {
-    dataCols?: string[]
-    dataRows: Child[]
-}
-
 export interface Assistant extends Person {
-    qualification: string,
-    capacity: number,
+    qualification: number
+    min_capacity: number
+    max_capacity: number
 }
 
+export type TChildImport = {
+    children: Child[]
+}
+
+export type TAssistantImport = {
+    assistants: Assistant[]
+}
