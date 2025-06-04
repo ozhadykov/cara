@@ -107,15 +107,17 @@ class AssistantsService:
                         a.id AS id,
                         a.first_name AS first_name,
                         a.family_name AS family_name,
-                        a.qualification AS qualification,
+                        q.qualification_text AS qualification,
                         a.min_capacity AS min_capacity,
                         a.max_capacity AS max_capacity,
                         REPLACE(adr.street, '+', ' ') AS street,
                         REPLACE(adr.street_number, '+', ' ') AS street_number,
                         REPLACE(adr.city, '+', ' ') AS city,
                         adr.zip_code AS zip_code
-                    FROM assistants a, address adr
-                    WHERE a.address_id = adr.id;
+                    FROM 
+                        assistants a
+                        JOIN address adr ON adr.id = a.address_id
+                        JOIN qualifications q ON q.id = a.qualification
                 """
             )
             return cursor.fetchall()
@@ -125,16 +127,21 @@ class AssistantsService:
             cursor.execute(
                 """
                     SELECT
-                        assistants.*,
-                        adr.street,
-                        adr.street_number,
-                        adr.city,
-                        adr.zip_code
-                    FROM
-                        assistants
-                        JOIN address adr ON adr.id = assistants.address_id
-                    WHERE
-                        assistants.id = %s;
+                        a.id AS id,
+                        a.first_name AS first_name,
+                        a.family_name AS family_name,
+                        q.qualification_text AS qualification,
+                        a.min_capacity AS min_capacity,
+                        a.max_capacity AS max_capacity,
+                        REPLACE(adr.street, '+', ' ') AS street,
+                        REPLACE(adr.street_number, '+', ' ') AS street_number,
+                        REPLACE(adr.city, '+', ' ') AS city,
+                        adr.zip_code AS zip_code
+                    FROM 
+                        assistants a
+                        JOIN address adr ON adr.id = a.address_id
+                        JOIN qualifications q ON q.id = a.qualification
+                    WHERE a.id = %s
                 """, (assistant_id)
             )
             return cursor.fetchall()

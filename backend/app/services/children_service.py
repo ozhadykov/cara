@@ -106,14 +106,16 @@ class ChildrenService:
                         c.id AS id,
                         c.first_name AS first_name,
                         c.family_name AS family_name,
-                        c.required_qualification AS required_qualification,
+                        q.qualification_text AS required_qualification,
                         c.requested_hours AS requested_hours,
                         REPLACE(adr.street, '+', ' ') AS street,
                         REPLACE(adr.street_number, '+', ' ') AS street_number,
                         REPLACE(adr.city, '+', ' ') AS city,
                         adr.zip_code AS zip_code
-                    FROM children c, address adr
-                    WHERE c.address_id = adr.id
+                    FROM 
+                        children c
+                        JOIN address adr ON adr.id = c.address_id
+                        JOIN qualifications q ON q.id = c.required_qualification;
                 """
             )
             return cursor.fetchall()
@@ -122,17 +124,21 @@ class ChildrenService:
         with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute(
                 """
-                    SELECT
-                        children.*,
-                        adr.street,
-                        adr.street_number,
-                        adr.city,
-                        adr.zip_code
-                    FROM
-                        children
-                        JOIN address adr ON adr.id = children.address_id
-                    WHERE
-                        children.id = %s
+                   SELECT
+                        c.id AS id,
+                        c.first_name AS first_name,
+                        c.family_name AS family_name,
+                        q.qualification_text AS required_qualification,
+                        c.requested_hours AS requested_hours,
+                        REPLACE(adr.street, '+', ' ') AS street,
+                        REPLACE(adr.street_number, '+', ' ') AS street_number,
+                        REPLACE(adr.city, '+', ' ') AS city,
+                        adr.zip_code AS zip_code
+                    FROM 
+                        children c
+                        JOIN address adr ON adr.id = c.address_id
+                        JOIN qualifications q ON q.id = c.required_qualification
+                    WHERE c.id = %s;
                 """, (child_id)
             )
             return cursor.fetchall()

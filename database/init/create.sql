@@ -37,9 +37,15 @@ CREATE TABLE children (
     id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(255) NOT NULL CHECK (LENGTH(first_name) > 1),
     family_name VARCHAR(255) NOT NULL CHECK (LENGTH(family_name) > 1),
+
     required_qualification INT CHECK (required_qualification > 0 AND required_qualification <= 3),
+
     requested_hours INT NOT NULL,
+
     address_id INT NOT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     FOREIGN KEY (address_id) REFERENCES address(id) ON DELETE CASCADE,
     FOREIGN KEY(required_qualification) REFERENCES qualifications(id)
@@ -50,10 +56,16 @@ CREATE TABLE assistants (
     id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(255) NOT NULL CHECK (LENGTH(first_name) > 1),
     family_name VARCHAR(255) NOT NULL CHECK (LENGTH(family_name) > 1),
+    
     qualification INT CHECK (qualification > 0 AND qualification <= 3),
+
     min_capacity INT NOT NULL CHECK(min_capacity >= 0),
     max_capacity INT NOT NULL CHECK(max_capacity >= 0),
+
     address_id INT NOT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     FOREIGN KEY(address_id) REFERENCES address(id) ON DELETE CASCADE,
     FOREIGN KEY(qualification) REFERENCES qualifications(id)
@@ -65,6 +77,10 @@ CREATE TABLE pairs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     child_id INT NOT NULL,
     assistant_id INT NOT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
     FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE,
     FOREIGN KEY (assistant_id) REFERENCES assistants(id) ON DELETE CASCADE,
     UNIQUE KEY unique_pair (child_id, assistant_id)
