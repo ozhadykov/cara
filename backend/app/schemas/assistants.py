@@ -13,4 +13,4 @@ class Assistant(BaseModel):
     zip_code: str
 
 class AssistantIn(BaseModel):
-    assistants: List[Assistant]
+    data: List[Assistant]

@@ -1,21 +1,22 @@
-first_name,family_name,qualification,street,street_number,city,zip_code,capacity,time_start,time_end
-Sophie,Schneider,QHK,Lessingstraße,15,"Halle (Saale)",06114,30,08:00:00,16:00:00
-Michael,Weber,HK,Goethestraße,8,"Halle (Saale)",06110,20,09:00:00,13:00:00
-Laura,Fischer,FK,Hallorenring,3,"Halle (Saale)",06108,40,10:00:00,18:00:00
-Daniel,Meyer,QHK,Merseburger Straße,60,"Halle (Saale)",06112,25,14:00:00,17:00:00
-Anna,Schulz,HK,Bernburger Straße,115,"Halle (Saale)",06108,15,11:00:00,14:00:00
-Tim,Wagner,FK,Dessauer Straße,90,"Halle (Saale)",06118,35,07:30:00,15:30:00
-Lena,Becker,QHK,Leipziger Straße,55,"Halle (Saale)",06108,18,12:00:00,16:00:00
-Paul,Hoffmann,HK,Magdeburger Straße,22,"Halle (Saale)",06112,28,15:00:00,19:00:00
-Emilia,Richter,FK,Neustädter Passage,10,"Halle (Saale)",06122,32,09:30:00,17:30:00
-Max,Klein,QHK,Große Steinstraße,70,"Halle (Saale)",06108,22,08:30:00,12:30:00
-Clara,Wolf,HK,Kröllwitzer Straße,105,"Halle (Saale)",06120,10,13:00:00,15:00:00
-Finn,Neumann,FK,Wörmlitzer Straße,75,"Halle (Saale)",06110,38,16:00:00,20:00:00
-Hanna,Schwarz,QHK,Charlottenstraße,25,"Halle (Saale)",06108,21,10:30:00,14:30:00
-Leon,Zimmermann,HK,Fährstraße,20,"Halle (Saale)",06114,27,11:30:00,15:30:00
-Lea,Braun,FK,Blumenstraße,30,"Halle (Saale)",06108,31,14:30:00,18:30:00
-Jonas,Krüger,QHK,Dieselstraße,65,"Halle (Saale)",06130,16,07:00:00,11:00:00
-Marie,Hartmann,HK,Jacobstraße,18,"Halle (Saale)",06108,29,15:30:00,19:30:00
-Ben,Lang,FK,Gimritzer Damm,12,"Halle (Saale)",06120,33,08:45:00,16:45:00
-Mia,Schröder,QHK,Weststraße,35,"Halle (Saale)",06114,19,12:30:00,16:30:00
-Noah,Müller,HK,Mansfelder Straße,45,"Halle (Saale)",06108,24,09:15:00,13:15:00
+first_name,family_name,qualification,street,street_number,city,zip_code,min_capacity,max_capacity,time_start,time_end
+Sophie,Schneider,2,Lessingstraße,15,"Halle (Saale)",06114,25,35,08:00:00,16:00:00
+Michael,Weber,1,Goethestraße,8,"Halle (Saale)",06110,15,25,09:00:00,13:00:00
+Laura,Fischer,3,Hallorenring,3,"Halle (Saale)",06108,35,40,10:00:00,18:00:00
+Daniel,Meyer,1,Merseburger Straße,60,"Halle (Saale)",06112,25,25,14:00:00,17:00:00
+Anna,Schulz,2,Bernburger Straße,115,"Halle (Saale)",06108,15,15,11:00:00,14:00:00
+Tim,Wagner,3,Dessauer Straße,90,"Halle (Saale)",06118,30,40,07:30:00,15:30:00
+Lena,Becker,1,Leipziger Straße,55,"Halle (Saale)",06108,15,25,12:00:00,16:00:00
+Paul,Hoffmann,2,Magdeburger Straße,22,"Halle (Saale)",06112,25,35,15:00:00,19:00:00
+Emilia,Richter,3,Neustädter Passage,10,"Halle (Saale)",06122,25,35,09:30:00,17:30:00
+Max,Klein,1,Große Steinstraße,70,"Halle (Saale)",06108,15,25,08:30:00,12:30:00
+Clara,Wolf,2,Kröllwitzer Straße,105,"Halle (Saale)",06120,15,15,13:00:00,15:00:00
+Finn,Neumann,3,Wörmlitzer Straße,75,"Halle (Saale)",06110,35,40,16:00:00,20:00:00
+Hanna,Schwarz,1,Charlottenstraße,25,"Halle (Saale)",06108,15,25,10:30:00,14:30:00
+Leon,Zimmermann,2,Fährstraße,20,"Halle (Saale)",06114,25,35,11:30:00,15:30:00
+Lea,Braun,3,Blumenstraße,30,"Halle (Saale)",06108,25,35,14:30:00,18:30:00
+Jonas,Krüger,1,Dieselstraße,65,"Halle (Saale)",06130,15,25,07:00:00,11:00:00
+Marie,Hartmann,2,Jacobstraße,18,"Halle (Saale)",06108,25,35,15:30:00,19:30:00
+Ben,Lang,3,Gimritzer Damm,12,"Halle (Saale)",06120,25,35,08:45:00,16:45:00
+Mia,Schröder,1,Weststraße,35,"Halle (Saale)",06114,15,25,12:30:00,16:30:00
+Noah,Müller,2,Mansfelder Straße,45,"Halle (Saale)",06108,15,25,09:15:00,13:15:00
+

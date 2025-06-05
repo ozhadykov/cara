@@ -4,17 +4,17 @@ import { postRequest } from "../lib/request"
 import { toastTypes } from "../lib/constants"
 import { useState } from "react"
 import { useLoading, useToast } from "../contexts"
-import { Child, TChildImport } from "../lib/models.ts"
+import {Assistant, Child, TPersonImport} from "../lib/models.ts"
 
 const ChildrenImport = () => {
     const { sendMessage } = useToast()
     const { toggleLoading } = useLoading()
     const [refreshChildren, setRefreshChildren] = useState(false)
 
-    const sendData = async (children: Child[]) => {
+    const sendData = async (children: Child[]|Assistant[]) => {
         const url = "/api/children"
-        const requestBody: TChildImport = {
-            children,
+        const requestBody: TPersonImport = {
+            data: children,
         }
         const response = await postRequest(url, requestBody, sendMessage, toggleLoading)
         if (response)
@@ -48,7 +48,7 @@ const ChildrenImport = () => {
                         CSV Import
                     </label>
                     <div className="tab-content bg-base-100 border-base-300 p-6">
-                        <CSVImport importLabel={"Children Import"} sendData={() => sendData} />
+                        <CSVImport importLabel={"Children Import"} sendData={sendData} />
                     </div>
                 </div>
             </div>

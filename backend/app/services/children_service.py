@@ -14,7 +14,7 @@ class ChildrenService:
 
     async def create_children(self, children_in: ChildrenIn, distance_service: DistanceService):
         failed = []
-        for child in children_in.children:
+        for child in children_in.data:
             address = Address(
                 street=child.street,
                 street_number=child.street_number,

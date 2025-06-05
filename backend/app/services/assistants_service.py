@@ -14,7 +14,7 @@ class AssistantsService:
 
     async def create_assistant(self, assistant_in: AssistantIn, distance_service: DistanceService):
         failed = []
-        for assistant in assistant_in.assistants:
+        for assistant in assistant_in.data:
             address = Address(
                 street=assistant.street,
                 street_number=assistant.street_number,

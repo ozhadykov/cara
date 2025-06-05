@@ -19,6 +19,10 @@ export interface Assistant extends Person {
     max_capacity: number
 }
 
+export type TPersonImport = {
+    data: Child[] | Assistant[]
+}
+
 export type TChildImport = {
     children: Child[]
 }

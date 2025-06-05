@@ -3,17 +3,17 @@ import { Icon } from "@iconify/react"
 import { useToast } from "../../contexts"
 import { toastTypes } from "../../lib/constants.ts"
 import Papa from "papaparse"
-import { Person } from "../../lib/models.ts"
+import {Assistant, Child, Person} from "../../lib/models.ts"
 
 export type CSVImportProps = {
     importLabel: string
-    sendData: (data: Person[]) => void
+    sendData: (data: Child[]|Assistant[]) => void
 }
 
 export type CsvRow = { [key: string]: string | number }
 
 const CsvImport = (props: CSVImportProps) => {
-    const [csvData, setCsvData] = useState<Person[]>([])
+    const [csvData, setCsvData] = useState<Child[]>([])
     const [csvCols, setCsvCols] = useState<string[]>([])
     const [file, setFile] = useState<File | null>(null)
     const { sendMessage } = useToast()

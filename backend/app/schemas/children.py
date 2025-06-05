@@ -12,4 +12,4 @@ class Child(BaseModel):
     zip_code: str
 
 class ChildrenIn(BaseModel):
-    children: List[Child]
+    data: List[Child]
