@@ -1,7 +1,8 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 class Child(BaseModel):
+    id: Optional[int] = None
     first_name: str
     family_name: str
     required_qualification: str
