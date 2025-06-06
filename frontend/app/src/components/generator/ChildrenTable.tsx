@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { Child } from "../../lib/models.ts"
 import { ColumnDef, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table"
 import Checkbox from "../input/Checkbox.tsx"
@@ -19,7 +19,8 @@ const ChildrenTable = ({ children }: IChildrenTable) => {
                 cell: ({ row }) => {
                     return (
                         <div>
-                            <Checkbox id={`child_checkbox_${row.id}`} onChange={row.getToggleSelectedHandler()} name="child_id"
+                            <Checkbox id={`child_checkbox_${row.id}`} onChange={row.getToggleSelectedHandler()}
+                                      name="child_id"
                                       checked={row.getIsSelected()} />
                         </div>
                     )
@@ -76,6 +77,15 @@ const ChildrenTable = ({ children }: IChildrenTable) => {
         onRowSelectionChange: setSelectedChildren,
         getPaginationRowModel: getPaginationRowModel(),
     })
+
+    useEffect(() => {
+        console.log(table.getState().rowSelection)
+    }, [selectedChildren, table])
+
+    useEffect(() => {
+        console.log('initial render')
+    }, [])
+
 
     return (
         <div>
