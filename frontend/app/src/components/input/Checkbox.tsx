@@ -1,13 +1,13 @@
-import React from 'react';
+import React from "react"
 
 interface CheckboxProps {
-  id: string;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  name: string;
-  checked: boolean;
+    id: string;
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    name: string;
+    checked: boolean;
 }
 
-const Checkbox = ({id, onChange, name, checked}: CheckboxProps) => {
+const Checkbox = ({ id, onChange, name, checked }: CheckboxProps) => {
     return (
         <div>
             <input
@@ -19,7 +19,7 @@ const Checkbox = ({id, onChange, name, checked}: CheckboxProps) => {
                 checked={checked}
             />
         </div>
-    );
-};
+    )
+}
 
-export default Checkbox;
+export default Checkbox

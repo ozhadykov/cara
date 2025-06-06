@@ -7,6 +7,9 @@ import ChildrenSingleImport from "./import/ChildrenSingleImport.tsx"
 import Alert from "./feedback/Alert.tsx"
 import Toast from "./feedback/Toast.tsx"
 import Loading from "./feedback/Loading.tsx"
+import AssistantTable from "./generator/AssistantTable.tsx"
+import ChildrenTable from "./generator/ChildrenTable.tsx"
+import Generator from "./generator/Generator.tsx"
 
 export {
     Navbar,
@@ -18,4 +21,7 @@ export {
     Alert,
     Toast,
     Loading,
+    AssistantTable,
+    ChildrenTable,
+    Generator
 }

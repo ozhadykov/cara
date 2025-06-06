@@ -1,17 +1,17 @@
 import React, { useMemo, useState } from "react"
-import { Child } from "../../lib/models.ts"
-import { ColumnDef, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table"
-import Checkbox from "../input/Checkbox.tsx"
 import Table from "./Table.tsx"
+import { ColumnDef, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table"
+import { Assistant } from "../../lib/models.ts"
+import Checkbox from "../input/Checkbox.tsx"
 
-interface IChildrenTable {
-    children: Child[]
+interface IAssistantTable {
+    assistants: Assistant[]
 }
 
-const ChildrenTable = ({ children }: IChildrenTable) => {
-    const [selectedChildren, setSelectedChildren] = useState({})
+const AssistantTable = ({ assistants }: IAssistantTable) => {
+    const [selectedAssistants, setSelectedAssistants] = useState({})
 
-    const columns = useMemo<ColumnDef<Child>[]>(
+    const columns = useMemo<ColumnDef<Assistant>[]>(
         () => [
             {
                 id: "select",
@@ -19,7 +19,7 @@ const ChildrenTable = ({ children }: IChildrenTable) => {
                 cell: ({ row }) => {
                     return (
                         <div>
-                            <Checkbox id={`child_checkbox_${row.id}`} onChange={row.getToggleSelectedHandler()} name="child_id"
+                            <Checkbox id={`assistant_checkbox_${row.id}`} onChange={row.getToggleSelectedHandler()} name="assistant_id"
                                       checked={row.getIsSelected()} />
                         </div>
                     )
@@ -42,11 +42,15 @@ const ChildrenTable = ({ children }: IChildrenTable) => {
                 cell: info => info.getValue(),
             },
             {
-                accessorKey: "required_qualification",
+                accessorKey: "qualification",
                 cell: info => info.getValue(),
             },
             {
-                accessorKey: "requested_hours",
+                accessorKey: "min_capacity",
+                cell: info => info.getValue(),
+            },
+            {
+                accessorKey: "max_capacity",
                 cell: info => info.getValue(),
             },
             {
@@ -66,17 +70,16 @@ const ChildrenTable = ({ children }: IChildrenTable) => {
     )
 
     const table = useReactTable({
-        data: children,
+        data: assistants,
         columns,
         state: {
-            rowSelection: selectedChildren,
+            rowSelection: selectedAssistants,
         },
         getCoreRowModel: getCoreRowModel(),
         enableRowSelection: true,
-        onRowSelectionChange: setSelectedChildren,
+        onRowSelectionChange: setSelectedAssistants,
         getPaginationRowModel: getPaginationRowModel(),
     })
-
     return (
         <div>
             <Table table={table} />
@@ -84,4 +87,4 @@ const ChildrenTable = ({ children }: IChildrenTable) => {
     )
 }
 
-export default ChildrenTable
+export default AssistantTable
