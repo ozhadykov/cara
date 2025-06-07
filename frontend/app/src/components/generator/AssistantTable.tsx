@@ -3,13 +3,20 @@ import Table from "./Table.tsx"
 import { ColumnDef, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table"
 import { Assistant } from "../../lib/models.ts"
 import Checkbox from "../input/Checkbox.tsx"
+import { usePairsGenerator } from "../../contexts/providers/PairsGeneratorContext.tsx"
+import { useToast } from "../../contexts"
+import { toastTypes } from "../../lib/constants.ts"
 
 interface IAssistantTable {
     assistants: Assistant[]
+    next: () => void
+    prev: () => void
 }
 
-const AssistantTable = ({ assistants }: IAssistantTable) => {
+const AssistantTable = ({ assistants, next, prev }: IAssistantTable) => {
     const [selectedAssistants, setSelectedAssistants] = useState({})
+    const { setSelectedAssistantsIds } = usePairsGenerator()
+    const { sendMessage } = useToast()
 
     const columns = useMemo<ColumnDef<Assistant>[]>(
         () => [
@@ -19,7 +26,8 @@ const AssistantTable = ({ assistants }: IAssistantTable) => {
                 cell: ({ row }) => {
                     return (
                         <div>
-                            <Checkbox id={`assistant_checkbox_${row.id}`} onChange={row.getToggleSelectedHandler()} name="assistant_id"
+                            <Checkbox id={`assistant_checkbox_${row.id}`} onChange={row.getToggleSelectedHandler()}
+                                      name="assistant_id"
                                       checked={row.getIsSelected()} />
                         </div>
                     )
@@ -80,9 +88,31 @@ const AssistantTable = ({ assistants }: IAssistantTable) => {
         onRowSelectionChange: setSelectedAssistants,
         getPaginationRowModel: getPaginationRowModel(),
     })
+
+    const handleNextStep = () => {
+        const selectedInTable = table.getState().rowSelection
+        const rowIds = Object.keys(selectedInTable)
+        if (rowIds.length) {
+            const assistantsToSave: number[] = []
+            rowIds.forEach(rowId => {
+                const rowData = table.getRow(rowId)
+                assistantsToSave.push(rowData.original.id)
+            })
+            setSelectedAssistantsIds(assistantsToSave)
+            next()
+        } else
+            sendMessage("Select some children to continue", toastTypes.error)
+
+    }
+
+
     return (
-        <div>
+        <div className="overflow-y-hidden">
             <Table table={table} />
+            <div className="generator-controls flex items-center justify-between gap-3 mt-6">
+                <button className="btn btn-soft btn-wide" onClick={prev}>previous step</button>
+                <button className="btn btn-soft btn-wide btn-secondary" onClick={handleNextStep}>next step</button>
+            </div>
         </div>
     )
 }

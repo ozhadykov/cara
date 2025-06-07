@@ -4,6 +4,7 @@ import { Assistant, Child } from "../lib/models.ts"
 import { useLoading, useToast } from "../contexts"
 import { toastTypes } from "../lib/constants.ts"
 import { ChildrenTable, AssistantTable, Generator } from "../components"
+import { PairsGeneratorProvider } from "../contexts/providers/PairsGeneratorContext.tsx"
 
 const PairGenerator = () => {
     const [children, setChildren] = useState<Child[]>([])
@@ -60,12 +61,10 @@ const PairGenerator = () => {
             {
                 id: 1,
                 title: "Choose Children",
-                component: <ChildrenTable children={children} />,
             },
             {
                 id: 2,
                 title: "Choose Assistants",
-                component: <h1>HEll yeah</h1>,
             },
             {
                 id: 3,
@@ -81,37 +80,35 @@ const PairGenerator = () => {
     }, [])
 
     return (
-        <div className="generator-content flex flex-col gap-3 w-full h-full">
-            <div className="generator-header mb-5">
-                <h1 className="text-3xl font-semibold">Pairs generator</h1>
-                <span className="mt-1 text-sm text-gray-400 flex items-center gap-1">
-                    <Icon icon="solar:info-circle-linear" /> Here you can generate and edit pairs
-                </span>
-            </div>
-            <div className="generator-body card shadow-md">
-                <div className="card-body bg-white rounded-lg flex flex-row">
-                    <div
-                        className="flex flex-col items-center justify-center w-fit px-8 flex-none border-r-1 border-gray-300">
-                        <div className="generator-steps-navigation w-full h-full flex flex-col">
-                            <ul className="steps steps-vertical grow-1">
-                                {steps.map(step => <li className={`step ${step.id <= currentStep && "step-primary"}`}
-                                                       key={step.id}>{step.title}</li>)}
-                            </ul>
-                            <div className="generator-controls flex items-center justify-around gap-3">
-                                <button className="btn btn-neutral grow" onClick={prevStep}>previous</button>
-                                <button className="btn btn-neutral grow" onClick={nextStep}>next</button>
+        <PairsGeneratorProvider>
+            <div className="generator-content flex flex-col gap-3 w-full h-full">
+                <div className="generator-header mb-5">
+                    <h1 className="text-3xl font-semibold">Pairs generator</h1>
+                    <span className="mt-1 text-sm text-gray-400 flex items-center gap-1">
+                        <Icon icon="solar:info-circle-linear" /> Here you can generate and edit pairs
+                    </span>
+                </div>
+                <div className="generator-body card shadow-md">
+                    <div className="card-body bg-white rounded-lg flex flex-row">
+                        <div
+                            className="flex flex-col items-center justify-center w-fit pl-4 pr-18 flex-none border-r-1 border-gray-300">
+                            <div className="generator-steps-navigation w-full h-full flex flex-col">
+                                <ul className="steps steps-vertical grow-1">
+                                    {steps.map(step => <li className={`step ${step.id <= currentStep && "step-primary"}`}
+                                                           key={step.id}>{step.title}</li>)}
+                                </ul>
                             </div>
                         </div>
-                    </div>
-                    <div
-                        className="generator-step-content pl-4 h-full overflow-x-scroll">
-                        {currentStep === 1 && <ChildrenTable children={children} />}
-                        {currentStep === 2 && <AssistantTable assistants={assistants} />}
-                        {currentStep === 3 && <Generator />}
+                        <div
+                            className="generator-step-content pl-4 h-full overflow-x-scroll">
+                            {currentStep === 1 && <ChildrenTable children={children} next={nextStep}/>}
+                            {currentStep === 2 && <AssistantTable assistants={assistants} next={nextStep} prev={prevStep} />}
+                            {currentStep === 3 && <Generator />}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </PairsGeneratorProvider>
     )
 }
 

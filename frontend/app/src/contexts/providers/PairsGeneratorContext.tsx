@@ -1,20 +1,19 @@
 import { createContext, ReactNode, useContext, useState } from "react"
-import { Assistant, Child } from "../../lib/models.ts"
 
 export type PairsGeneratorTypes = {
-    selectedChildren: Child[]
-    selectedAssistants: Assistant[]
-    setSelectedChildren: (children:Child[]) => void
-    setSelectedAssistants: (assistants:Assistant[]) => void
+    selectedChildrenIds: number[]
+    selectedAssistantsIds: number[]
+    setSelectedChildrenIds: (children:number[]) => void
+    setSelectedAssistantsIds: (assistants:number[]) => void
 }
 
 const PairsGeneratorContext = createContext<PairsGeneratorTypes | null>(null)
 
 export const PairsGeneratorProvider = ({ children }: { children: ReactNode }) => {
-    const [selectedChildren, setSelectedChildren] = useState<Child[]>([])
-    const [selectedAssistants, setSelectedAssistants] = useState<Assistant[]>([])
+    const [selectedChildrenIds, setSelectedChildrenIds] = useState<number[]>([])
+    const [selectedAssistantsIds, setSelectedAssistantsIds] = useState<number[]>([])
     return (
-        <PairsGeneratorContext.Provider value={{selectedChildren, setSelectedChildren, selectedAssistants, setSelectedAssistants}}>
+        <PairsGeneratorContext.Provider value={{selectedChildrenIds, setSelectedChildrenIds, selectedAssistantsIds, setSelectedAssistantsIds}}>
             {children}
         </PairsGeneratorContext.Provider>
     )
