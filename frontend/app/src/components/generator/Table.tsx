@@ -3,13 +3,13 @@ import { flexRender, RowData, Table as TanStackTable } from "@tanstack/react-tab
 
 interface ITableComponentProps<TData extends RowData> {
     table: TanStackTable<TData>
-    controls: boolean
+    controls?: boolean
 }
 
 const Table = <TData extends RowData>({ table, controls = true }: ITableComponentProps<TData>) => {
     return (
         <>
-            <div className="table-wrapper rounded-box border border-base-content/5 bg-base-100">
+            <div className="table-wrapper rounded-box border border-base-content/5 bg-base-100 overflow-x-scroll">
                 <table className="table">
                     <thead>
                     {table.getHeaderGroups().map(headerGroup => (
