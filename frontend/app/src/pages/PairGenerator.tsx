@@ -94,16 +94,18 @@ const PairGenerator = () => {
                             className="flex flex-col items-center justify-center w-fit pl-4 pr-18 flex-none border-r-1 border-gray-300">
                             <div className="generator-steps-navigation w-full h-full flex flex-col">
                                 <ul className="steps steps-vertical grow-1">
-                                    {steps.map(step => <li className={`step ${step.id <= currentStep && "step-primary"}`}
-                                                           key={step.id}>{step.title}</li>)}
+                                    {steps.map(step => <li
+                                        className={`step ${step.id <= currentStep && "step-primary"}`}
+                                        key={step.id}>{step.title}</li>)}
                                 </ul>
                             </div>
                         </div>
                         <div
-                            className="generator-step-content pl-4 h-full overflow-x-scroll">
-                            {currentStep === 1 && <ChildrenTable children={children} next={nextStep}/>}
-                            {currentStep === 2 && <AssistantTable assistants={assistants} next={nextStep} prev={prevStep} />}
-                            {currentStep === 3 && <Generator next={nextStep} prev={prevStep}/>}
+                            className="generator-step-content pl-4 h-full w-full overflow-x-scroll">
+                            {currentStep === 1 && <ChildrenTable children={children} next={nextStep} />}
+                            {currentStep === 2 &&
+                                <AssistantTable assistants={assistants} next={nextStep} prev={prevStep} />}
+                            {currentStep === 3 && <Generator next={nextStep} prev={prevStep} />}
                         </div>
                     </div>
                 </div>

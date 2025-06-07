@@ -15,7 +15,7 @@ interface IAssistantTable {
 
 const AssistantTable = ({ assistants, next, prev }: IAssistantTable) => {
     const [selectedAssistants, setSelectedAssistants] = useState({})
-    const { setSelectedAssistantsIds, selectedAssistantsIds } = usePairsGenerator()
+    const { setSelectedAssistantsObj, selectedAssistantsObj } = usePairsGenerator()
     const { sendMessage } = useToast()
 
     const columns = useMemo<ColumnDef<Assistant>[]>(
@@ -95,12 +95,12 @@ const AssistantTable = ({ assistants, next, prev }: IAssistantTable) => {
         const selectedInTable = table.getState().rowSelection
         const rowIds = Object.keys(selectedInTable)
         if (rowIds.length) {
-            const assistantsToSave: number[] = []
+            const assistantsToSave: Assistant[] = []
             rowIds.forEach(rowId => {
                 const rowData = table.getRow(rowId)
-                assistantsToSave.push(rowData.original.id)
+                assistantsToSave.push(rowData.original)
             })
-            setSelectedAssistantsIds(assistantsToSave)
+            setSelectedAssistantsObj(assistantsToSave)
             next()
         } else
             sendMessage("Select some children to continue", toastTypes.error)
@@ -108,8 +108,8 @@ const AssistantTable = ({ assistants, next, prev }: IAssistantTable) => {
     }
 
     useEffect(() => {
-        const restoredSelection = selectedAssistantsIds.reduce((acc: { [key: number]: boolean }, currVal) => {
-            acc[currVal] = true
+        const restoredSelection = selectedAssistantsObj.reduce((acc: { [key: number]: boolean }, currVal) => {
+            acc[currVal.id] = true
             return acc
         }, {} as { [key: number]: boolean })
 
@@ -118,7 +118,7 @@ const AssistantTable = ({ assistants, next, prev }: IAssistantTable) => {
 
 
     return (
-        <div className="overflow-y-hidden">
+        <div className="step-2-assistant-pick overflow-y-hidden">
             <Table table={table} />
             <div className="generator-controls flex items-center justify-between gap-3 mt-6">
                 <button className="btn btn-soft btn-wide" onClick={prev}>previous step</button>

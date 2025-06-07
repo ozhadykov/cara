@@ -14,7 +14,7 @@ interface IChildrenTable {
 
 const ChildrenTable = ({ children, next }: IChildrenTable) => {
     const [selectedChildrenLocal, setSelectedChildrenLocal] = useState({})
-    const { setSelectedChildrenIds, selectedChildrenIds } = usePairsGenerator()
+    const { setSelectedChildrenObj, selectedChildrenObj } = usePairsGenerator()
     const { sendMessage } = useToast()
 
     const columns = useMemo<ColumnDef<Child>[]>(
@@ -90,12 +90,12 @@ const ChildrenTable = ({ children, next }: IChildrenTable) => {
         const selectedInTable = table.getState().rowSelection
         const rowIds = Object.keys(selectedInTable)
         if (rowIds.length) {
-            const childrenToSave: number[] = []
+            const childrenToSave: Child[] = []
             rowIds.forEach(rowId => {
                 const rowData = table.getRow(rowId)
-                childrenToSave.push(rowData.original.id)
+                childrenToSave.push(rowData.original)
             })
-            setSelectedChildrenIds(childrenToSave)
+            setSelectedChildrenObj(childrenToSave)
             next()
         } else
             sendMessage("Select some children to continue", toastTypes.error)
@@ -103,8 +103,8 @@ const ChildrenTable = ({ children, next }: IChildrenTable) => {
     }
 
     useEffect(() => {
-        const restoredSelection = selectedChildrenIds.reduce((acc: { [key: number]: boolean }, currVal) => {
-            acc[currVal] = true
+        const restoredSelection = selectedChildrenObj.reduce((acc: { [key: number]: boolean }, currVal) => {
+            acc[currVal.id] = true
             return acc
         }, {} as { [key: number]: boolean })
 
@@ -113,7 +113,7 @@ const ChildrenTable = ({ children, next }: IChildrenTable) => {
 
 
     return (
-        <div className="overflow-y-hidden">
+        <div className="overflow-y-hidden step-1-chidlren-pick">
             <Table table={table} />
             <div className="generator-controls flex items-center justify-end gap-3 mt-6">
                 <button className="btn btn-soft btn-wide btn-secondary" onClick={handleNextStep}>next step</button>
