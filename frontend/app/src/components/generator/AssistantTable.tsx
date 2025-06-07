@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import Table from "./Table.tsx"
 import { ColumnDef, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table"
 import { Assistant } from "../../lib/models.ts"
@@ -15,7 +15,7 @@ interface IAssistantTable {
 
 const AssistantTable = ({ assistants, next, prev }: IAssistantTable) => {
     const [selectedAssistants, setSelectedAssistants] = useState({})
-    const { setSelectedAssistantsIds } = usePairsGenerator()
+    const { setSelectedAssistantsIds, selectedAssistantsIds } = usePairsGenerator()
     const { sendMessage } = useToast()
 
     const columns = useMemo<ColumnDef<Assistant>[]>(
@@ -83,6 +83,8 @@ const AssistantTable = ({ assistants, next, prev }: IAssistantTable) => {
         state: {
             rowSelection: selectedAssistants,
         },
+        //@ts-ignore
+        getRowId: originalRow => originalRow.id,
         getCoreRowModel: getCoreRowModel(),
         enableRowSelection: true,
         onRowSelectionChange: setSelectedAssistants,
@@ -104,6 +106,15 @@ const AssistantTable = ({ assistants, next, prev }: IAssistantTable) => {
             sendMessage("Select some children to continue", toastTypes.error)
 
     }
+
+    useEffect(() => {
+        const restoredSelection = selectedAssistantsIds.reduce((acc: { [key: number]: boolean }, currVal) => {
+            acc[currVal] = true
+            return acc
+        }, {} as { [key: number]: boolean })
+
+        setSelectedAssistants(restoredSelection)
+    }, [])
 
 
     return (

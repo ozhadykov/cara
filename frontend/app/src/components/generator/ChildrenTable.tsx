@@ -88,7 +88,6 @@ const ChildrenTable = ({ children, next }: IChildrenTable) => {
 
     const handleNextStep = () => {
         const selectedInTable = table.getState().rowSelection
-        console.log(selectedInTable)
         const rowIds = Object.keys(selectedInTable)
         if (rowIds.length) {
             const childrenToSave: number[] = []
@@ -104,11 +103,10 @@ const ChildrenTable = ({ children, next }: IChildrenTable) => {
     }
 
     useEffect(() => {
-        console.log(table.getRowModel())
-        const restoredSelection = selectedChildrenIds.reduce((acc, currVal) => {
+        const restoredSelection = selectedChildrenIds.reduce((acc: { [key: number]: boolean }, currVal) => {
             acc[currVal] = true
             return acc
-        }, {})
+        }, {} as { [key: number]: boolean })
 
         setSelectedChildrenLocal(restoredSelection)
     }, [])
@@ -117,8 +115,7 @@ const ChildrenTable = ({ children, next }: IChildrenTable) => {
     return (
         <div className="overflow-y-hidden">
             <Table table={table} />
-            <div className="generator-controls flex items-center justify-between gap-3 mt-6">
-                <button className="btn btn-soft btn-wide">previous step</button>
+            <div className="generator-controls flex items-center justify-end gap-3 mt-6">
                 <button className="btn btn-soft btn-wide btn-secondary" onClick={handleNextStep}>next step</button>
             </div>
         </div>

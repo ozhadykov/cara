@@ -1,7 +1,8 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 class Assistant(BaseModel):
+    id: Optional[int] = None
     first_name: str
     family_name: str
     qualification: str

@@ -103,7 +103,7 @@ const PairGenerator = () => {
                             className="generator-step-content pl-4 h-full overflow-x-scroll">
                             {currentStep === 1 && <ChildrenTable children={children} next={nextStep}/>}
                             {currentStep === 2 && <AssistantTable assistants={assistants} next={nextStep} prev={prevStep} />}
-                            {currentStep === 3 && <Generator />}
+                            {currentStep === 3 && <Generator next={nextStep} prev={prevStep}/>}
                         </div>
                     </div>
                 </div>
