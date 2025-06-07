@@ -5,7 +5,7 @@ const Toast = () => {
 
     return (
         <div
-            className={`toast toast-start transition-opacity ${
+            className={`toast toast-start transition-opacity z-100 ${
                 isOpen ? "opacity-100" : "opacity-0"
             }`}
         >
