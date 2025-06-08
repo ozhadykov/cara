@@ -5,3 +5,4 @@ numpy
 fastapi[standard]
 pydantic
 uvicorn
+pymysql

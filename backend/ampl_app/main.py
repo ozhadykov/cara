@@ -1,10 +1,14 @@
 import pandas as pd
 import numpy as np
 import amplpy
+import json
 from amplpy import AMPL
+from typing import List
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from .schemas.assistants import Assistant
+from .schemas.children import Child
 
 app = FastAPI()
 
@@ -25,6 +29,17 @@ class devAMPLResponse(BaseModel):
     status: str
     total_pairs: float
     assignments: object
+
+
+class GeneratePairsIN(BaseModel):
+    children: List[Child]
+    assistants: List[Assistant]
+
+
+@app.post("/generate_pairs")
+async def generate_pairs(data: GeneratePairsIN):
+    print(json.dumps(data.model_dump(), indent=4))
+    return 'hello'
 
 
 @app.get("/ampl", summary="solving dummy model with generated data", response_model=devAMPLResponse)
@@ -95,7 +110,7 @@ def read_root():
         # distance measuring? through possible aasosiations, teacher have to reach the school
 
         ampl.set_data(children_df[['child_id', 'qualification_requirment',
-                      'hours_requested']].set_index("child_id"), "CHILDREN")
+                                   'hours_requested']].set_index("child_id"), "CHILDREN")
         ampl.set_data(assistants_df[['assistant_id', 'qualification', 'capacity_hours']].set_index(
             "assistant_id"), "ASSISTANTS")
         ampl.get_parameter("QUALIFICATIONS").set_values(score_df)

@@ -63,6 +63,7 @@ CREATE TABLE assistants (
     max_capacity INT NOT NULL CHECK(max_capacity >= 0),
 
     address_id INT NOT NULL,
+    has_car BOOL NOT NULL,
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -93,5 +94,6 @@ CREATE TABLE apiKeys (
 
 INSERT INTO apiKeys (id, apiKey)
 VALUES
-    ('opencagekey', ''),
-    ('amplkey', '');
+    ('opencage_key', ''),
+    ('ampl_key', ''),
+    ('google_maps_key', '');

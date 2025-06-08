@@ -2,7 +2,7 @@ import { useLoading, usePairsGenerator, useToast } from "../../contexts"
 import { ColumnDef, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { useMemo } from "react"
 import { Assistant, Child } from "../../lib/models.ts"
-import {postRequest} from "../../lib/request.ts"
+import { postRequest } from "../../lib/request.ts"
 import Table from "./Table.tsx"
 
 interface IGeneratorProps {
@@ -12,8 +12,8 @@ interface IGeneratorProps {
 
 const Generator = ({ next, prev }: IGeneratorProps) => {
     const { selectedChildrenObj, selectedAssistantsObj } = usePairsGenerator()
-    const {sendMessage} = useToast()
-    const {toggleLoading} = useLoading()
+    const { sendMessage } = useToast()
+    const { toggleLoading } = useLoading()
 
     // region children table
     const childrenColumns = useMemo<ColumnDef<Child>[]>(
@@ -110,7 +110,7 @@ const Generator = ({ next, prev }: IGeneratorProps) => {
                 cell: info => info.getValue(),
             },
         ],
-        []
+        [],
     )
 
     const assistantsPreviewTable = useReactTable({
@@ -122,10 +122,10 @@ const Generator = ({ next, prev }: IGeneratorProps) => {
 
     const handleGenerate = async () => {
 
-        const url = '/api/pair_generator'
+        const url = "/api/pair_generator"
         const data = {
             children: selectedChildrenObj,
-            assistants: selectedAssistantsObj
+            assistants: selectedAssistantsObj,
         }
         const response = await postRequest(url, data, sendMessage, toggleLoading)
         console.log(response)
@@ -142,7 +142,7 @@ const Generator = ({ next, prev }: IGeneratorProps) => {
                 <div className="children-list-container w-full">
                     <span className="list-header text-lg">Selected children</span>
                     <div className="table-container mt-4">
-                        <Table table={childrenPreviewTable} controls={false}/>
+                        <Table table={childrenPreviewTable} controls={false} />
                     </div>
                 </div>
                 <div className="assistant-list-container w-full">

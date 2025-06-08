@@ -15,6 +15,7 @@ async def get_base_data(pairs_service: PairsService = Depends()):
     result = await pairs_service.get_base_data()
     return result
 
+
 @router.post("/")
 async def generate_pairs(data: GeneratePairsData, pairs_service: PairsService = Depends()):
     result = await pairs_service.generate_pairs(data)

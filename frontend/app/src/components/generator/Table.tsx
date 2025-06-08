@@ -82,10 +82,10 @@ const Table = <TData extends RowData>({ table, controls = true }: ITableComponen
                         </span>
                     </div>
                     <select className="select cursor-pointer"
-                        value={table.getState().pagination.pageSize}
-                        onChange={e => {
-                            table.setPageSize(Number(e.target.value))
-                        }}
+                            value={table.getState().pagination.pageSize}
+                            onChange={e => {
+                                table.setPageSize(Number(e.target.value))
+                            }}
                     >
                         {[10, 20, 30, 40, 50].map(pageSize => (
                             <option key={pageSize} value={pageSize}>

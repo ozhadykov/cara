@@ -14,7 +14,7 @@ class DistanceService:
         self.keys_service = keys_service
 
     async def get_coordinates_from_street_name(self, address: Address):
-        key_data = await self.keys_service.get_api_key("opencagekey")
+        key_data = await self.keys_service.get_api_key("opencage_key")
         url = f"https://api.opencagedata.com/geocode/v1/json?q={address.street}+{address.street_number}%2C+{address.zip_code}+{address.city}%2C+Germany&key={key_data["apiKey"]}"  # streetnumber u key wieder einfügen
         r = httpx.get(url)
 

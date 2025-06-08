@@ -1,5 +1,5 @@
+import httpx
 import pymysql.cursors
-import pprint
 import json
 from fastapi import Depends
 from ..database.database import get_db
@@ -10,10 +10,13 @@ from ..services.children_service import ChildrenService
 from ..services.assistants_service import AssistantsService
 from ..schemas.pairs_generator import GeneratePairsData
 
+BASE_URL = 'http://ampl:8000/'
+
 
 class PairsService:
 
-    def __init__(self, db: Connection = Depends(get_db), children_service: ChildrenService = Depends(), assistants_service: AssistantsService = Depends()):
+    def __init__(self, db: Connection = Depends(get_db), children_service: ChildrenService = Depends(),
+                 assistants_service: AssistantsService = Depends()):
         self.db = db
         self.children_service = children_service
         self.assistants_service = assistants_service
@@ -48,5 +51,16 @@ class PairsService:
     async def generate_pairs(self, data: GeneratePairsData):
         # dev only
         print(json.dumps(data.model_dump(), indent=4))
+
+        # preparing data for ampl
+
+        # get distances for children and assistants
+
+        # send data to ampl container
+
+        try:
+            r = httpx.post(f"{BASE_URL}/generate_pairs", json=data.model_dump())
+        except Exception as e:
+            return Response(success=False, message="someting went wrong")
 
         return 'hello world'
