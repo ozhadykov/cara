@@ -1,4 +1,6 @@
 import pymysql.cursors
+import pprint
+import json
 from fastapi import Depends
 from ..database.database import get_db
 from ..schemas.Response import Response
@@ -6,6 +8,8 @@ from ..schemas.pairs_generator import PairsGeneratorBaseData
 from pymysql.connections import Connection
 from ..services.children_service import ChildrenService
 from ..services.assistants_service import AssistantsService
+from ..schemas.pairs_generator import GeneratePairsData
+
 
 class PairsService:
 
@@ -40,3 +44,9 @@ class PairsService:
 
         result = PairsGeneratorBaseData(children=children, assistants=assistants, pairs=pairs)
         return Response(success=True, message="pairs data fetched", data=result)
+
+    async def generate_pairs(self, data: GeneratePairsData):
+        # dev only
+        print(json.dumps(data.model_dump(), indent=4))
+
+        return 'hello world'

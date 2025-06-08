@@ -1,7 +1,8 @@
-import { usePairsGenerator } from "../../contexts/providers/PairsGeneratorContext.tsx"
+import { useLoading, usePairsGenerator, useToast } from "../../contexts"
 import { ColumnDef, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { useMemo } from "react"
 import { Assistant, Child } from "../../lib/models.ts"
+import {postRequest} from "../../lib/request.ts"
 import Table from "./Table.tsx"
 
 interface IGeneratorProps {
@@ -11,6 +12,8 @@ interface IGeneratorProps {
 
 const Generator = ({ next, prev }: IGeneratorProps) => {
     const { selectedChildrenObj, selectedAssistantsObj } = usePairsGenerator()
+    const {sendMessage} = useToast()
+    const {toggleLoading} = useLoading()
 
     // region children table
     const childrenColumns = useMemo<ColumnDef<Child>[]>(
@@ -117,8 +120,17 @@ const Generator = ({ next, prev }: IGeneratorProps) => {
     })
     // endregion
 
-    const handleGenerate = () => {
-        next()
+    const handleGenerate = async () => {
+
+        const url = '/api/pair_generator'
+        const data = {
+            children: selectedChildrenObj,
+            assistants: selectedAssistantsObj
+        }
+        const response = await postRequest(url, data, sendMessage, toggleLoading)
+        console.log(response)
+
+        //next()
     }
 
     return (
