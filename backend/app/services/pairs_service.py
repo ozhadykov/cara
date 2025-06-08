@@ -1,7 +1,8 @@
 import httpx
 import pymysql.cursors
 import json
-from fastapi import Depends
+import asyncio
+from fastapi import Depends, WebSocket
 from ..database.database import get_db
 from ..schemas.Response import Response
 from ..schemas.pairs_generator import PairsGeneratorBaseData
@@ -48,15 +49,24 @@ class PairsService:
         result = PairsGeneratorBaseData(children=children, assistants=assistants, pairs=pairs)
         return Response(success=True, message="pairs data fetched", data=result)
 
-    async def generate_pairs(self, data: GeneratePairsData):
+    async def generate_pairs(self, websocket: WebSocket, data: GeneratePairsData):
         # dev only
         print(json.dumps(data.model_dump(), indent=4))
 
         # preparing data for ampl
+        await websocket.send_text(json.dumps(Response(success=True, message='THis is step 1').model_dump()))
+        await asyncio.sleep(2)
 
-        # get distances for children and assistants
+        # calc distances
+        await websocket.send_text(json.dumps(Response(success=True, message='THis is step 2').model_dump()))
+        await asyncio.sleep(2)
 
+        # prepare data
+
+        # calc pairs
         # send data to ampl container
+
+        # send response
 
         try:
             r = httpx.post(f"{BASE_URL}/generate_pairs", json=data.model_dump())

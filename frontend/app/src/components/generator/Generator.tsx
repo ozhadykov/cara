@@ -4,6 +4,7 @@ import { useMemo } from "react"
 import { Assistant, Child } from "../../lib/models.ts"
 import { postRequest } from "../../lib/request.ts"
 import Table from "./Table.tsx"
+import { toastTypes } from "../../lib/constants.ts"
 
 interface IGeneratorProps {
     next: () => void
@@ -120,15 +121,36 @@ const Generator = ({ next, prev }: IGeneratorProps) => {
     })
     // endregion
 
-    const handleGenerate = async () => {
+    const handleGenerate = () => {
 
-        const url = "/api/pair_generator"
+        const url = `ws://${window.location.host}/api/pair_generator/ws/generate_pairs`
         const data = {
             children: selectedChildrenObj,
             assistants: selectedAssistantsObj,
         }
-        const response = await postRequest(url, data, sendMessage, toggleLoading)
-        console.log(response)
+
+        const ws = new WebSocket(url)
+
+        ws.onopen = () => {
+            console.log('Websocket connected')
+            toggleLoading(true)
+            sendMessage('Websocket connected', toastTypes.info)
+            ws.send(JSON.stringify(data))
+        }
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            console.log("Received:", data);
+        }
+
+        ws.onclose = (event) => {
+            console.log("WebSocket disconnected:", event.code, event.reason);
+            toggleLoading(false)
+        };
+
+        ws.onerror = (err) => {
+            console.error("WebSocket error:", err);
+        };
 
         //next()
     }
