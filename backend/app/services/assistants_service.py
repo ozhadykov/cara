@@ -31,11 +31,11 @@ class AssistantsService:
                     cursor.execute(
                         """
                             INSERT INTO assistants 
-                            (first_name, family_name, qualification, min_capacity, max_capacity,address_id) 
-                            VALUES (%s, %s, %s, %s, %s, %s);
+                            (first_name, family_name, qualification, min_capacity, max_capacity,address_id, has_car) 
+                            VALUES (%s, %s, %s, %s, %s, %s, %s);
                         """,
                         (assistant.first_name, assistant.family_name, assistant.qualification,
-                         assistant.min_capacity, assistant.max_capacity, address_id)
+                         assistant.min_capacity, assistant.max_capacity, address_id, assistant.has_car)
                     )
                     self.db.commit()
             except pymysql.err.Error as e:
@@ -70,12 +70,13 @@ class AssistantsService:
                     SET 
                         first_name = %s, 
                         family_name = %s, 
-                        qualification = %s,  
+                        qualification = %s,
+                        has_car = %s,  
                         min_capacity = %s,
                         max_capacity = %s
                     WHERE id = %s;
                 """,
-                (assistant.first_name, assistant.family_name, assistant.qualification, assistant.min_capacity, assistant.max_capacity,assistant_id)
+                (assistant.first_name, assistant.family_name, assistant.qualification, assistant.has_car, assistant.min_capacity, assistant.max_capacity,assistant_id)
             )
             cursor.execute(
                 """
@@ -108,6 +109,7 @@ class AssistantsService:
                         a.first_name AS first_name,
                         a.family_name AS family_name,
                         q.qualification_text AS qualification,
+                        a.has_car AS has_car,
                         a.min_capacity AS min_capacity,
                         a.max_capacity AS max_capacity,
                         REPLACE(adr.street, '+', ' ') AS street,

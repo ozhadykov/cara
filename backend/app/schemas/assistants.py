@@ -8,6 +8,7 @@ class Assistant(BaseModel):
     qualification: str
     min_capacity: int
     max_capacity: int
+    has_car: bool
     street: str
     street_number: str
     city: str
