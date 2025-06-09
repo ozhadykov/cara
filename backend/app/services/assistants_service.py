@@ -41,10 +41,9 @@ class AssistantsService:
                          assistant.min_capacity, assistant.max_capacity, address_id, assistant.has_car)
                     )
 
-                    assistant_id = cursor.lastrowid
                     children = await children_service.get_children_for_distance_matrix()
 
-                    response = await distance_service.create_distances_for_assistant(assistant, assistant_id, address_id, children)
+                    response = await distance_service.create_distances_for_assistant(assistant, address_id, children)
                     if not response.success:
                         raise Exception('Something went wrong with distance matrix api logic')
                     self.db.commit()
@@ -56,6 +55,7 @@ class AssistantsService:
                 print(f"An unexpected error occurred during assistant insertion: {e}")
                 failed.append(assistant)
                 self.db.rollback()
+
         if len(failed) > 0:
             return Response(success=False, message=f"{len(failed)} assistant failed to insert in Database")
         return Response(success=True, message="All assistant successfully inserted")

@@ -1,5 +1,4 @@
 import httpx
-import json
 import googlemaps
 import pymysql.cursors
 from fastapi import Depends
@@ -86,7 +85,7 @@ class DistanceService:
             self.db.rollback()
             return Response(success=False, message="Database error")
 
-    async def create_distances_for_assistant(self, assistant: Assistant, assistant_id: int, address_id: int,
+    async def create_distances_for_assistant(self, assistant: Assistant, address_id: int,
                                              children: List[ChildForDistanceMatrix]):
         # google api expects:
         # origin - assistant's address

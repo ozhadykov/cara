@@ -1,9 +1,9 @@
 import { useState } from "react"
 import { postRequest } from "../../../lib/request.ts"
-import { Assistant, TAssistantImport } from "../../../lib/models.ts"
+import { Assistant, TPersonImport } from "../../../lib/models.ts"
 
 import { useRecordSidebar } from "../../../contexts/providers/RecordSidebarContext.tsx"
-import { useToast } from "../../../contexts/providers/ToastContext.tsx"
+import { useToast } from "../../../contexts"
 import { toastTypes } from "../../../lib/constants.ts"
 import { useAssistantData } from "../../../contexts/providers/AssistantDataContext.tsx"
 import AssistantsForm from "./forms/AssistantsForm.tsx"
@@ -18,7 +18,7 @@ const AssistantCreate = () => {
         first_name: "",
         family_name: "",
         qualification: -1,
-        has_car: false,
+        has_car: 0,
         street: "",
         street_number: "",
         city: "",
@@ -45,8 +45,8 @@ const AssistantCreate = () => {
         }
 
         try {
-            const requestBody: TAssistantImport = {
-                assistants: [formData],
+            const requestBody: TPersonImport = {
+                data: [formData],
             }
             const response = await postRequest("/api/assistants", requestBody, sendMessage)
             if (response)

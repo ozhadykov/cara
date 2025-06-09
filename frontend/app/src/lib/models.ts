@@ -17,7 +17,7 @@ export interface Assistant extends Person {
     qualification: number
     min_capacity: number
     max_capacity: number
-    has_car: boolean
+    has_car: number
 }
 
 export type TPersonImport = {
