@@ -56,3 +56,45 @@ class DistanceService:
             print(f"Database error during child insertion: {e}")
             self.db.rollback()
             return Response(success=False, message="Database error")
+
+    async def create_distances_for_assistant(self, assistant: Assistant, assistant_id: int, address_id: int,
+                                             children: List[ChildForDistanceMatrix]):
+
+        # get assistant address
+        with self.db.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT 
+                    * 
+                FROM 
+                    address 
+                WHERE 
+                    id = %s
+                """,
+                address_id
+            )
+            assistant_address = cursor.fetchone()
+
+        origin = (assistant_address.latitude, assistant_address.longitude)
+        destinations = []
+        # loop through and create destinations arr
+        for child in children:
+            # check for which children has assistant qualification
+            if assistant.qualification >= child['required_qualification_int']:
+                # call google api
+                destinations.append((child.latitude, child.longitude))
+                print(child['required_qualification_int'])
+            else:
+                # if not, then fill it with nullish values in db
+                print('')
+
+        # google api expects:
+        # origin - assistant's address
+        # destinations - children's addresses
+        # mode - car or public transport
+        # units - metric or imperical
+        # there a few more, but not relevant in this project
+
+        # gmaps = googlemaps.Client(key='')
+
+        raise Exception('error')
