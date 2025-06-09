@@ -108,8 +108,10 @@ class DistanceService:
                 # if not, then fill it with nullish values in db
                 cursor.execute(
                     """
-                    INSERT INTO distance_matrix
-                    """
+                    INSERT INTO distance_matrix (origin_address_id, destination_address_id, distance, travel_time)
+                    VALUES (%s, %s, %s, %s)
+                    """,
+                    (address_id, child['address_id'], -1, -1)
                 )
                 print('')
 

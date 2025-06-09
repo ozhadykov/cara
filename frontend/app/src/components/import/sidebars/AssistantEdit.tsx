@@ -17,6 +17,7 @@ const AssistantEdit = () => {
         first_name: selectedData.first_name,
         family_name: selectedData.family_name,
         qualification: selectedData.qualification,
+        has_car: selectedData.has_car,
         street: selectedData.street,
         street_number: selectedData.street_number,
         city: selectedData.city,

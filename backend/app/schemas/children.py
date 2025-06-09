@@ -20,6 +20,7 @@ class ChildrenIn(BaseModel):
 
 class ChildForDistanceMatrix(BaseModel):
     child_id: int
+    address_id: int
     required_qualification_int: int
     latitude: float
     longitude: float

@@ -18,6 +18,7 @@ const AssistantCreate = () => {
         first_name: "",
         family_name: "",
         qualification: -1,
+        has_car: false,
         street: "",
         street_number: "",
         city: "",

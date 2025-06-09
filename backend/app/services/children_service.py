@@ -126,6 +126,7 @@ class ChildrenService:
                 """
                      SELECT
                         c.id AS child_id,
+                        c.address_id as address_id,
                         c.required_qualification AS required_qualification_int,
                         adr.latitude AS latitude,
                         adr.longitude AS longitude
