@@ -44,9 +44,9 @@ class AssistantsService:
                     assistant_id = cursor.lastrowid
                     children = await children_service.get_children_for_distance_matrix()
 
-                    await distance_service.create_distances_for_assistant(assistant, assistant_id, address_id, children)
-                    # dev only
-                    raise Exception('error')
+                    response = await distance_service.create_distances_for_assistant(assistant, assistant_id, address_id, children)
+                    if not response.success:
+                        raise Exception('Something went wrong with distance matrix api logic')
                     self.db.commit()
             except pymysql.err.Error as e:
                 print(f"Database error during assistant insertion: {e}")
