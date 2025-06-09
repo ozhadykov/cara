@@ -6,12 +6,16 @@ const KeyInput = () => {
     const { sendMessage } = useToast()
     const [openCageKey, setOpenCageKey] = useState("")
     const [amplKey, setAmplKey] = useState("")
+    const [googleKey, setGoogleKey] = useState("")
 
     const handleChangeApiKey = (event: ChangeEvent<HTMLInputElement>) => {
         setOpenCageKey(event.target.value)
     }
     const handleChangeAmpl = (event: ChangeEvent<HTMLInputElement>) => {
         setAmplKey(event.target.value)
+    }
+    const handleChangeGoogle = (event: ChangeEvent<HTMLInputElement>) => {
+        setGoogleKey(event.target.value)
     }
 
     useEffect(() => {
@@ -31,8 +35,17 @@ const KeyInput = () => {
             }
         }
 
+        const getGoogleKey = async () => {
+            const response = await fetch("/api/keys/google_maps_key")
+            const data = await response.json()
+            if (response.ok) {
+                setGoogleKey(data.apiKey)
+            }
+        }
+
         getOpenCageKey()
         getAmplKey()
+        getGoogleKey()
     }, [])
 
     return (
@@ -51,7 +64,7 @@ const KeyInput = () => {
                         postRequest(
                             "/api/keys/opencage_key",
                             { apiKey: openCageKey },
-                            sendMessage
+                            sendMessage,
                         )
                     }
                 >
@@ -71,6 +84,24 @@ const KeyInput = () => {
                     className="btn btn-secondary"
                     onClick={() =>
                         postRequest("/api/keys/ampl_key", { apiKey: amplKey }, sendMessage)
+                    }
+                >
+                    Send
+                </button>
+            </div>
+
+            <div className="flex flex-row items-center gap-2">
+                <label className="w-32">Google Cloud Key</label>
+                <input
+                    className="border border-gray-300 rounded px-3 py-2 w-64"
+                    type="text"
+                    value={googleKey}
+                    onChange={handleChangeGoogle}
+                />
+                <button
+                    className="btn btn-secondary"
+                    onClick={() =>
+                        postRequest("/api/keys/google_maps_key", { apiKey: googleKey }, sendMessage)
                     }
                 >
                     Send
