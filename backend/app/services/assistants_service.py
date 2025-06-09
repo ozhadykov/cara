@@ -45,6 +45,7 @@ class AssistantsService:
                     children = await children_service.get_children_for_distance_matrix()
 
                     await distance_service.create_distances_for_assistant(assistant, assistant_id, address_id, children)
+                    # dev only
                     raise Exception('error')
                     self.db.commit()
             except pymysql.err.Error as e:
@@ -85,7 +86,8 @@ class AssistantsService:
                         max_capacity = %s
                     WHERE id = %s;
                 """,
-                (assistant.first_name, assistant.family_name, assistant.qualification, assistant.has_car, assistant.min_capacity, assistant.max_capacity,assistant_id)
+                (assistant.first_name, assistant.family_name, assistant.qualification, assistant.has_car,
+                 assistant.min_capacity, assistant.max_capacity, assistant_id)
             )
             cursor.execute(
                 """
@@ -101,7 +103,8 @@ class AssistantsService:
                     id = (SELECT address_id FROM assistants WHERE id = %s);
     
                 """,
-                (assistant.street, assistant.street_number, assistant.zip_code, assistant.city, latitude, longitude, assistant_id)
+                (assistant.street, assistant.street_number, assistant.zip_code, assistant.city, latitude, longitude,
+                 assistant_id)
             )
             self.db.commit()
             return Response(success=True, message=f"assistant with ID: {cursor.lastrowid} is successfully updated")
@@ -159,7 +162,9 @@ class AssistantsService:
 
     async def delete_assistant(self, assistant_id: int):
         with self.db.cursor() as cursor:
-            cursor.execute("DELETE FROM address WHERE address.id = (SELECT address_id FROM assistants WHERE assistants.id = %s);", (assistant_id))
+            cursor.execute(
+                "DELETE FROM address WHERE address.id = (SELECT address_id FROM assistants WHERE assistants.id = %s);",
+                (assistant_id))
             cursor.execute("DELETE FROM assistants WHERE id = %s;", (assistant_id))
             self.db.commit()
             return cursor.rowcount

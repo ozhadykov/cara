@@ -106,6 +106,11 @@ class DistanceService:
                 print(child['required_qualification_int'])
             else:
                 # if not, then fill it with nullish values in db
+                cursor.execute(
+                    """
+                    INSERT INTO distance_matrix
+                    """
+                )
                 print('')
 
         print(destinations)
