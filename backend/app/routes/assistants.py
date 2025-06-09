@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from ..services.assistants_service import AssistantsService
+from ..services.children_service import ChildrenService
 from ..services.distance_service import DistanceService
 from ..schemas.assistants import AssistantIn, Assistant
 
@@ -25,8 +26,8 @@ async def get_assistant(assistant_id: int, assistant_service: AssistantsService 
 
 @router.post("/")
 async def create_assistants(assistants: AssistantIn, assistant_service: AssistantsService = Depends(),
-                            distance_service: DistanceService = Depends()):
-    result = await assistant_service.create_assistant(assistants, distance_service)
+                            distance_service: DistanceService = Depends(), children_service: ChildrenService = Depends(),):
+    result = await assistant_service.create_assistant(assistants, distance_service, children_service)
     return result
 
 

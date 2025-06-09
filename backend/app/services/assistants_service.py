@@ -1,6 +1,8 @@
 from fastapi import Depends
 from pymysql.connections import Connection
 import pymysql.cursors
+
+from .children_service import ChildrenService
 from ..database.database import get_db
 from ..schemas.assistants import AssistantIn, Assistant
 from ..schemas.address import Address
@@ -12,7 +14,8 @@ class AssistantsService:
     def __init__(self, db: Connection = Depends(get_db)):
         self.db = db
 
-    async def create_assistant(self, assistant_in: AssistantIn, distance_service: DistanceService):
+    async def create_assistant(self, assistant_in: AssistantIn, distance_service: DistanceService,
+                               children_service: ChildrenService):
         failed = []
         for assistant in assistant_in.data:
             address = Address(
@@ -37,6 +40,12 @@ class AssistantsService:
                         (assistant.first_name, assistant.family_name, assistant.qualification,
                          assistant.min_capacity, assistant.max_capacity, address_id, assistant.has_car)
                     )
+
+                    assistant_id = cursor.lastrowid
+                    children = await children_service.get_children_for_distance_matrix()
+
+                    await distance_service.create_distances_for_assistant(assistant, assistant_id, address_id, children)
+                    raise Exception('error')
                     self.db.commit()
             except pymysql.err.Error as e:
                 print(f"Database error during assistant insertion: {e}")

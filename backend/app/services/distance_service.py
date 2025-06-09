@@ -1,9 +1,12 @@
 import httpx
 import pymysql.cursors
 from fastapi import Depends
+from typing import List
 from ..database.database import get_db
 from ..schemas.address import Address
 from ..schemas.Response import Response
+from ..schemas.assistants import Assistant
+from ..schemas.children import ChildForDistanceMatrix
 from pymysql.connections import Connection
 from ..services.keys_service import KeysService
 
@@ -39,15 +42,33 @@ class DistanceService:
                 return coordinates_response
 
             latitude, longitude = coordinates_response
-            cursor = self.db.cursor()
-            cursor.execute(
-                """
-                INSERT INTO address (street, street_number, city, zip_code, latitude, longitude)
-                VALUES (%s, %s, %s, %s, %s, %s)
-                """,
-                (address.street, address.street_number, address.city, address.zip_code, latitude, longitude)
-            )
-            return Response(success=True, message="Address inserted successfully", data=cursor.lastrowid)
+            with self.db.cursor(pymysql.cursors.DictCursor) as cursor:  # Use a context manager for cursor
+                cursor.execute(
+                    """
+                    SELECT id FROM address WHERE latitude = %s AND longitude = %s
+                    """,
+                    (latitude, longitude)
+                )
+
+                # Use fetchone() to get the first (or only) matching row
+                existing_address_record = cursor.fetchone()
+
+                if existing_address_record:
+                    # Address already exists, return its ID or a message
+                    existing_address_id = existing_address_record['id']
+                    print(f"Address already exists with ID: {existing_address_id}")
+                    return Response(success=True, message="Address already exists", data=existing_address_id)
+                else:
+                    # Address does not exist, proceed with insertion
+                    cursor.execute(
+                        """
+                        INSERT INTO address (street, street_number, city, zip_code, latitude, longitude)
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                        """,
+                        (address.street, address.street_number, address.city, address.zip_code, latitude, longitude)
+                    )
+                    self.db.commit()
+                    return Response(success=True, message="Address inserted successfully", data=cursor.lastrowid)
         except pymysql.err.Error as e:
             print(f"Database error during child insertion: {e}")
             self.db.rollback()
@@ -59,9 +80,8 @@ class DistanceService:
 
     async def create_distances_for_assistant(self, assistant: Assistant, assistant_id: int, address_id: int,
                                              children: List[ChildForDistanceMatrix]):
-
         # get assistant address
-        with self.db.cursor() as cursor:
+        with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute(
                 """
                 SELECT 
@@ -75,18 +95,20 @@ class DistanceService:
             )
             assistant_address = cursor.fetchone()
 
-        origin = (assistant_address.latitude, assistant_address.longitude)
+        origin = (assistant_address['latitude'], assistant_address['longitude'])
         destinations = []
         # loop through and create destinations arr
         for child in children:
             # check for which children has assistant qualification
             if assistant.qualification >= child['required_qualification_int']:
                 # call google api
-                destinations.append((child.latitude, child.longitude))
+                destinations.append((child['latitude'], child['longitude']))
                 print(child['required_qualification_int'])
             else:
                 # if not, then fill it with nullish values in db
                 print('')
+
+        print(destinations)
 
         # google api expects:
         # origin - assistant's address

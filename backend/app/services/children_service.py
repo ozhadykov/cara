@@ -120,6 +120,23 @@ class ChildrenService:
             )
             return cursor.fetchall()
 
+    async def get_children_for_distance_matrix(self):
+        with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute(
+                """
+                     SELECT
+                        c.id AS child_id,
+                        c.required_qualification AS required_qualification_int,
+                        adr.latitude AS latitude,
+                        adr.longitude AS longitude
+                    FROM 
+                        children c
+                        JOIN address adr ON adr.id = c.address_id
+                        JOIN qualifications q ON q.id = c.required_qualification;
+                """
+            )
+            return cursor.fetchall()
+
     async def get_child(self, child_id: int):
         with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute(
