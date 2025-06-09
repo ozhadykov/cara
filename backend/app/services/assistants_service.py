@@ -1,6 +1,8 @@
 from fastapi import Depends
 from pymysql.connections import Connection
 import pymysql.cursors
+
+from .children_service import ChildrenService
 from ..database.database import get_db
 from ..schemas.assistants import AssistantIn, Assistant
 from ..schemas.address import Address
@@ -12,7 +14,8 @@ class AssistantsService:
     def __init__(self, db: Connection = Depends(get_db)):
         self.db = db
 
-    async def create_assistant(self, assistant_in: AssistantIn, distance_service: DistanceService):
+    async def create_assistant(self, assistant_in: AssistantIn, distance_service: DistanceService,
+                               children_service: ChildrenService):
         failed = []
         for assistant in assistant_in.data:
             address = Address(
@@ -31,12 +34,18 @@ class AssistantsService:
                     cursor.execute(
                         """
                             INSERT INTO assistants 
-                            (first_name, family_name, qualification, min_capacity, max_capacity,address_id) 
-                            VALUES (%s, %s, %s, %s, %s, %s);
+                            (first_name, family_name, qualification, min_capacity, max_capacity,address_id, has_car) 
+                            VALUES (%s, %s, %s, %s, %s, %s, %s);
                         """,
                         (assistant.first_name, assistant.family_name, assistant.qualification,
-                         assistant.min_capacity, assistant.max_capacity, address_id)
+                         assistant.min_capacity, assistant.max_capacity, address_id, assistant.has_car)
                     )
+
+                    children = await children_service.get_children_for_distance_matrix()
+
+                    response = await distance_service.create_distances_for_assistant(assistant, address_id, children)
+                    if not response.success:
+                        raise Exception('Something went wrong with distance matrix api logic')
                     self.db.commit()
             except pymysql.err.Error as e:
                 print(f"Database error during assistant insertion: {e}")
@@ -46,6 +55,7 @@ class AssistantsService:
                 print(f"An unexpected error occurred during assistant insertion: {e}")
                 failed.append(assistant)
                 self.db.rollback()
+
         if len(failed) > 0:
             return Response(success=False, message=f"{len(failed)} assistant failed to insert in Database")
         return Response(success=True, message="All assistant successfully inserted")
@@ -70,12 +80,14 @@ class AssistantsService:
                     SET 
                         first_name = %s, 
                         family_name = %s, 
-                        qualification = %s,  
+                        qualification = %s,
+                        has_car = %s,  
                         min_capacity = %s,
                         max_capacity = %s
                     WHERE id = %s;
                 """,
-                (assistant.first_name, assistant.family_name, assistant.qualification, assistant.min_capacity, assistant.max_capacity,assistant_id)
+                (assistant.first_name, assistant.family_name, assistant.qualification, assistant.has_car,
+                 assistant.min_capacity, assistant.max_capacity, assistant_id)
             )
             cursor.execute(
                 """
@@ -91,7 +103,8 @@ class AssistantsService:
                     id = (SELECT address_id FROM assistants WHERE id = %s);
     
                 """,
-                (assistant.street, assistant.street_number, assistant.zip_code, assistant.city, latitude, longitude, assistant_id)
+                (assistant.street, assistant.street_number, assistant.zip_code, assistant.city, latitude, longitude,
+                 assistant_id)
             )
             self.db.commit()
             return Response(success=True, message=f"assistant with ID: {cursor.lastrowid} is successfully updated")
@@ -108,6 +121,7 @@ class AssistantsService:
                         a.first_name AS first_name,
                         a.family_name AS family_name,
                         q.qualification_text AS qualification,
+                        a.has_car AS has_car,
                         a.min_capacity AS min_capacity,
                         a.max_capacity AS max_capacity,
                         REPLACE(adr.street, '+', ' ') AS street,
@@ -148,7 +162,9 @@ class AssistantsService:
 
     async def delete_assistant(self, assistant_id: int):
         with self.db.cursor() as cursor:
-            cursor.execute("DELETE FROM address WHERE address.id = (SELECT address_id FROM assistants WHERE assistants.id = %s);", (assistant_id))
+            cursor.execute(
+                "DELETE FROM address WHERE address.id = (SELECT address_id FROM assistants WHERE assistants.id = %s);",
+                (assistant_id))
             cursor.execute("DELETE FROM assistants WHERE id = %s;", (assistant_id))
             self.db.commit()
             return cursor.rowcount

@@ -11,8 +11,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Installing amplpy
 RUN python -m pip install amplpy --no-cache-dir
-RUN python -m amplpy.modules install highs gurobi --no-cache-dir
-RUN python -m amplpy.modules install cplex
+RUN python -m amplpy.modules install highs --no-cache-dir
 
 COPY ./ampl_app /ampl/app
 

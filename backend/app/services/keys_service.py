@@ -10,7 +10,6 @@ class KeysService:
         self.db = db
 
     async def get_api_key(self, id: str):
-        print("getting key")
         with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT apiKey FROM apiKeys WHERE id = %s", id)
             return cursor.fetchone()

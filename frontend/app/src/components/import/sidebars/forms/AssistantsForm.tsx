@@ -135,9 +135,25 @@ const AssistantsForm = ({ handleChange, handleSubmit, formData, formName }: Assi
                         <option disabled value={-1}>
                             Select qualification
                         </option>
-                        <option value={1}>QHK</option>
-                        <option value={2}>ReKo</option>
-                        <option value={3}>HK</option>
+                        <option value={3}>QHK</option>
+                        <option value={1}>ReKo</option>
+                        <option value={2}>HK</option>
+                    </select>
+                </InputWrapper>
+               <InputWrapper htmlFor="has car" labelText="owns a car">
+                    <select
+                        name="has_car"
+                        id="has_car"
+                        value={formData.has_car}
+                        onChange={handleChange}
+                        required
+                        className="outline-none text-sm validator"
+                    >
+                        <option disabled value={-1}>
+                            Does assistant has a car?
+                        </option>
+                        <option value={1}>yes</option>
+                        <option value={0}>no</option>
                     </select>
                 </InputWrapper>
             </form>

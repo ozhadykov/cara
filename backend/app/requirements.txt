@@ -1,4 +1,5 @@
 certifi
+googlemaps
 charset-normalizer
 idna
 requests

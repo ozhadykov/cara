@@ -1,15 +1,23 @@
+import httpx
 import pymysql.cursors
-from fastapi import Depends
+import json
+import asyncio
+from fastapi import Depends, WebSocket
 from ..database.database import get_db
 from ..schemas.Response import Response
 from ..schemas.pairs_generator import PairsGeneratorBaseData
 from pymysql.connections import Connection
 from ..services.children_service import ChildrenService
 from ..services.assistants_service import AssistantsService
+from ..schemas.pairs_generator import GeneratePairsData
+
+BASE_URL = 'http://ampl:8000/'
+
 
 class PairsService:
 
-    def __init__(self, db: Connection = Depends(get_db), children_service: ChildrenService = Depends(), assistants_service: AssistantsService = Depends()):
+    def __init__(self, db: Connection = Depends(get_db), children_service: ChildrenService = Depends(),
+                 assistants_service: AssistantsService = Depends()):
         self.db = db
         self.children_service = children_service
         self.assistants_service = assistants_service
@@ -40,3 +48,29 @@ class PairsService:
 
         result = PairsGeneratorBaseData(children=children, assistants=assistants, pairs=pairs)
         return Response(success=True, message="pairs data fetched", data=result)
+
+    async def generate_pairs(self, websocket: WebSocket, data: GeneratePairsData):
+        # dev only
+        print(json.dumps(data.model_dump(), indent=4))
+
+        # preparing data for ampl
+        await websocket.send_text(json.dumps(Response(success=True, message='THis is step 1').model_dump()))
+        await asyncio.sleep(2)
+
+        # calc distances
+        await websocket.send_text(json.dumps(Response(success=True, message='THis is step 2').model_dump()))
+        await asyncio.sleep(2)
+
+        # prepare data
+
+        # calc pairs
+        # send data to ampl container
+
+        # send response
+
+        try:
+            r = httpx.post(f"{BASE_URL}/generate_pairs", json=data.model_dump())
+        except Exception as e:
+            return Response(success=False, message="someting went wrong")
+
+        return 'hello world'

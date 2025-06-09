@@ -72,6 +72,7 @@ const AssistantSingleImport = ({ refresh }: { refresh: boolean }) => {
                             <th>first_name</th>
                             <th>family_name</th>
                             <th>qualification</th>
+                            <th>has_car</th>
                             <th>street</th>
                             <th>street_number</th>
                             <th>zip_code</th>
@@ -98,6 +99,7 @@ const AssistantSingleImport = ({ refresh }: { refresh: boolean }) => {
                                 <td>{assistant.first_name}</td>
                                 <td>{assistant.family_name}</td>
                                 <td>{assistant.qualification}</td>
+                                <td>{assistant.has_car}</td>
                                 <td>{assistant.street}</td>
                                 <td>{assistant.street_number}</td>
                                 <td>{assistant.zip_code}</td>

@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { postRequest } from "../../../lib/request.ts"
-import { Child, TChildImport } from "../../../lib/models.ts"
+import { Child, TChildImport, TPersonImport } from "../../../lib/models.ts"
 
 import { useRecordSidebar } from "../../../contexts/providers/RecordSidebarContext.tsx"
 import { useChildrenData } from "../../../contexts/providers/ChildrenDataContext.tsx"
@@ -43,8 +43,8 @@ const ChildCreate = () => {
         }
 
         try {
-            const requestBody: TChildImport = {
-                children: [formData],
+            const requestBody: TPersonImport = {
+                data: [formData],
             }
             const response = await postRequest("/api/children", requestBody, sendMessage)
             if (response)
