@@ -11,7 +11,7 @@ from ..services.children_service import ChildrenService
 from ..services.assistants_service import AssistantsService
 from ..schemas.pairs_generator import GeneratePairsData
 
-BASE_URL = 'http://ampl:8000/'
+BASE_URL = 'http://ampl:8000'
 
 
 class PairsService:
@@ -50,27 +50,51 @@ class PairsService:
         return Response(success=True, message="pairs data fetched", data=result)
 
     async def generate_pairs(self, websocket: WebSocket, data: GeneratePairsData):
-        # dev only
-        print(json.dumps(data.model_dump(), indent=4))
-
         # preparing data for ampl
-        await websocket.send_text(json.dumps(Response(success=True, message='THis is step 1').model_dump()))
-        await asyncio.sleep(2)
+        await websocket.send_text(
+            json.dumps(Response(success=True, message='Preparing children and assistants').model_dump()))
+        children = data.children
+        assistants = data.assistants
+        await asyncio.sleep(1)
 
-        # calc distances
-        await websocket.send_text(json.dumps(Response(success=True, message='THis is step 2').model_dump()))
-        await asyncio.sleep(2)
+        # get distances
+        await websocket.send_text(json.dumps(Response(success=True, message='Getting distances').model_dump()))
+        try:
+            with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+                cursor.execute(
+                    """
+                    SELECT 
+                        id, 
+                        origin_address_id,
+                        destination_address_id,
+                        distance,
+                        travel_time
+                    FROM 
+                        distance_matrix
+                    """
+                )
+                distances = cursor.fetchall()
+        except Exception as e:
+            return Response(success=False, message=f"WTFFFF {str(e)}")
+        await asyncio.sleep(1)
+        await websocket.send_text(json.dumps(Response(success=True, message='Distance gotten').model_dump()))
 
-        # prepare data
-
-        # calc pairs
         # send data to ampl container
-
-        # send response
+        data_for_ampl = {
+            "children": [child.model_dump() for child in children],
+            "assistants": [assistant.model_dump() for assistant in assistants],
+            "distances": distances
+        }
 
         try:
-            r = httpx.post(f"{BASE_URL}/generate_pairs", json=data.model_dump())
+            async with httpx.AsyncClient() as client:
+                print("Making request", flush=True)
+                r = await client.post(url=f"{BASE_URL}/generate_pairs", json=data_for_ampl)
+                print(r.json(), flush=True)
         except Exception as e:
-            return Response(success=False, message="someting went wrong")
+            await websocket.send_text(
+                json.dumps(Response(success=False, message=f"Error calling ampl: {str(e)}").model_dump()))
+            return
 
-        return 'hello world'
+        # send response
+        return Response(success=True, message="pairs data generated", data=r.json())

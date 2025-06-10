@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from .schemas.assistants import Assistant
 from .schemas.children import Child
+from .schemas.distance import Distance
 
 app = FastAPI()
 
@@ -34,6 +35,7 @@ class devAMPLResponse(BaseModel):
 class GeneratePairsIN(BaseModel):
     children: List[Child]
     assistants: List[Assistant]
+    distances: List[Distance]
 
 
 @app.post("/generate_pairs")
