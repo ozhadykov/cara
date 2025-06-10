@@ -49,7 +49,8 @@ const ChildrenTable = ({ children, next }: IChildrenTable) => {
                 cell: info => info.getValue(),
             },
             {
-                accessorKey: "required_qualification",
+                accessorKey: "required_qualification_text",
+                header: "required qualification",
                 cell: info => info.getValue(),
             },
             {

@@ -106,12 +106,14 @@ class ChildrenService:
                         c.id AS id,
                         c.first_name AS first_name,
                         c.family_name AS family_name,
-                        q.qualification_text AS required_qualification,
+                        c.required_qualification AS required_qualification,
+                        q.qualification_text AS required_qualification_text,
                         c.requested_hours AS requested_hours,
                         REPLACE(adr.street, '+', ' ') AS street,
                         REPLACE(adr.street_number, '+', ' ') AS street_number,
                         REPLACE(adr.city, '+', ' ') AS city,
-                        adr.zip_code AS zip_code
+                        adr.zip_code AS zip_code,
+                        adr.id AS address_id
                     FROM 
                         children c
                         JOIN address adr ON adr.id = c.address_id

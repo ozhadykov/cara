@@ -120,14 +120,16 @@ class AssistantsService:
                         a.id AS id,
                         a.first_name AS first_name,
                         a.family_name AS family_name,
-                        q.qualification_text AS qualification,
+                        a.qualification AS qualification,
+                        q.qualification_text AS qualification_text,
                         a.has_car AS has_car,
                         a.min_capacity AS min_capacity,
                         a.max_capacity AS max_capacity,
                         REPLACE(adr.street, '+', ' ') AS street,
                         REPLACE(adr.street_number, '+', ' ') AS street_number,
                         REPLACE(adr.city, '+', ' ') AS city,
-                        adr.zip_code AS zip_code
+                        adr.zip_code AS zip_code,
+                        adr.id AS address_id
                     FROM 
                         assistants a
                         JOIN address adr ON adr.id = a.address_id

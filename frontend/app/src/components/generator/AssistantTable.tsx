@@ -50,7 +50,8 @@ const AssistantTable = ({ assistants, next, prev }: IAssistantTable) => {
                 cell: info => info.getValue(),
             },
             {
-                accessorKey: "qualification",
+                accessorKey: "qualification_text",
+                header: "qualification",
                 cell: info => info.getValue(),
             },
             {

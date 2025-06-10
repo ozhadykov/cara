@@ -7,6 +7,7 @@ class Child(BaseModel):
     first_name: str
     family_name: str
     required_qualification: int
+    required_qualification_text: Optional[str] = None
     requested_hours: int
     street: str
     street_number: str

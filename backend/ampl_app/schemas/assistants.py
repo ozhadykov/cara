@@ -5,9 +5,11 @@ class Assistant(BaseModel):
     id: Optional[int] = None
     first_name: str
     family_name: str
-    qualification: str
+    qualification: int
+    qualification_text: Optional[str] = None
     min_capacity: int
     max_capacity: int
+    has_car: bool
     street: str
     street_number: str
     city: str
