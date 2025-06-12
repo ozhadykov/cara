@@ -13,7 +13,7 @@ interface IRoute {
 const routes: Array<IRoute> = [
     {
         path: "/",
-        component: <AmplData />,
+        component: <Home />,
         label: "Home",
         fillIcon: "solar:widget-bold-duotone",
         outlineIcon: "solar:widget-line-duotone",
