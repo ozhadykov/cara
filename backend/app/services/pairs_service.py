@@ -98,3 +98,23 @@ class PairsService:
 
         # send response
         return Response(success=True, message="pairs data generated", data=r.json())
+
+    async def get_coverage(self):
+        with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute(
+                """
+                    SELECT 
+                        COUNT(DISTINCT p.child_id) AS covered_children_absolute,
+                        COUNT(DISTINCT p.child_id) / (SELECT COUNT(*) FROM children) AS covered_children_relative,
+                        COUNT(DISTINCT p.assistant_id) AS covered_assistants_absolute,
+                        COUNT(DISTINCT p.assistant_id) / (SELECT COUNT(*) FROM assistants) AS covered_assistants_relative,
+                        (SELECT COUNT(*) FROM children) AS total_children,
+                        (SELECT COUNT(*) FROM assistants) AS total_assistants,
+                        (SELECT COUNT(*) FROM pairs) As pairs_count
+                    FROM pairs p;
+                """
+            )
+            return cursor.fetchone()
+
+
+

@@ -23,7 +23,7 @@ const InputWrapper = ({ htmlFor, labelText, children, basis = "auto" }: InputWra
 
     return (
         <div
-            className={`flex flex-col w-full justify-center bg-gray-200 p-2 rounded-lg mb-8 ${basisClass}`}
+            className={`flex flex-col w-full justify-center bg-gray-200 p-2 rounded-lg ${basisClass}`}
         >
             <label className="text-xs text-gray-400 mb-1 w-0" htmlFor={htmlFor}>
                 {labelText}

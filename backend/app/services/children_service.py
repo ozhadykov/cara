@@ -64,6 +64,28 @@ class ChildrenService:
         latitude, longitude = coordinates_response
         try:
             cursor = self.db.cursor()
+
+            cursor.execute(
+                """
+                    SELECT id
+                    FROM address 
+                    WHERE 
+                        latitude = %s
+                        AND longitude = %s
+                """, 
+                (latitude, longitude)
+            )
+
+            result = cursor.fetchone()
+            
+            address_id = None
+
+            if result == None:
+                response = await distance_service.insert_address(address)
+                address_id = response.data
+            else:
+                address_id = result["id"]
+            
             cursor.execute(
                 """
                     UPDATE children
@@ -71,27 +93,15 @@ class ChildrenService:
                         first_name = %s, 
                         family_name = %s, 
                         required_qualification = %s,  
-                        requested_hours = %s
+                        requested_hours = %s,
+                        address_id = %s
                     WHERE id = %s;
                 """,
-                (child.first_name, child.family_name, child.required_qualification, child.requested_hours, child_id)
+                (child.first_name, child.family_name, child.required_qualification, child.requested_hours, address_id, child_id)
             )
-            cursor.execute(
-                """
-                    UPDATE address
-                    SET
-                        street = %s,
-                        street_number = %s,
-                        zip_code = %s,
-                        city = %s,
-                        latitude = %s,
-                        longitude = %s
-                    WHERE
-                    id = (SELECT address_id FROM children WHERE id = %s);
-    
-                """,
-                (child.street, child.street_number, child.zip_code, child.city, latitude, longitude, child_id)
-            )
+
+            # distance_service.refresh_distances()
+
             self.db.commit()
             return Response(success=True, message=f"Child with ID: {cursor.lastrowid} is successfully updated")
         except pymysql.err.Error as e:
@@ -117,7 +127,8 @@ class ChildrenService:
                     FROM 
                         children c
                         JOIN address adr ON adr.id = c.address_id
-                        JOIN qualifications q ON q.id = c.required_qualification;
+                        JOIN qualifications q ON q.id = c.required_qualification
+                    ORDER BY c.id;
                 """
             )
             return cursor.fetchall()

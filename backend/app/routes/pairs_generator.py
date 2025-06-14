@@ -16,6 +16,11 @@ async def get_base_data(pairs_service: PairsService = Depends()):
     result = await pairs_service.get_base_data()
     return result
 
+@router.get("/coverage")
+async def get_base_data(pairs_service: PairsService = Depends()):
+    result = await pairs_service.get_coverage()
+    return result
+
 
 @router.websocket("/ws/generate_pairs")
 async def websocket_generate_pairs(websocket: WebSocket, pairs_service: PairsService = Depends()):
