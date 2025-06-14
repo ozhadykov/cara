@@ -107,22 +107,22 @@ class DistanceService:
     #         cursor.execute(
     #             """
     #                 SELECT 
-    #                     a.id,
-    #                     a.qualification,
-    #                     a.address_id,
-    #                     c.id,
-    #                     c.required_qualification,
-    #                     c.address_id,
-    #                     a.has_car
+    #                     a.id AS assistant_id,
+    #                     a.qualification AS assistant_qualification,
+    #                     a.address_id AS origin_address_id,
+    #                     a.has_car AS assistant_has_car,
+    #                     c.id AS child_id,
+    #                     c.required_qualification AS child_required_qualification,
+    #                     c.address_id AS destination_address_id
     #                 FROM children c, assistants a
     #                 WHERE 
-    #                     qualification.a >= required_qualification.c
+    #                     assistant_qualification >= child_required_qualification
     #                     AND NOT EXISTS(
     #                         SELECT * 
-    #                         FROM distance_matrix d
+    #                         FROM distance_matrix dm
     #                         WHERE 
-    #                             d.origin_address_id = a.id
-    #                             AND d.destination_address_id = c.id
+    #                             dm.origin_address_id = origin_address_id
+    #                             AND dm.destination_address_id = destination_address_id
     #                     )
     #             """
     #         )

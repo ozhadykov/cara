@@ -109,7 +109,8 @@ class PairsService:
                         COUNT(DISTINCT p.assistant_id) AS covered_assistants_absolute,
                         COUNT(DISTINCT p.assistant_id) / (SELECT COUNT(*) FROM assistants) AS covered_assistants_relative,
                         (SELECT COUNT(*) FROM children) AS total_children,
-                        (SELECT COUNT(*) FROM assistants) AS total_assistants
+                        (SELECT COUNT(*) FROM assistants) AS total_assistants,
+                        (SELECT COUNT(*) FROM pairs) As pairs_count
                     FROM pairs p;
                 """
             )

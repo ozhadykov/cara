@@ -11,6 +11,8 @@ type Coverage = {
 
     covered_children_relative: number
     covered_assistants_relative: number
+
+    pairs_count: number
 }
 
 const Home = () => {
@@ -40,32 +42,54 @@ const Home = () => {
                 </span>
             </div>
 
-            <div className="flex flex-row gap-5">
+            <div className="flex flex-row gap-16 pt-20">
                 <InfoContainer
                     icon="solar:people-nearby-line-duotone"
-                    header={coverage.covered_children_absolute.toString()}
+                    header="Children"
+                    href="children"
                 >
-                    <div className="flex flex-col gap-2">
-                        <p className="text-gray-600">Total Children</p>
-
-                        <p>Coverage</p>
-                        <p>20%</p>
-                        <button className="w-full btn btn-secondary">Configure</button>
-                    </div>
+                    <p>
+                        Total Children:
+                        <b className="text-black"> {coverage.total_children}</b>
+                    </p>
+                    <p>
+                        Assigned Children:
+                        <b className="text-black"> {coverage.covered_children_absolute}</b>
+                    </p>
+                    <p>
+                        Coverage:
+                        <b className="text-black"> {coverage.covered_children_relative}%</b>
+                    </p>
                 </InfoContainer>
 
                 <InfoContainer
                     icon="solar:users-group-rounded-line-duotone"
-                    header={coverage.covered_assistants_absolute.toString()}
+                    header="Assistants"
+                    href="assistants"
                 >
-                    <p>Available Assistants</p>
+                    <p>
+                        Total Assistants:
+                        <b className="text-black"> {coverage.total_assistants}</b>
+                    </p>
+                    <p>
+                        Active Assistants:
+                        <b className="text-black"> {coverage.covered_assistants_absolute}</b>
+                    </p>
+                    <p>
+                        Activity Rate:
+                        <b className="text-black"> {coverage.covered_assistants_relative}%</b>
+                    </p>
                 </InfoContainer>
 
                 <InfoContainer
                     icon="solar:transfer-horizontal-line-duotone"
-                    header={coverage.covered_children_absolute.toString()}
+                    header="Pairs"
+                    href="pairs"
                 >
-                    <p>Assigned Pairs</p>
+                    <p>
+                        Total Pairs:
+                        <b className="text-black"> {coverage.total_children}</b>
+                    </p>
                 </InfoContainer>
             </div>
         </div>
