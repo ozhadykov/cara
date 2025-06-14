@@ -1,5 +1,6 @@
 import { Icon } from "@iconify/react"
 import { useEffect, useState } from "react"
+import InfoContainer from "../components/infoContainer"
 
 type Coverage = {
     total_children: number
@@ -39,31 +40,33 @@ const Home = () => {
                 </span>
             </div>
 
-            <div className="flex flex-col gap-5">
-                <div>
-                    <b>{coverage.covered_children_absolute}</b> children are assigned to{" "}
-                    <b>{coverage.covered_assistants_absolute}</b> assistants
-                </div>
+            <div className="flex flex-row gap-5">
+                <InfoContainer
+                    icon="solar:people-nearby-line-duotone"
+                    header={coverage.covered_children_absolute.toString()}
+                >
+                    <div className="flex flex-col gap-2">
+                        <p className="text-gray-600">Total Children</p>
 
-                <div>
-                    <h2 className="font-bold text-lg">Total</h2>
-                    <div>
-                        <b>Children</b> {coverage.total_children}
+                        <p>Coverage</p>
+                        <p>20%</p>
+                        <button className="w-full btn btn-secondary">Configure</button>
                     </div>
-                    <div>
-                        <b>Assistants</b>: {coverage.total_assistants}
-                    </div>
-                </div>
+                </InfoContainer>
 
-                <div>
-                    <h2 className="font-bold text-lg">Coverage (in %)</h2>
-                    <div>
-                        <b>Children</b> {coverage.covered_children_relative * 100}%
-                    </div>
-                    <div>
-                        <b>Assistants</b> {coverage.covered_assistants_relative * 100}%
-                    </div>
-                </div>
+                <InfoContainer
+                    icon="solar:users-group-rounded-line-duotone"
+                    header={coverage.covered_assistants_absolute.toString()}
+                >
+                    <p>Available Assistants</p>
+                </InfoContainer>
+
+                <InfoContainer
+                    icon="solar:transfer-horizontal-line-duotone"
+                    header={coverage.covered_children_absolute.toString()}
+                >
+                    <p>Assigned Pairs</p>
+                </InfoContainer>
             </div>
         </div>
     )

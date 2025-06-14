@@ -1,5 +1,4 @@
 import { Home, AssistantsImport, ChildrenImport, KeyInput, PairGenerator } from "./pages"
-import AmplData from "./pages/AmplData.tsx"
 import { ReactElement } from "react"
 
 interface IRoute {
@@ -22,15 +21,15 @@ const routes: Array<IRoute> = [
         path: "/children",
         component: <ChildrenImport />,
         label: "Children",
-        fillIcon: "solar:documents-bold-duotone",
-        outlineIcon: "solar:documents-line-duotone",
+        fillIcon: "solar:people-nearby-bold-duotone",
+        outlineIcon: "solar:people-nearby-line-duotone",
     },
     {
         path: "/assistants",
         component: <AssistantsImport />,
         label: "Assistants",
-        fillIcon: "solar:documents-bold-duotone",
-        outlineIcon: "solar:documents-line-duotone",
+        fillIcon: "solar:users-group-rounded-bold-duotone",
+        outlineIcon: "solar:users-group-rounded-line-duotone",
     },
     {
         path: "/keyInput",

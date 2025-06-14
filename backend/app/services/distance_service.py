@@ -85,6 +85,57 @@ class DistanceService:
             self.db.rollback()
             return Response(success=False, message="Database error")
 
+    # async def refresh_distances(self):
+    #     google_api_key_data = await self.keys_service.get_api_key('google_maps_key')
+    #     if not google_api_key_data or 'apiKey' not in google_api_key_data:
+    #         return Response(success=False, message="Google Maps API Key not found or invalid.")
+
+    #     gmaps = googlemaps.Client(key=google_api_key_data['apiKey'])
+
+    #     with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+    #         cursor.execute(
+    #             """
+    #             SELECT 
+    #                 * 
+    #             FROM 
+    #                 address 
+    #             """,
+    #             address_id
+    #         )
+    #         addresses = cursor.fetchall()
+
+    #         cursor.execute(
+    #             """
+    #                 SELECT 
+    #                     a.id,
+    #                     a.qualification,
+    #                     a.address_id,
+    #                     c.id,
+    #                     c.required_qualification,
+    #                     c.address_id,
+    #                     a.has_car
+    #                 FROM children c, assistants a
+    #                 WHERE 
+    #                     qualification.a >= required_qualification.c
+    #                     AND NOT EXISTS(
+    #                         SELECT * 
+    #                         FROM distance_matrix d
+    #                         WHERE 
+    #                             d.origin_address_id = a.id
+    #                             AND d.destination_address_id = c.id
+    #                     )
+    #             """
+    #         )
+
+    #         results = cursor.fetchall()
+
+    #         assistant_ids = [row["a.address_id"] for row in results]  
+    #         child_ids = [row["c.address_id"] for row in results]      
+
+    #         # TODO OMAR
+                
+
+
     async def create_distances_for_assistant(self, assistant: Assistant, address_id: int,
                                              children: List[ChildForDistanceMatrix]):
         # google api expects:

@@ -74,6 +74,28 @@ class AssistantsService:
         latitude, longitude = coordinates_response
         try:
             cursor = self.db.cursor()
+
+            cursor.execute(
+                """
+                    SELECT id
+                    FROM address 
+                    WHERE 
+                        latitude = %s
+                        AND longitude = %s
+                """, 
+                (latitude, longitude)
+            )
+
+            result = cursor.fetchone()
+            
+            address_id = None
+
+            if result == None:
+                response = await distance_service.insert_address(address)
+                address_id = response.data
+            else:
+                address_id = result["id"]
+                
             cursor.execute(
                 """
                     UPDATE assistants
@@ -83,29 +105,16 @@ class AssistantsService:
                         qualification = %s,
                         has_car = %s,  
                         min_capacity = %s,
-                        max_capacity = %s
+                        max_capacity = %s,
+                        address_id = %s
                     WHERE id = %s;
                 """,
                 (assistant.first_name, assistant.family_name, assistant.qualification, assistant.has_car,
-                 assistant.min_capacity, assistant.max_capacity, assistant_id)
+                 assistant.min_capacity, assistant.max_capacity, address_id, assistant_id)
             )
-            cursor.execute(
-                """
-                    UPDATE address
-                    SET
-                        street = %s,
-                        street_number = %s,
-                        zip_code = %s,
-                        city = %s,
-                        latitude = %s,
-                        longitude = %s
-                    WHERE
-                    id = (SELECT address_id FROM assistants WHERE id = %s);
-    
-                """,
-                (assistant.street, assistant.street_number, assistant.zip_code, assistant.city, latitude, longitude,
-                 assistant_id)
-            )
+
+            # distance_service.refresh_distances()
+ 
             self.db.commit()
             return Response(success=True, message=f"assistant with ID: {cursor.lastrowid} is successfully updated")
         except pymysql.err.Error as e:
@@ -134,6 +143,7 @@ class AssistantsService:
                         assistants a
                         JOIN address adr ON adr.id = a.address_id
                         JOIN qualifications q ON q.id = a.qualification
+                    ORDER BY a.id;
                 """
             )
             return cursor.fetchall()
