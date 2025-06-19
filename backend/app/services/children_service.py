@@ -1,18 +1,22 @@
+import pymysql.cursors
 from fastapi import Depends
 from pymysql.connections import Connection
-import pymysql.cursors
+from typing import TYPE_CHECKING
 from ..database.database import get_db
 from ..schemas.children import ChildrenIn, Child
 from ..schemas.address import Address
 from ..schemas.Response import Response
-from ..services.distance_service import DistanceService
+
+if TYPE_CHECKING:
+    from ..services.distance_service import DistanceService
+    from ..services.assistants_service import AssistantsService
 
 
 class ChildrenService:
     def __init__(self, db: Connection = Depends(get_db)):
         self.db = db
 
-    async def create_children(self, children_in: ChildrenIn, distance_service: DistanceService):
+    async def create_children(self, children_in: ChildrenIn, distance_service: "DistanceService"):
         failed = []
         for child in children_in.data:
             address = Address(
@@ -50,7 +54,7 @@ class ChildrenService:
             return Response(success=False, message=f"{len(failed)} children failed to insert in Database")
         return Response(success=True, message="All children successfully inserted")
 
-    async def update_child(self, child: Child, child_id: int, distance_service: DistanceService):
+    async def update_child(self, child: Child, child_id: int, distance_service: "DistanceService", assistant_service: "AssistantsService"):
         address = Address(
             street=child.street,
             street_number=child.street_number,

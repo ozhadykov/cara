@@ -1,21 +1,27 @@
+from typing import TYPE_CHECKING
 from fastapi import Depends
 from pymysql.connections import Connection
 import pymysql.cursors
 
-from .children_service import ChildrenService
 from ..database.database import get_db
 from ..schemas.assistants import AssistantIn, Assistant
 from ..schemas.address import Address
 from ..schemas.Response import Response
-from .distance_service import DistanceService
+if TYPE_CHECKING:
+    from .children_service import ChildrenService
+    from .distance_service import DistanceService
 
 
 class AssistantsService:
     def __init__(self, db: Connection = Depends(get_db)):
         self.db = db
 
-    async def create_assistant(self, assistant_in: AssistantIn, distance_service: DistanceService,
-                               children_service: ChildrenService):
+    async def create_assistant(
+            self,
+            assistant_in: AssistantIn,
+            distance_service: "DistanceService",
+            children_service: "ChildrenService"
+    ):
         failed = []
         for assistant in assistant_in.data:
             address = Address(
@@ -60,7 +66,13 @@ class AssistantsService:
             return Response(success=False, message=f"{len(failed)} assistant failed to insert in Database")
         return Response(success=True, message="All assistant successfully inserted")
 
-    async def update_assistant(self, assistant: Assistant, assistant_id: int, distance_service: DistanceService):
+    async def update_assistant(
+            self,
+            assistant: Assistant,
+            assistant_id: int,
+            distance_service: "DistanceService",
+            children_service: "ChildrenService"
+    ):
         address = Address(
             street=assistant.street,
             street_number=assistant.street_number,
@@ -89,8 +101,9 @@ class AssistantsService:
                      assistant.min_capacity, assistant.max_capacity, address_id, assistant_id)
                 )
 
-            # distance_service.refresh_distances()
- 
+            # refreshing the matrix
+            response = await distance_service.refresh_distance_matrix(children_service, self)
+
             self.db.commit()
             return Response(success=True, message=f"assistant with ID: {cursor.lastrowid} is successfully updated")
         except pymysql.err.Error as e:

@@ -3,14 +3,18 @@ import googlemaps
 import pymysql.cursors
 from fastapi import Depends
 from datetime import datetime
-from typing import List, Dict, Any
+from typing import List, Dict, Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from .assistants_service import AssistantsService
+    from .children_service import ChildrenService
+
+from .keys_service import KeysService
 from ..database.database import get_db
 from ..schemas.address import Address
 from ..schemas.Response import Response
 from ..schemas.assistants import Assistant
 from ..schemas.children import ChildForDistanceMatrix
 from pymysql.connections import Connection
-from ..services.keys_service import KeysService
 
 
 def split_list_by_count(data_list, chunk_size):
@@ -109,54 +113,61 @@ class DistanceService:
             self.db.rollback()
             return Response(success=False, message="Error")
 
-    # async def refresh_distances(self):
-    #     google_api_key_data = await self.keys_service.get_api_key('google_maps_key')
-    #     if not google_api_key_data or 'apiKey' not in google_api_key_data:
-    #         return Response(success=False, message="Google Maps API Key not found or invalid.")
+    async def _get_all_distances_for_address(self, address_id: int) -> Response:
+        try:
+            with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+                cursor.execute(
+                    """
+                        SELECT 
+                            *
+                        FROM 
+                            distance_matrix
+                        WHERE 
+                            origin_address_id = %s
+                    """,
+                    (address_id)
+                )
 
-    #     gmaps = googlemaps.Client(key=google_api_key_data['apiKey'])
+                result = cursor.fetchall()
+                return Response(success=True, data=result)
+        except pymysql.err.Error as e:
+            print(f"Database error during address reading for matrix refresh: {e}")
+            return Response(success=False, message="Database error")
 
-    #     with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
-    #         cursor.execute(
-    #             """
-    #             SELECT 
-    #                 * 
-    #             FROM 
-    #                 address 
-    #             """,
-    #             address_id
-    #         )
-    #         addresses = cursor.fetchall()
+    async def _validate_children_address(self, assistant_address_id: int, children: List) -> List:
+        test = 10
+    async def refresh_distance_matrix(
+            self,
+            children_service: "ChildrenService",
+            assistants_service: "AssistantsService"
+    ) -> Response:
 
-    #         cursor.execute(
-    #             """
-    #                 SELECT 
-    #                     a.id AS assistant_id,
-    #                     a.qualification AS assistant_qualification,
-    #                     a.address_id AS origin_address_id,
-    #                     a.has_car AS assistant_has_car,
-    #                     c.id AS child_id,
-    #                     c.required_qualification AS child_required_qualification,
-    #                     c.address_id AS destination_address_id
-    #                 FROM children c, assistants a
-    #                 WHERE 
-    #                     assistant_qualification >= child_required_qualification
-    #                     AND NOT EXISTS(
-    #                         SELECT * 
-    #                         FROM distance_matrix dm
-    #                         WHERE 
-    #                             dm.origin_address_id = origin_address_id
-    #                             AND dm.destination_address_id = destination_address_id
-    #                     )
-    #             """
-    #         )
+        # check if there are new address id mappings between children and assistants
+        # get all assistants from db
+        assistants = await assistants_service.get_all_assistants()
+        children = await children_service.get_all_children()
+        for assistant in assistants:
+            # get all distances for assistant
+            assistant_address_id = assistant["address_id"]
+            response = await self._get_all_distances_for_address(assistant_address_id)
+            if not response.success:
+                return response
 
-    #         results = cursor.fetchall()
+            assistant_distances = response.data
+            children_to_distance_matrix = []
 
-    #         assistant_ids = [row["a.address_id"] for row in results]  
-    #         child_ids = [row["c.address_id"] for row in results]      
+            if len(assistant_distances) == 0:
+                test = 10
+                # calculate distances to all children for this assistant
+            else:
+                # validate data
+                children_to_distance_matrix = await self._validate_children_address
 
-    #         # TODO OMAR
+            print(len(assistant_distances))
+            print("assistant id: ", assistant["id"])
+            print("assistant address id: ", assistant["address_id"])
+            print(assistant_distances)
+
 
     async def create_distances_for_assistant(self, assistant: Assistant, address_id: int,
                                              children: List[ChildForDistanceMatrix]):
