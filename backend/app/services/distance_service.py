@@ -134,8 +134,19 @@ class DistanceService:
             print(f"Database error during address reading for matrix refresh: {e}")
             return Response(success=False, message="Database error")
 
-    async def _validate_children_address(self, assistant_address_id: int, children: List) -> List:
-        test = 10
+    async def _validate_children_address(self, assistant_distances: List, children: List) -> List:
+        invalid_children = []
+        for child in children:
+            mapping_exists = False
+            for distance in assistant_distances:
+                if distance["destination_address_id"] == child["address_id"]:
+                    mapping_exists = True
+
+            if not mapping_exists:
+                invalid_children.append(child)
+
+        return invalid_children
+
     async def refresh_distance_matrix(
             self,
             children_service: "ChildrenService",
@@ -154,19 +165,25 @@ class DistanceService:
                 return response
 
             assistant_distances = response.data
-            children_to_distance_matrix = []
+            children_to_distance_matrix = await self._validate_children_address(assistant_distances, children)
+            transformed_children = [
+                ChildForDistanceMatrix(
+                    **{
+                        'child_id': child_data['id'],
+                        'address_id': child_data['address_id'],
+                        'required_qualification_int': child_data['required_qualification'],
+                        'latitude': child_data['latitude'],
+                        'longitude': child_data['longitude']
+                    }
+                )
+                for child_data in children_to_distance_matrix
+            ]
 
-            if len(assistant_distances) == 0:
-                test = 10
-                # calculate distances to all children for this assistant
-            else:
-                # validate data
-                children_to_distance_matrix = await self._validate_children_address
+            transformed_assistant = Assistant(**assistant)
+            response = await self.create_distances_for_assistant(transformed_assistant, assistant_address_id, transformed_children)
+            return response
 
-            print(len(assistant_distances))
-            print("assistant id: ", assistant["id"])
-            print("assistant address id: ", assistant["address_id"])
-            print(assistant_distances)
+
 
 
     async def create_distances_for_assistant(self, assistant: Assistant, address_id: int,

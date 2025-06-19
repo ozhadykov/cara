@@ -103,7 +103,9 @@ class ChildrenService:
                         REPLACE(adr.street_number, '+', ' ') AS street_number,
                         REPLACE(adr.city, '+', ' ') AS city,
                         adr.zip_code AS zip_code,
-                        adr.id AS address_id
+                        adr.id AS address_id,
+                        adr.latitude AS latitude,
+                        adr.longitude AS longitude
                     FROM 
                         children c
                         JOIN address adr ON adr.id = c.address_id

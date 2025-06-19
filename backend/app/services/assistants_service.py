@@ -127,7 +127,9 @@ class AssistantsService:
                         REPLACE(adr.street_number, '+', ' ') AS street_number,
                         REPLACE(adr.city, '+', ' ') AS city,
                         adr.zip_code AS zip_code,
-                        adr.id AS address_id
+                        adr.id AS address_id,
+                        adr.latitude AS latitude,
+                        adr.longitude AS longitude
                     FROM 
                         assistants a
                         JOIN address adr ON adr.id = a.address_id
