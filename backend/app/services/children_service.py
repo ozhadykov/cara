@@ -51,54 +51,30 @@ class ChildrenService:
         return Response(success=True, message="All children successfully inserted")
 
     async def update_child(self, child: Child, child_id: int, distance_service: DistanceService):
-        child.street = child.street.replace(" ", "+")
-        child.street_number = child.street_number.replace(" ", "+")
-        child.city = child.city.replace(" ", "+")
         address = Address(
             street=child.street,
             street_number=child.street_number,
             city=child.city,
             zip_code=child.zip_code
         )
-        coordinates_response = await distance_service.get_coordinates_from_street_name(address)
-        latitude, longitude = coordinates_response
         try:
-            cursor = self.db.cursor()
+            response = await distance_service.insert_address(address)
+            address_id = response.data
 
-            cursor.execute(
-                """
-                    SELECT id
-                    FROM address 
-                    WHERE 
-                        latitude = %s
-                        AND longitude = %s
-                """, 
-                (latitude, longitude)
-            )
-
-            result = cursor.fetchone()
-            
-            address_id = None
-
-            if result == None:
-                response = await distance_service.insert_address(address)
-                address_id = response.data
-            else:
-                address_id = result["id"]
-            
-            cursor.execute(
-                """
-                    UPDATE children
-                    SET 
-                        first_name = %s, 
-                        family_name = %s, 
-                        required_qualification = %s,  
-                        requested_hours = %s,
-                        address_id = %s
-                    WHERE id = %s;
-                """,
-                (child.first_name, child.family_name, child.required_qualification, child.requested_hours, address_id, child_id)
-            )
+            with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+                cursor.execute(
+                    """
+                        UPDATE children
+                        SET 
+                            first_name = %s, 
+                            family_name = %s, 
+                            required_qualification = %s,  
+                            requested_hours = %s,
+                            address_id = %s
+                        WHERE id = %s;
+                    """,
+                    (child.first_name, child.family_name, child.required_qualification, child.requested_hours, address_id, child_id)
+                )
 
             # distance_service.refresh_distances()
 

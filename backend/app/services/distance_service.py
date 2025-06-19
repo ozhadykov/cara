@@ -38,34 +38,53 @@ class DistanceService:
         geometry = result_data["results"][0]["geometry"]
         return geometry["lat"], geometry["lng"]
 
+    async def address_exists(self, address: Address) -> Response:
+        try:
+            coordinates_response = await self.get_coordinates_from_street_name(address)
+            if isinstance(coordinates_response, Response) and not coordinates_response.success:
+                return coordinates_response
+
+            latitude, longitude = coordinates_response
+
+            with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+                cursor.execute(
+                    """
+                        SELECT id
+                        FROM address 
+                        WHERE 
+                            latitude = %s
+                            AND longitude = %s
+                    """,
+                    (latitude, longitude)
+                )
+
+                result = cursor.fetchone()
+
+            return Response(success=True, data=result)
+        except ValueError:
+            return Response(success=False, message="Coordinates not found")
+        except pymysql.err.Error as e:
+            print(f"Database error during assistant update: {e}")
+            return Response(success=False, message="Database error")
+
     async def insert_address(self, address: Address) -> Response:
         try:
             address.street = address.street.replace(" ", "+")
             address.street_number = address.street_number.replace(" ", "+")
             address.city = address.city.replace(" ", "+")
 
-            coordinates_response = await self.get_coordinates_from_street_name(address)
-            if isinstance(coordinates_response, Response) and not coordinates_response.success:
-                return coordinates_response
+            # if failed somewhere then return Response
+            address_exists_response = await self.address_exists(address)
+            if not address_exists_response.success:
+                return address_exists_response
+            # address does not exist in db
+            if address_exists_response.data is None:
+                coordinates_response = await self.get_coordinates_from_street_name(address)
+                if isinstance(coordinates_response, Response) and not coordinates_response.success:
+                    return coordinates_response
 
-            latitude, longitude = coordinates_response
-            with self.db.cursor(pymysql.cursors.DictCursor) as cursor:  # Use a context manager for cursor
-                cursor.execute(
-                    """
-                    SELECT id FROM address WHERE latitude = %s AND longitude = %s
-                    """,
-                    (latitude, longitude)
-                )
-
-                # Use fetchone() to get the first (or only) matching row
-                existing_address_record = cursor.fetchone()
-
-                if existing_address_record:
-                    # Address already exists, return its ID or a message
-                    existing_address_id = existing_address_record['id']
-                    print(f"Address already exists with ID: {existing_address_id}")
-                    return Response(success=True, message="Address already exists", data=existing_address_id)
-                else:
+                latitude, longitude = coordinates_response
+                with self.db.cursor(pymysql.cursors.DictCursor) as cursor:  # Use a context manager for cursor
                     # Address does not exist, proceed with insertion
                     cursor.execute(
                         """
@@ -76,14 +95,19 @@ class DistanceService:
                     )
                     self.db.commit()
                     return Response(success=True, message="Address inserted successfully", data=cursor.lastrowid)
+            # address exists
+            else:
+                address_id = address_exists_response.data["id"]
+                print(f"Address already exists with ID: {address_id}")
+                return Response(success=True, message="Address already exists", data=address_id)
         except pymysql.err.Error as e:
-            print(f"Database error during child insertion: {e}")
+            print(f"Database error during address insertion: {e}")
             self.db.rollback()
             return Response(success=False, message="Database error")
         except Exception as e:
-            print(f"Database error during child insertion: {e}")
+            print(f"Error during address insertion: {e}")
             self.db.rollback()
-            return Response(success=False, message="Database error")
+            return Response(success=False, message="Error")
 
     # async def refresh_distances(self):
     #     google_api_key_data = await self.keys_service.get_api_key('google_maps_key')
@@ -133,8 +157,6 @@ class DistanceService:
     #         child_ids = [row["c.address_id"] for row in results]      
 
     #         # TODO OMAR
-                
-
 
     async def create_distances_for_assistant(self, assistant: Assistant, address_id: int,
                                              children: List[ChildForDistanceMatrix]):

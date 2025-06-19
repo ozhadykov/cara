@@ -61,57 +61,33 @@ class AssistantsService:
         return Response(success=True, message="All assistant successfully inserted")
 
     async def update_assistant(self, assistant: Assistant, assistant_id: int, distance_service: DistanceService):
-        assistant.street = assistant.street.replace(" ", "+")
-        assistant.street_number = assistant.street_number.replace(" ", "+")
-        assistant.city = assistant.city.replace(" ", "+")
         address = Address(
             street=assistant.street,
             street_number=assistant.street_number,
             city=assistant.city,
             zip_code=assistant.zip_code
         )
-        coordinates_response = await distance_service.get_coordinates_from_street_name(address)
-        latitude, longitude = coordinates_response
         try:
-            cursor = self.db.cursor()
+            response = await distance_service.insert_address(address)
+            address_id = response.data
 
-            cursor.execute(
-                """
-                    SELECT id
-                    FROM address 
-                    WHERE 
-                        latitude = %s
-                        AND longitude = %s
-                """, 
-                (latitude, longitude)
-            )
-
-            result = cursor.fetchone()
-            
-            address_id = None
-
-            if result == None:
-                response = await distance_service.insert_address(address)
-                address_id = response.data
-            else:
-                address_id = result["id"]
-                
-            cursor.execute(
-                """
-                    UPDATE assistants
-                    SET 
-                        first_name = %s, 
-                        family_name = %s, 
-                        qualification = %s,
-                        has_car = %s,  
-                        min_capacity = %s,
-                        max_capacity = %s,
-                        address_id = %s
-                    WHERE id = %s;
-                """,
-                (assistant.first_name, assistant.family_name, assistant.qualification, assistant.has_car,
-                 assistant.min_capacity, assistant.max_capacity, address_id, assistant_id)
-            )
+            with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+                cursor.execute(
+                    """
+                        UPDATE assistants
+                        SET 
+                            first_name = %s, 
+                            family_name = %s, 
+                            qualification = %s,
+                            has_car = %s,  
+                            min_capacity = %s,
+                            max_capacity = %s,
+                            address_id = %s
+                        WHERE id = %s;
+                    """,
+                    (assistant.first_name, assistant.family_name, assistant.qualification, assistant.has_car,
+                     assistant.min_capacity, assistant.max_capacity, address_id, assistant_id)
+                )
 
             # distance_service.refresh_distances()
  
