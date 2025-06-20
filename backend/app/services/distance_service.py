@@ -4,13 +4,14 @@ import pymysql.cursors
 from fastapi import Depends
 from datetime import datetime
 from typing import List, Dict, Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from .assistants_service import AssistantsService
     from .children_service import ChildrenService
 
 from .keys_service import KeysService
 from ..database.database import get_db
-from ..schemas.address import Address
+from ..schemas.address import Address, DistanceMatrixAddress
 from ..schemas.Response import Response
 from ..schemas.assistants import Assistant
 from ..schemas.children import ChildForDistanceMatrix
@@ -18,7 +19,6 @@ from pymysql.connections import Connection
 
 
 def split_list_by_count(data_list, chunk_size):
-    """Splits a list into chunks of a specified size."""
     return [data_list[i:i + chunk_size] for i in range(0, len(data_list), chunk_size)]
 
 
@@ -178,83 +178,32 @@ class DistanceService:
                 )
                 for child_data in children_to_distance_matrix
             ]
-
-            transformed_assistant = Assistant(**assistant)
-            response = await self.create_distances_for_assistant(transformed_assistant, assistant_address_id, transformed_children)
+            assistant_address = DistanceMatrixAddress(**{
+                'id': assistant_address_id,
+                'latitude': assistant['latitude'],
+                'longitude': assistant['longitude']
+            })
+            response = await self._update_distances_for_origin(assistant_address, transformed_children)
             return response
 
+    async def _update_distances_for_origin(self, origin: DistanceMatrixAddress,
+                                           destinations: List[ChildForDistanceMatrix]) -> Response:
+        # make 2 google api calls for modes transit and driving
+        modes = [
+            'transit',
+            'driving'
+        ]
+        transformed_origin = (origin.latitude, origin.longitude)
 
+        transformed_destinations = []
+        for destination in destinations:
+            transformed_destinations.append({
+                "coords": (destination.latitude, destination.longitude),
+                "address_id": destination.address_id
+            })
 
-
-    async def create_distances_for_assistant(self, assistant: Assistant, address_id: int,
-                                             children: List[ChildForDistanceMatrix]):
-        # google api expects:
-        # origin - assistant's address
-        # destinations - children's addresses
-        # mode - car or public transport
-        # there a few more, but not relevant in this project
-
-        # get assistant address
-        with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute(
-                """
-                SELECT 
-                    * 
-                FROM 
-                    address 
-                WHERE 
-                    id = %s
-                """,
-                address_id
-            )
-            assistant_address = cursor.fetchone()
-
-        if not assistant_address:
-            print(f"Error: Assistant address with ID {address_id} not found.")
-            return Response(success=False, message=f"Assistant address with ID {address_id} not found.")
-
-        mode = 'transit'
-        if assistant.has_car:
-            mode = 'driving'
-
-        origin = (assistant_address['latitude'], assistant_address['longitude'])
-
-        qualified_destinations_with_data: List[Dict[str, Any]] = []
-        unqualified_children_ids: List[int] = []
-
-        for child in children:
-            if assistant.qualification >= child['required_qualification_int']:
-                qualified_destinations_with_data.append({
-                    "coords": (child['latitude'], child['longitude']),
-                    "address_id": child['address_id']
-                })
-            else:
-                unqualified_children_ids.append(child['address_id'])
-
-        # Handle unqualified children first by inserting -1
-        try:
-            with self.db.cursor() as cursor:
-                if unqualified_children_ids:
-                    # Prepare values for batch insert
-                    insert_values = [(address_id, child_addr_id, -1, -1) for child_addr_id in
-                                     unqualified_children_ids]
-                    query = """
-                            INSERT INTO distance_matrix (origin_address_id, destination_address_id, distance, travel_time)
-                            VALUES (%s, %s, %s, %s)
-                            """
-                    cursor.executemany(query, insert_values)
-                    self.db.commit()
-                    print(f"Inserted -1 for {len(unqualified_children_ids)} unqualified children.")
-        except Exception as e:
-            print(f"Database error during unqualified child distance insertion: {e}")
-            self.db.rollback()
-            return Response(success=False,
-                            message="Database error during unqualified child distance insertion.")
-
-        # If there are no qualified destinations, we can stop here
-        if not qualified_destinations_with_data:
-            print("No qualified children to calculate distances for.")
-            return Response(success=True, message="No qualified children to calculate distances for.")
+        # Split qualified destinations into chunks with 100 items, because matrix api has max 100 els
+        destination_chunks_with_data = split_list_by_count(transformed_destinations, 100)
 
         # preparing credentials
         google_api_key_data = await self.keys_service.get_api_key('google_maps_key')
@@ -262,80 +211,78 @@ class DistanceService:
             return Response(success=False, message="Google Maps API Key not found or invalid.")
 
         gmaps = googlemaps.Client(key=google_api_key_data['apiKey'])
+        for mode in modes:
+            for chunk_index, destination_chunk_with_data in enumerate(destination_chunks_with_data):
+                # Extract just the coordinates for the API call
+                current_dest_coords = [item["coords"] for item in destination_chunk_with_data]
 
-        # Split qualified destinations into chunks with 100 items, because matrix api has max 100 els
-        destination_chunks_with_data = split_list_by_count(qualified_destinations_with_data, 100)
+                departure_time = datetime.now()
 
-        for chunk_index, destination_chunk_with_data in enumerate(destination_chunks_with_data):
-            # Extract just the coordinates for the API call
-            current_dest_coords = [item["coords"] for item in destination_chunk_with_data]
+                try:
+                    matrix_result = gmaps.distance_matrix(origins=[transformed_origin],
+                                                          destinations=current_dest_coords,
+                                                          mode=mode,
+                                                          departure_time=departure_time if mode == 'transit' else None
+                                                          )
 
-            departure_time = datetime.now()
+                    if matrix_result['status'] == 'OK':
+                        # There's only one row since we have one origin
+                        elements = matrix_result['rows'][0]['elements']
 
-            try:
-                matrix_result = gmaps.distance_matrix(origins=[origin],
-                                                      destinations=current_dest_coords,
-                                                      mode=mode,
-                                                      departure_time=departure_time if mode == 'transit' else None
-                                                      )
+                        # The order of `elements` directly corresponds to the order of `current_dest_coords`
+                        # which in turn corresponds to `destination_chunk_with_data`.
+                        for i, element in enumerate(elements):
+                            # Retrieve the original child data using the index `i`
+                            corresponding_destination_data = destination_chunk_with_data[i]
+                            destination_address_id = corresponding_destination_data['address_id']
 
-                if matrix_result['status'] == 'OK':
-                    # There's only one row since we have one origin
-                    elements = matrix_result['rows'][0]['elements']
-
-                    # The order of `elements` directly corresponds to the order of `current_dest_coords`
-                    # which in turn corresponds to `destination_chunk_with_data`.
-                    for i, element in enumerate(elements):
-                        # Retrieve the original child data using the index `i`
-                        corresponding_child_data = destination_chunk_with_data[i]
-                        child_address_id = corresponding_child_data['address_id']
-
-                        if element['status'] == 'OK':
-                            distance = element['distance']['value']
-                            duration = element['duration']['value']
-                            print(element)
-                            # Save to database
-                            try:
-                                with self.db.cursor() as cursor:
-                                    cursor.execute(
-                                        """
-                                        INSERT INTO distance_matrix (origin_address_id, destination_address_id, distance, travel_time)
-                                        VALUES (%s, %s, %s, %s)
-                                        """,
-                                        (address_id, child_address_id, distance, duration)
-                                    )
-                                self.db.commit()
+                            if element['status'] == 'OK':
+                                distance = element['distance']['value']
+                                duration = element['duration']['value']
+                                print(element)
+                                # Save to database
+                                try:
+                                    with self.db.cursor() as cursor:
+                                        cursor.execute(
+                                            """
+                                            INSERT INTO distance_matrix (origin_address_id, destination_address_id, transport_type, distance, travel_time)
+                                            VALUES (%s, %s, %s, %s, %s)
+                                            """,
+                                            (origin.id, destination_address_id, mode, distance, duration)
+                                        )
+                                    self.db.commit()
+                                    print(
+                                        f"Inserted distance for destination_address_id {destination_address_id}: Distance={distance}, Duration={duration}")
+                                except Exception as db_e:
+                                    print(
+                                        f"Database error saving distance for destination_address_id {destination_address_id}: {db_e}")
+                                    self.db.rollback()
+                                    # todo: Decide if you want to stop processing or continue
+                            else:
                                 print(
-                                    f"  Inserted distance for child_address_id {child_address_id}: Distance={distance}, Duration={duration}")
-                            except Exception as db_e:
-                                print(f"Database error saving distance for child_address_id {child_address_id}: {db_e}")
-                                self.db.rollback()
-                                # todo: Decide if you want to stop processing or continue
-                        else:
-                            print(f"  Error for child_address_id {child_address_id} (API status: {element['status']})")
-                            try:
-                                with self.db.cursor() as cursor:
-                                    cursor.execute(
-                                        """
-                                        INSERT INTO distance_matrix (origin_address_id, destination_address_id, distance, travel_time)
-                                        VALUES (%s, %s, %s, %s)
-                                        """,
-                                        (address_id, child_address_id, -2, -2)
-                                        # -2 used, because api could not build a route
-                                    )
-                                self.db.commit()
-                            except Exception as db_e:
-                                print(
-                                    f"Database error saving error code for child_address_id {child_address_id}: {db_e}")
-                                self.db.rollback()
-
-                else:
-                    print(
-                        f"Error in Distance Matrix API call for chunk {chunk_index + 1}: {matrix_result['status']} - {matrix_result.get('error_message', 'No error message provided.')}")
-                    # todo: mark all children in this chunk as failed?
-            except googlemaps.exceptions.ApiError as api_e:
-                print(f"Google Maps API error for chunk {chunk_index + 1}: {api_e}")
-            except Exception as e:
-                print(f"An unexpected error occurred for chunk {chunk_index + 1}: {e}")
+                                    f"  Error for destination_address_id {destination_address_id} (API status: {element['status']})")
+                                try:
+                                    with self.db.cursor() as cursor:
+                                        cursor.execute(
+                                            """
+                                            INSERT INTO distance_matrix (origin_address_id, destination_address_id, transport_type, distance, travel_time)
+                                            VALUES (%s, %s, %s, %s, %s)
+                                            """,
+                                            (origin.id, destination_address_id, 'invalid', -2, -2)
+                                            # -2 used, because api could not build a route
+                                        )
+                                    self.db.commit()
+                                except Exception as db_e:
+                                    print(
+                                        f"Database error saving error code for destination_address_id {destination_address_id}: {db_e}")
+                                    self.db.rollback()
+                    else:
+                        print(
+                            f"Error in Distance Matrix API call for chunk {chunk_index + 1}: {matrix_result['status']} - {matrix_result.get('error_message', 'No error message provided.')}")
+                        # todo: mark all children in this chunk as failed?
+                except googlemaps.exceptions.ApiError as api_e:
+                    print(f"Google Maps API error for chunk {chunk_index + 1}: {api_e}")
+                except Exception as e:
+                    print(f"An unexpected error occurred for chunk {chunk_index + 1}: {e}")
 
         return Response(success=True, message="Distances calculated and saved successfully.")

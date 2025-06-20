@@ -16,45 +16,58 @@ class ChildrenService:
     def __init__(self, db: Connection = Depends(get_db)):
         self.db = db
 
-    async def create_children(self, children_in: ChildrenIn, distance_service: "DistanceService"):
-        failed = []
-        for child in children_in.data:
-            address = Address(
-                street=child.street,
-                street_number=child.street_number,
-                city=child.city,
-                zip_code=child.zip_code
-            )
-            address_response = await distance_service.insert_address(address)
-            if not address_response.success:
-                return address_response
+    async def create_children(self, children_in: ChildrenIn,
+                              distance_service: "DistanceService",
+                              assistant_service: "AssistantsService"):
+        try:
+            failed = []
+            for child in children_in.data:
+                address = Address(
+                    street=child.street,
+                    street_number=child.street_number,
+                    city=child.city,
+                    zip_code=child.zip_code
+                )
+                address_response = await distance_service.insert_address(address)
+                if not address_response.success:
+                    return address_response
 
-            address_id = address_response.data
-            try:
-                with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
-                    cursor.execute(
-                        """
-                            INSERT INTO children 
-                            (first_name, family_name, required_qualification, requested_hours, address_id) 
-                            VALUES (%s, %s, %s, %s, %s)
-                        """,
-                        (child.first_name, child.family_name, child.required_qualification,
-                         child.requested_hours, address_id)
-                    )
-                    self.db.commit()
-            except pymysql.err.Error as e:
-                print(f"Database error during child insertion: {e}")
-                failed.append(child)
-                self.db.rollback()
-            except Exception as e:
-                print(f"An unexpected error occurred during child insertion: {e}")
-                failed.append(child)
-                self.db.rollback()
-        if len(failed) > 0:
-            return Response(success=False, message=f"{len(failed)} children failed to insert in Database")
+                address_id = address_response.data
+                try:
+                    with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+                        cursor.execute(
+                            """
+                                INSERT INTO children 
+                                (first_name, family_name, required_qualification, requested_hours, address_id) 
+                                VALUES (%s, %s, %s, %s, %s)
+                            """,
+                            (child.first_name, child.family_name, child.required_qualification,
+                             child.requested_hours, address_id)
+                        )
+                        self.db.commit()
+                except pymysql.err.Error as e:
+                    print(f"Database error during child insertion: {e}")
+                    failed.append(child)
+                    self.db.rollback()
+                except Exception as e:
+                    print(f"An unexpected error occurred during child insertion: {e}")
+                    failed.append(child)
+                    self.db.rollback()
+            if len(failed) > 0:
+                return Response(success=False, message=f"{len(failed)} children failed to insert in Database")
+
+            response = await distance_service.refresh_distance_matrix(self, assistant_service)
+            if not response.success:
+                raise Exception(response.message)
+        except Exception as e:
+            print(f"An unexpected error occurred during child insertion: {e}")
+            self.db.rollback()
+
         return Response(success=True, message="All children successfully inserted")
 
-    async def update_child(self, child: Child, child_id: int, distance_service: "DistanceService", assistant_service: "AssistantsService"):
+    async def update_child(self, child: Child, child_id: int,
+                           distance_service: "DistanceService",
+                           assistant_service: "AssistantsService"):
         address = Address(
             street=child.street,
             street_number=child.street_number,
@@ -80,7 +93,9 @@ class ChildrenService:
                     (child.first_name, child.family_name, child.required_qualification, child.requested_hours, address_id, child_id)
                 )
 
-            # distance_service.refresh_distances()
+            response = await distance_service.refresh_distance_matrix(self, assistant_service)
+            if not response.success:
+                raise Exception(response.message)
 
             self.db.commit()
             return Response(success=True, message=f"Child with ID: {cursor.lastrowid} is successfully updated")
@@ -111,24 +126,6 @@ class ChildrenService:
                         JOIN address adr ON adr.id = c.address_id
                         JOIN qualifications q ON q.id = c.required_qualification
                     ORDER BY c.id;
-                """
-            )
-            return cursor.fetchall()
-
-    async def get_children_for_distance_matrix(self):
-        with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute(
-                """
-                     SELECT
-                        c.id AS child_id,
-                        c.address_id as address_id,
-                        c.required_qualification AS required_qualification_int,
-                        adr.latitude AS latitude,
-                        adr.longitude AS longitude
-                    FROM 
-                        children c
-                        JOIN address adr ON adr.id = c.address_id
-                        JOIN qualifications q ON q.id = c.required_qualification;
                 """
             )
             return cursor.fetchall()

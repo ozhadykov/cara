@@ -97,18 +97,19 @@ CREATE TABLE pairs
 CREATE TABLE distance_matrix
 (
     id                     INT AUTO_INCREMENT PRIMARY KEY,
-    origin_address_id      INT   NOT NULL,
-    destination_address_id INT   NOT NULL,
-    distance               FLOAT NOT NULL,
-    travel_time            FLOAT NOT NULL,
-
+    origin_address_id      INT                         NOT NULL,
+    destination_address_id INT                         NOT NULL,
+    transport_type         ENUM ('transit', 'driving', 'invalid') NOT NULL,
+    distance               FLOAT                       NOT NULL,
+    travel_time            FLOAT                       NOT NULL,
     created_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at             DATETIME  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     FOREIGN KEY (origin_address_id) REFERENCES address (id) ON DELETE CASCADE,
     FOREIGN KEY (destination_address_id) REFERENCES address (id) ON DELETE CASCADE,
-    UNIQUE KEY unique_pair (origin_address_id, destination_address_id)
+    UNIQUE KEY unique_trip (origin_address_id, destination_address_id, transport_type)
 );
+
 
 CREATE TABLE apiKeys
 (

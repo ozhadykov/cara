@@ -47,11 +47,9 @@ class AssistantsService:
                          assistant.min_capacity, assistant.max_capacity, address_id, assistant.has_car)
                     )
 
-                    children = await children_service.get_children_for_distance_matrix()
-
-                    response = await distance_service.create_distances_for_assistant(assistant, address_id, children)
+                    response = await distance_service.refresh_distance_matrix(children_service, self)
                     if not response.success:
-                        raise Exception('Something went wrong with distance matrix api logic')
+                        raise Exception(response.message)
                     self.db.commit()
             except pymysql.err.Error as e:
                 print(f"Database error during assistant insertion: {e}")
@@ -103,6 +101,8 @@ class AssistantsService:
 
             # refreshing the matrix
             response = await distance_service.refresh_distance_matrix(children_service, self)
+            if not response.success:
+                raise Exception(response.message)
 
             self.db.commit()
             return Response(success=True, message=f"assistant with ID: {cursor.lastrowid} is successfully updated")
