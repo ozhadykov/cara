@@ -82,3 +82,16 @@ As requested the goal is to get as many pairs as possible with the best possible
 ## Look into problem
 
 We have defined this problem as a maximization problem.
+
+# TODO:
+
+1. Add Toasts to Add/Update Assistants and Children.
+2. Add Loading and Toasts to keys Setup
+3. Add "add all" to table in pairs generator
+4. Add Weights settings for LP model settings page
+5. Refactor Settings Page
+6. Add custom assigment tool to pairs generator page
+7. Finish color Scheme, add success, danger, warning colors
+8. Fix Frontend calls to backend without "npm run dev"
+9. AMPL Model python code
+10. Generate pairs step 4.
