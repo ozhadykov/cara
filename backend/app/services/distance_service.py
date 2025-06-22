@@ -1,4 +1,4 @@
-import httpx
+import httpx, json
 import googlemaps
 import pymysql.cursors
 from fastapi import Depends
@@ -13,7 +13,6 @@ from .keys_service import KeysService
 from ..database.database import get_db
 from ..schemas.address import Address, DistanceMatrixAddress
 from ..schemas.Response import Response
-from ..schemas.assistants import Assistant
 from ..schemas.children import ChildForDistanceMatrix
 from pymysql.connections import Connection
 
@@ -27,29 +26,46 @@ class DistanceService:
         self.db = db
         self.keys_service = keys_service
 
-    async def get_coordinates_from_street_name(self, address: Address):
-        key_data = await self.keys_service.get_api_key("opencage_key")
-        url = f"https://api.opencagedata.com/geocode/v1/json?q={address.street}+{address.street_number}%2C+{address.zip_code}+{address.city}%2C+Germany&key={key_data["apiKey"]}"  # streetnumber u key wieder einfügen
-        r = httpx.get(url)
+    async def validate_address(self, address: Address):
+        # preparing credentials
+        google_api_key_data = await self.keys_service.get_api_key('google_maps_key')
+        if not google_api_key_data or 'apiKey' not in google_api_key_data or not len(google_api_key_data['apiKey']):
+            return Response(success=False, message="Google Maps API Key not found or invalid.")
 
-        if r.status_code == 401:
-            return Response(success=False, message="API Key is invalid")
+        gmaps = googlemaps.Client(key=google_api_key_data['apiKey'])
 
-        result_data = r.json()
-        if not result_data["results"]:
-            raise ValueError("No results returned from geocoding API")
-
-        geometry = result_data["results"][0]["geometry"]
-        return geometry["lat"], geometry["lng"]
-
-    async def address_exists(self, address: Address) -> Response:
+        address_lines = [f"{address.street} {address.street_number}"]
         try:
-            coordinates_response = await self.get_coordinates_from_street_name(address)
-            if isinstance(coordinates_response, Response) and not coordinates_response.success:
-                return coordinates_response
+            validation_result = gmaps.addressvalidation(address_lines,
+                                                        regionCode='DE',
+                                                        locality=address.city,
+                                                        )
 
-            latitude, longitude = coordinates_response
+            if validation_result and validation_result.get('error'):
+                return Response(success=False, message=validation_result['error'].get('message'))
 
+            if validation_result and validation_result.get('result'):
+                result = validation_result['result']
+                verdict = result.get('verdict', {})
+                address_validated = result.get('address', {})
+                geocode = result.get('geocode', {})
+
+                if verdict.get('addressComplete') is False or verdict.get('validationGranularity') != 'PREMISE':
+                    return Response(success=False, message="Address validation failed.")
+
+                return Response(success=True,
+                                data={'address_validated': address_validated,
+                                      'geocode': geocode})
+            else:
+                print(
+                    f"No validation results found for the input: {address.street}, {address.street_number}, {address.city}, {address.zip_code}, DE")
+                return Response(success=False, message="Address validation failed.")
+        except Exception as e:
+            print(f"Error validating address: {e}")
+            return Response(success=False, message=f"Address validation failed. {e}")
+
+    async def address_exists(self, latitude, longitude) -> Response:
+        try:
             with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
                 cursor.execute(
                     """
@@ -63,7 +79,6 @@ class DistanceService:
                 )
 
                 result = cursor.fetchone()
-
             return Response(success=True, data=result)
         except ValueError:
             return Response(success=False, message="Coordinates not found")
@@ -73,21 +88,23 @@ class DistanceService:
 
     async def insert_address(self, address: Address) -> Response:
         try:
-            address.street = address.street.replace(" ", "+")
-            address.street_number = address.street_number.replace(" ", "+")
-            address.city = address.city.replace(" ", "+")
+            response = await self.validate_address(address)
+            if not response.success:
+                return Response(success=False, message=response.message)
 
+            validated_address_data = response.data
+            geocode = validated_address_data.get('geocode').get('location')
+            print(geocode)
+            latitude = geocode.get('latitude')
+            longitude = geocode.get('longitude')
+            print(latitude, longitude)
             # if failed somewhere then return Response
-            address_exists_response = await self.address_exists(address)
+            address_exists_response = await self.address_exists(latitude, longitude)
             if not address_exists_response.success:
                 return address_exists_response
+
             # address does not exist in db
             if address_exists_response.data is None:
-                coordinates_response = await self.get_coordinates_from_street_name(address)
-                if isinstance(coordinates_response, Response) and not coordinates_response.success:
-                    return coordinates_response
-
-                latitude, longitude = coordinates_response
                 with self.db.cursor(pymysql.cursors.DictCursor) as cursor:  # Use a context manager for cursor
                     # Address does not exist, proceed with insertion
                     cursor.execute(
@@ -183,9 +200,10 @@ class DistanceService:
                 'latitude': assistant['latitude'],
                 'longitude': assistant['longitude']
             })
-            response = await self._update_distances_for_origin(assistant_address, transformed_children)
-            if not response.success:
-                return response
+            if len(transformed_children) > 0:
+                response = await self._update_distances_for_origin(assistant_address, transformed_children)
+                if not response.success:
+                    return response
 
         return Response(success=True, message="Distance matrix updated successfully")
 
@@ -246,7 +264,6 @@ class DistanceService:
                             if element['status'] == 'OK':
                                 distance = element['distance']['value']
                                 duration = element['duration']['value']
-                                print(element)
                                 # Save to database
                                 try:
                                     with self.db.cursor() as cursor:

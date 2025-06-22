@@ -78,6 +78,8 @@ class ChildrenService:
         )
         try:
             response = await distance_service.insert_address(address)
+            if not response.success:
+                return response
             address_id = response.data
 
             with self.db.cursor(pymysql.cursors.DictCursor) as cursor:

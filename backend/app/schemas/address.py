@@ -10,7 +10,7 @@ class Address(BaseModel):
     latitude: Optional[float] = None
     longitude: Optional[float] = None
 
-class DistanceMatrixAddress(Address):
+class DistanceMatrixAddress(BaseModel):
     id: int
     latitude: float
     longitude: float

@@ -35,9 +35,8 @@ build:
   docker compose up -d --build
 
 build_db:
-  docker compose down db -v
+  docker compose down db -v --remove-orphans
   rm -rf database/db_data
   docker compose up -d db
   #just _wait_for_mysql
   #just _insert_initial_data
-  @echo "Database initialized with API keys."

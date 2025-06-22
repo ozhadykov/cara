@@ -31,7 +31,10 @@ CREATE TABLE address
     city          VARCHAR(255)     NOT NULL,
     zip_code      VARCHAR(20)      NOT NULL,
     latitude      DOUBLE PRECISION NOT NULL,
-    longitude     DOUBLE PRECISION NOT NULL
+    longitude     DOUBLE PRECISION NOT NULL,
+    place_id      VARCHAR(255)     NOT NULL,
+
+    UNIQUE KEY unique_address (street, street_number, city, zip_code)
 );
 
 -- Create the children table
@@ -51,7 +54,9 @@ CREATE TABLE children
     updated_at             DATETIME  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     FOREIGN KEY (address_id) REFERENCES address (id) ON DELETE CASCADE,
-    FOREIGN KEY (required_qualification) REFERENCES qualifications (id)
+    FOREIGN KEY (required_qualification) REFERENCES qualifications (id),
+
+    UNIQUE KEY unique_name_family_address (first_name, family_name, address_id)
 );
 
 -- Create the assistants table
@@ -72,8 +77,10 @@ CREATE TABLE assistants
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    DATETIME  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (address_id) REFERENCES address (id) ON DELETE CASCADE,
-    FOREIGN KEY (qualification) REFERENCES qualifications (id)
+    FOREIGN KEY (address_id) REFERENCES address (id),
+    FOREIGN KEY (qualification) REFERENCES qualifications (id),
+
+    UNIQUE KEY unique_name_family_address (first_name, family_name, address_id)
 );
 
 
