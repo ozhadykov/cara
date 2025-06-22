@@ -1,4 +1,3 @@
-import httpx, json
 import googlemaps
 import pymysql.cursors
 from fastapi import Depends
@@ -94,10 +93,10 @@ class DistanceService:
 
             validated_address_data = response.data
             geocode = validated_address_data.get('geocode').get('location')
-            print(geocode)
             latitude = geocode.get('latitude')
             longitude = geocode.get('longitude')
-            print(latitude, longitude)
+            # todo: get address lines from validated_address_data to save in DB
+
             # if failed somewhere then return Response
             address_exists_response = await self.address_exists(latitude, longitude)
             if not address_exists_response.success:
