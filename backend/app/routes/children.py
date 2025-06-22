@@ -25,9 +25,11 @@ async def get_child(child_id: int, children_service: ChildrenService = Depends()
 
 
 @router.post("/")
-async def create_children(children: ChildrenIn, children_service: ChildrenService = Depends(),
-                          distance_service: DistanceService = Depends()):
-    result = await children_service.create_children(children, distance_service)
+async def create_children(children: ChildrenIn,
+                          children_service: ChildrenService = Depends(),
+                          distance_service: DistanceService = Depends(),
+                          assistants_service: AssistantsService = Depends()):
+    result = await children_service.create_children(children, distance_service, assistants_service)
     return result
 
 

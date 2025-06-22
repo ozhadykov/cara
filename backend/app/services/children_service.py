@@ -44,7 +44,6 @@ class ChildrenService:
                             (child.first_name, child.family_name, child.required_qualification,
                              child.requested_hours, address_id)
                         )
-                        self.db.commit()
                 except pymysql.err.Error as e:
                     print(f"Database error during child insertion: {e}")
                     failed.append(child)
@@ -54,11 +53,14 @@ class ChildrenService:
                     failed.append(child)
                     self.db.rollback()
             if len(failed) > 0:
-                return Response(success=False, message=f"{len(failed)} children failed to insert in Database")
+                return Response(success=False, message=f"{len(failed)} children failed to insert in Database, aborting insertion")
 
             response = await distance_service.refresh_distance_matrix(self, assistant_service)
             if not response.success:
                 raise Exception(response.message)
+
+            # commit if only registered all destinations
+            self.db.commit()
         except Exception as e:
             print(f"An unexpected error occurred during child insertion: {e}")
             self.db.rollback()

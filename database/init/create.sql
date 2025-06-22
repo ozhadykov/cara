@@ -13,14 +13,15 @@ DROP TABLE IF EXISTS qualifications;
 
 CREATE TABLE qualifications
 (
-    id                 INT AUTO_INCREMENT PRIMARY KEY,
-    qualification_text VARCHAR(10) NOT NULL
+    id                  INT AUTO_INCREMENT PRIMARY KEY,
+    qualification_text  VARCHAR(10) NOT NULL,
+    qualification_value INT         NOT NULL
 );
 
-INSERT INTO qualifications (qualification_text)
-VALUES ('QHK'),
-       ('ReKo'),
-       ('HK');
+INSERT INTO qualifications (qualification_text, qualification_value)
+VALUES ('QHK', 3),
+       ('ReKo', 1),
+       ('HK', 2);
 
 CREATE TABLE address
 (
@@ -97,11 +98,11 @@ CREATE TABLE pairs
 CREATE TABLE distance_matrix
 (
     id                     INT AUTO_INCREMENT PRIMARY KEY,
-    origin_address_id      INT                         NOT NULL,
-    destination_address_id INT                         NOT NULL,
+    origin_address_id      INT                                    NOT NULL,
+    destination_address_id INT                                    NOT NULL,
     transport_type         ENUM ('transit', 'driving', 'invalid') NOT NULL,
-    distance               FLOAT                       NOT NULL,
-    travel_time            FLOAT                       NOT NULL,
+    distance               FLOAT                                  NOT NULL,
+    travel_time            FLOAT                                  NOT NULL,
     created_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at             DATETIME  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 

@@ -184,10 +184,17 @@ class DistanceService:
                 'longitude': assistant['longitude']
             })
             response = await self._update_distances_for_origin(assistant_address, transformed_children)
-            return response
+            if not response.success:
+                return response
+
+        return Response(success=True, message="Distance matrix updated successfully")
 
     async def _update_distances_for_origin(self, origin: DistanceMatrixAddress,
                                            destinations: List[ChildForDistanceMatrix]) -> Response:
+        # check destinations
+        if len(destinations) == 0:
+            return Response(success=False, message="No destination addresses found")
+
         # make 2 google api calls for modes transit and driving
         modes = [
             'transit',
