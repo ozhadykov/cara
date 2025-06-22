@@ -1,21 +1,27 @@
+from typing import TYPE_CHECKING
 from fastapi import Depends
 from pymysql.connections import Connection
 import pymysql.cursors
 
-from .children_service import ChildrenService
 from ..database.database import get_db
 from ..schemas.assistants import AssistantIn, Assistant
 from ..schemas.address import Address
 from ..schemas.Response import Response
-from .distance_service import DistanceService
+if TYPE_CHECKING:
+    from .children_service import ChildrenService
+    from .distance_service import DistanceService
 
 
 class AssistantsService:
     def __init__(self, db: Connection = Depends(get_db)):
         self.db = db
 
-    async def create_assistant(self, assistant_in: AssistantIn, distance_service: DistanceService,
-                               children_service: ChildrenService):
+    async def create_assistant(
+            self,
+            assistant_in: AssistantIn,
+            distance_service: "DistanceService",
+            children_service: "ChildrenService"
+    ):
         failed = []
         for assistant in assistant_in.data:
             address = Address(
@@ -41,11 +47,9 @@ class AssistantsService:
                          assistant.min_capacity, assistant.max_capacity, address_id, assistant.has_car)
                     )
 
-                    children = await children_service.get_children_for_distance_matrix()
-
-                    response = await distance_service.create_distances_for_assistant(assistant, address_id, children)
+                    response = await distance_service.refresh_distance_matrix(children_service, self)
                     if not response.success:
-                        raise Exception('Something went wrong with distance matrix api logic')
+                        raise Exception(response.message)
                     self.db.commit()
             except pymysql.err.Error as e:
                 print(f"Database error during assistant insertion: {e}")
@@ -60,61 +64,46 @@ class AssistantsService:
             return Response(success=False, message=f"{len(failed)} assistant failed to insert in Database")
         return Response(success=True, message="All assistant successfully inserted")
 
-    async def update_assistant(self, assistant: Assistant, assistant_id: int, distance_service: DistanceService):
-        assistant.street = assistant.street.replace(" ", "+")
-        assistant.street_number = assistant.street_number.replace(" ", "+")
-        assistant.city = assistant.city.replace(" ", "+")
+    async def update_assistant(
+            self,
+            assistant: Assistant,
+            assistant_id: int,
+            distance_service: "DistanceService",
+            children_service: "ChildrenService"
+    ):
         address = Address(
             street=assistant.street,
             street_number=assistant.street_number,
             city=assistant.city,
             zip_code=assistant.zip_code
         )
-        coordinates_response = await distance_service.get_coordinates_from_street_name(address)
-        latitude, longitude = coordinates_response
         try:
-            cursor = self.db.cursor()
+            response = await distance_service.insert_address(address)
+            address_id = response.data
 
-            cursor.execute(
-                """
-                    SELECT id
-                    FROM address 
-                    WHERE 
-                        latitude = %s
-                        AND longitude = %s
-                """, 
-                (latitude, longitude)
-            )
+            with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+                cursor.execute(
+                    """
+                        UPDATE assistants
+                        SET 
+                            first_name = %s, 
+                            family_name = %s, 
+                            qualification = %s,
+                            has_car = %s,  
+                            min_capacity = %s,
+                            max_capacity = %s,
+                            address_id = %s
+                        WHERE id = %s;
+                    """,
+                    (assistant.first_name, assistant.family_name, assistant.qualification, assistant.has_car,
+                     assistant.min_capacity, assistant.max_capacity, address_id, assistant_id)
+                )
 
-            result = cursor.fetchone()
-            
-            address_id = None
+            # refreshing the matrix
+            response = await distance_service.refresh_distance_matrix(children_service, self)
+            if not response.success:
+                raise Exception(response.message)
 
-            if result == None:
-                response = await distance_service.insert_address(address)
-                address_id = response.data
-            else:
-                address_id = result["id"]
-                
-            cursor.execute(
-                """
-                    UPDATE assistants
-                    SET 
-                        first_name = %s, 
-                        family_name = %s, 
-                        qualification = %s,
-                        has_car = %s,  
-                        min_capacity = %s,
-                        max_capacity = %s,
-                        address_id = %s
-                    WHERE id = %s;
-                """,
-                (assistant.first_name, assistant.family_name, assistant.qualification, assistant.has_car,
-                 assistant.min_capacity, assistant.max_capacity, address_id, assistant_id)
-            )
-
-            # distance_service.refresh_distances()
- 
             self.db.commit()
             return Response(success=True, message=f"assistant with ID: {cursor.lastrowid} is successfully updated")
         except pymysql.err.Error as e:
@@ -138,7 +127,9 @@ class AssistantsService:
                         REPLACE(adr.street_number, '+', ' ') AS street_number,
                         REPLACE(adr.city, '+', ' ') AS city,
                         adr.zip_code AS zip_code,
-                        adr.id AS address_id
+                        adr.id AS address_id,
+                        adr.latitude AS latitude,
+                        adr.longitude AS longitude
                     FROM 
                         assistants a
                         JOIN address adr ON adr.id = a.address_id

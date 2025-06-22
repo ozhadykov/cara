@@ -13,14 +13,15 @@ DROP TABLE IF EXISTS qualifications;
 
 CREATE TABLE qualifications
 (
-    id                 INT AUTO_INCREMENT PRIMARY KEY,
-    qualification_text VARCHAR(10) NOT NULL
+    id                  INT AUTO_INCREMENT PRIMARY KEY,
+    qualification_text  VARCHAR(10) NOT NULL,
+    qualification_value INT         NOT NULL
 );
 
-INSERT INTO qualifications (qualification_text)
-VALUES ('QHK'),
-       ('ReKo'),
-       ('HK');
+INSERT INTO qualifications (qualification_text, qualification_value)
+VALUES ('QHK', 3),
+       ('ReKo', 1),
+       ('HK', 2);
 
 CREATE TABLE address
 (
@@ -30,7 +31,10 @@ CREATE TABLE address
     city          VARCHAR(255)     NOT NULL,
     zip_code      VARCHAR(20)      NOT NULL,
     latitude      DOUBLE PRECISION NOT NULL,
-    longitude     DOUBLE PRECISION NOT NULL
+    longitude     DOUBLE PRECISION NOT NULL,
+    place_id      VARCHAR(255)     NOT NULL,
+
+    UNIQUE KEY unique_address (street, street_number, city, zip_code)
 );
 
 -- Create the children table
@@ -50,7 +54,9 @@ CREATE TABLE children
     updated_at             DATETIME  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     FOREIGN KEY (address_id) REFERENCES address (id) ON DELETE CASCADE,
-    FOREIGN KEY (required_qualification) REFERENCES qualifications (id)
+    FOREIGN KEY (required_qualification) REFERENCES qualifications (id),
+
+    UNIQUE KEY unique_name_family_address (first_name, family_name, address_id)
 );
 
 -- Create the assistants table
@@ -71,8 +77,10 @@ CREATE TABLE assistants
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    DATETIME  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (address_id) REFERENCES address (id) ON DELETE CASCADE,
-    FOREIGN KEY (qualification) REFERENCES qualifications (id)
+    FOREIGN KEY (address_id) REFERENCES address (id),
+    FOREIGN KEY (qualification) REFERENCES qualifications (id),
+
+    UNIQUE KEY unique_name_family_address (first_name, family_name, address_id)
 );
 
 
@@ -97,18 +105,19 @@ CREATE TABLE pairs
 CREATE TABLE distance_matrix
 (
     id                     INT AUTO_INCREMENT PRIMARY KEY,
-    origin_address_id      INT   NOT NULL,
-    destination_address_id INT   NOT NULL,
-    distance               FLOAT NOT NULL,
-    travel_time            FLOAT NOT NULL,
-
+    origin_address_id      INT                                    NOT NULL,
+    destination_address_id INT                                    NOT NULL,
+    transport_type         ENUM ('transit', 'driving', 'invalid') NOT NULL,
+    distance               FLOAT                                  NOT NULL,
+    travel_time            FLOAT                                  NOT NULL,
     created_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at             DATETIME  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     FOREIGN KEY (origin_address_id) REFERENCES address (id) ON DELETE CASCADE,
     FOREIGN KEY (destination_address_id) REFERENCES address (id) ON DELETE CASCADE,
-    UNIQUE KEY unique_pair (origin_address_id, destination_address_id)
+    UNIQUE KEY unique_trip (origin_address_id, destination_address_id, transport_type)
 );
+
 
 CREATE TABLE apiKeys
 (

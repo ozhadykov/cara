@@ -25,16 +25,25 @@ async def get_assistant(assistant_id: int, assistant_service: AssistantsService 
 
 
 @router.post("/")
-async def create_assistants(assistants: AssistantIn, assistant_service: AssistantsService = Depends(),
-                            distance_service: DistanceService = Depends(), children_service: ChildrenService = Depends(),):
+async def create_assistants(
+        assistants: AssistantIn,
+        assistant_service: AssistantsService = Depends(),
+        distance_service: DistanceService = Depends(),
+        children_service: ChildrenService = Depends()
+):
     result = await assistant_service.create_assistant(assistants, distance_service, children_service)
     return result
 
 
 @router.post("/{assistant_id}")
-async def update_assistant(assistant: Assistant, assistant_id: int, assistant_service: AssistantsService = Depends(),
-                           distance_service: DistanceService = Depends()):
-    result = await assistant_service.update_assistant(assistant, assistant_id, distance_service)
+async def update_assistant(
+        assistant: Assistant,
+        assistant_id: int,
+        assistant_service: AssistantsService = Depends(),
+        distance_service: DistanceService = Depends(),
+        children_service: ChildrenService = Depends()
+):
+    result = await assistant_service.update_assistant(assistant, assistant_id, distance_service, children_service)
     return result
 
 

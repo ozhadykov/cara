@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { postRequest } from "../../../lib/request.ts"
-import { Child, TChildImport, TPersonImport } from "../../../lib/models.ts"
+import { Child, TPersonImport } from "../../../lib/models.ts"
 
 import { useRecordSidebar } from "../../../contexts/providers/RecordSidebarContext.tsx"
 import { useChildrenData } from "../../../contexts/providers/ChildrenDataContext.tsx"

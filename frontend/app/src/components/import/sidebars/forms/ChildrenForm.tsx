@@ -10,21 +10,6 @@ type ChildrenFormType = {
 }
 
 const ChildrenForm = ({ handleChange, handleSubmit, formData, formName }: ChildrenFormType) => {
-    type InputField = {
-        name: keyof Child
-        type: string
-    }
-
-    const inputFieldData: InputField[] = [
-        { name: "first_name", type: "text" },
-        { name: "family_name", type: "text" },
-        { name: "street", type: "text" },
-        { name: "street_number", type: "text" },
-        { name: "zip_code", type: "text" },
-        { name: "city", type: "text" },
-        { name: "requested_hours", type: "number" },
-    ]
-
     return (
         <div className="overflow-auto scrollbar-hide p-7">
             <form onSubmit={handleSubmit} id={formName}>
