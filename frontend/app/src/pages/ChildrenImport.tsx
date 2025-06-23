@@ -4,14 +4,14 @@ import { postRequest } from "../lib/request"
 import { toastTypes } from "../lib/constants"
 import { useState } from "react"
 import { useLoading, useToast } from "../contexts"
-import {Assistant, Child, TPersonImport} from "../lib/models.ts"
+import { Assistant, Child, TPersonImport } from "../lib/models.ts"
 
 const ChildrenImport = () => {
     const { sendMessage } = useToast()
     const { toggleLoading } = useLoading()
     const [refreshChildren, setRefreshChildren] = useState(false)
 
-    const sendData = async (children: Child[]|Assistant[]) => {
+    const sendData = async (children: Child[] | Assistant[]) => {
         const url = "/api/children"
         const requestBody: TPersonImport = {
             data: children,

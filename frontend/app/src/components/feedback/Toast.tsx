@@ -1,4 +1,4 @@
-import { useToast } from "../../contexts/providers/ToastContext.tsx"
+import { useToast } from "../../contexts"
 
 const Toast = () => {
     const { message, type, isOpen } = useToast()

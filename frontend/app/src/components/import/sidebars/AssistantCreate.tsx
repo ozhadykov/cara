@@ -3,7 +3,7 @@ import { postRequest } from "../../../lib/request.ts"
 import { Assistant, TPersonImport } from "../../../lib/models.ts"
 
 import { useRecordSidebar } from "../../../contexts/providers/RecordSidebarContext.tsx"
-import { useToast } from "../../../contexts"
+import { useToast, useLoading } from "../../../contexts"
 import { toastTypes } from "../../../lib/constants.ts"
 import { useAssistantData } from "../../../contexts/providers/AssistantDataContext.tsx"
 import AssistantsForm from "./forms/AssistantsForm.tsx"
@@ -12,6 +12,7 @@ const AssistantCreate = () => {
     const { toggle } = useRecordSidebar()
     const { refreshAssistants } = useAssistantData()
     const { sendMessage } = useToast()
+    const { toggleLoading } = useLoading()
 
     const initialFormData = {
         id: 0,
@@ -48,11 +49,11 @@ const AssistantCreate = () => {
             const requestBody: TPersonImport = {
                 data: [formData],
             }
-            const response = await postRequest("/api/assistants", requestBody, sendMessage)
+            const response = await postRequest("/api/assistants", requestBody, sendMessage, toggleLoading)
             if (response)
                 sendMessage(
                     response.message,
-                    response.success ? toastTypes.success : toastTypes.error
+                    response.success ? toastTypes.success : toastTypes.error,
                 )
             toggle()
             await refreshAssistants()
@@ -75,7 +76,8 @@ const AssistantCreate = () => {
                 formName="create_record_assistant"
             />
 
-            <div className="flex justify-end gap-6 border-t-1 border-gray-200 p-7 shadow-md shadow-black/5 -translate-y-1">
+            <div
+                className="flex justify-end gap-6 border-t-1 border-gray-200 p-7 shadow-md shadow-black/5 -translate-y-1">
                 <button className="btn btn-ghost px-9" onClick={toggle}>
                     Cancel
                 </button>

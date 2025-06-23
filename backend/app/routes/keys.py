@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, Depends
 from ..services.keys_service import KeysService
 from ..schemas.api_key import ApiKey
@@ -13,6 +14,7 @@ router = APIRouter(
 @router.post("/{id}")
 async def update_api_key(data: ApiKey, id: str, keys_service: KeysService = Depends()):
     result = await keys_service.update_api_key(data, id)
+    await asyncio.sleep(1)
     return result
 
 

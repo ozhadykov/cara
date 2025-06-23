@@ -3,12 +3,14 @@ import { postRequest } from "../../../lib/request.ts"
 import { Assistant } from "../../../lib/models.ts"
 
 import { useRecordSidebar } from "../../../contexts/providers/RecordSidebarContext.tsx"
-import { useToast } from "../../../contexts/providers/ToastContext.tsx"
+import { useToast, useLoading } from "../../../contexts"
 import { useAssistantData } from "../../../contexts/providers/AssistantDataContext.tsx"
 import AssistantsForm from "./forms/AssistantsForm.tsx"
+import { toastTypes } from "../../../lib/constants.ts"
 
 const AssistantEdit = () => {
     const { sendMessage } = useToast()
+    const { toggleLoading } = useLoading()
     const { toggle, selectedData } = useRecordSidebar()
     const { refreshAssistants } = useAssistantData()
 
@@ -36,10 +38,18 @@ const AssistantEdit = () => {
         e.preventDefault()
 
         try {
-            await postRequest(`/api/assistants/${selectedData.id}`, formData, sendMessage)
+            // todo: check if data changed
+            const response = await postRequest(`/api/assistants/${selectedData.id}`, formData, sendMessage, toggleLoading)
+            if (response)
+                sendMessage(
+                    response.message,
+                    response.success ? toastTypes.success : toastTypes.error
+                )
             toggle()
             await refreshAssistants()
-        } catch (error) {}
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     return (
@@ -54,7 +64,8 @@ const AssistantEdit = () => {
                 formData={formData}
                 formName="edit_record_assistant"
             />
-            <div className="flex justify-end gap-6 border-t-1 border-gray-200 p-7 shadow-md shadow-black/5 -translate-y-1">
+            <div
+                className="flex justify-end gap-6 border-t-1 border-gray-200 p-7 shadow-md shadow-black/5 -translate-y-1">
                 <button className="btn btn-ghost px-9" onClick={toggle}>
                     Cancel
                 </button>

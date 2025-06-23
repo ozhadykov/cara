@@ -1,8 +1,9 @@
+import pymysql.cursors
 from fastapi import Depends
 from pymysql.connections import Connection
 from ..schemas.api_key import ApiKey
-import pymysql.cursors
 from ..database.database import get_db
+from ..schemas.Response import Response
 
 
 class KeysService:
@@ -25,5 +26,9 @@ class KeysService:
                 """,
                 (data.apiKey, key_id)
             )
+            # todo create validation process
+            success = cursor.rowcount
+            if success:
+                return Response(success=True, message="API key updated")
             self.db.commit()
             return cursor.rowcount

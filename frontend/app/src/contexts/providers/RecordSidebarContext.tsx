@@ -23,7 +23,6 @@ export const RecordSidebarProvider = ({ children }: { children: ReactNode }) => 
 
     const toggle = () => {
         setIsOpen((p) => !p)
-        console.log(selectedData)
     }
 
     const toggleCreateRecord = () => {
