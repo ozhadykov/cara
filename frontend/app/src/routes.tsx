@@ -1,4 +1,4 @@
-import { Home, AssistantsImport, ChildrenImport, KeyInput, PairGenerator } from "./pages"
+import { Home, AssistantsImport, ChildrenImport, Settings, PairGenerator } from "./pages"
 import { ReactElement } from "react"
 
 interface IRoute {
@@ -33,8 +33,8 @@ const routes: Array<IRoute> = [
     },
     {
         path: "/keyInput",
-        component: <KeyInput />,
-        label: "Key Input",
+        component: <Settings />,
+        label: "Settings",
         fillIcon: "solar:settings-bold-duotone",
         outlineIcon: "solar:settings-line-duotone",
     },

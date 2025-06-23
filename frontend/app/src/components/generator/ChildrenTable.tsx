@@ -21,7 +21,9 @@ const ChildrenTable = ({ children, next }: IChildrenTable) => {
         () => [
             {
                 id: "select",
-                header: "select",
+                header: ({ table }) => (
+                    <Checkbox id="select" onChange={table.getToggleAllRowsSelectedHandler()} name="selec-all" checked={table.getIsAllRowsSelected()}></Checkbox>
+                ),
                 cell: ({ row }) => {
                     return (
                         <div>

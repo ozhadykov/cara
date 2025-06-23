@@ -1,8 +1,8 @@
 export const toastTypes = {
-    success: 'success',
-    warning: 'warning',
-    error: 'error',
-    info: 'info',
-    secondary: 'secondary',
-    primary: 'primary',
+    success: 'alert-success',
+    warning: 'alert-warning',
+    error: 'alert-error',
+    info: 'alert-info',
+    secondary: 'alert-secondary',
+    primary: 'alert-primary',
 }

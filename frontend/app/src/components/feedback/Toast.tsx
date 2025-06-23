@@ -9,7 +9,7 @@ const Toast = () => {
                 isOpen ? "opacity-100" : "opacity-0"
             }`}
         >
-            <div className={`alert alert-${type}`}>
+            <div className={`alert ${type}`}>
                 <span>{message}</span>
             </div>
         </div>

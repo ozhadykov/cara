@@ -10,6 +10,7 @@ import Loading from "./feedback/Loading.tsx"
 import AssistantTable from "./generator/AssistantTable.tsx"
 import ChildrenTable from "./generator/ChildrenTable.tsx"
 import Generator from "./generator/Generator.tsx"
+import Range from "./input/Range.tsx"
 
 export {
     Navbar,
@@ -23,5 +24,6 @@ export {
     Loading,
     AssistantTable,
     ChildrenTable,
-    Generator
+    Generator,
+    Range
 }

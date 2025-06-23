@@ -86,10 +86,10 @@ We have defined this problem as a maximization problem.
 # TODO:
 
 1. Add Toasts to Add/Update Assistants and Children. - DONE
-2. Add Loading and Toasts to keys Setup
-3. Add "add all" to table in pairs generator
+2. Add Loading and Toasts to keys Setup - DONE
+3. Add "add all" to table in pairs generator - DONE
 4. Add Weights settings for LP model settings page
-5. Refactor Settings Page
+5. Refactor Settings Page - DONE
 6. Add custom assigment tool to pairs generator page
 7. Finish color Scheme, add success, danger, warning colors - DONE
 8. Fix Frontend calls to backend without "npm run dev"

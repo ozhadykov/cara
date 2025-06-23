@@ -22,7 +22,9 @@ const AssistantTable = ({ assistants, next, prev }: IAssistantTable) => {
         () => [
             {
                 id: "select",
-                header: "select",
+               header: ({ table }) => (
+                    <Checkbox id="select" onChange={table.getToggleAllRowsSelectedHandler()} name="selec-all" checked={table.getIsAllRowsSelected()}></Checkbox>
+                ),
                 cell: ({ row }) => {
                     return (
                         <div>
