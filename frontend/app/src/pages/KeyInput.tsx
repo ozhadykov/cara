@@ -81,9 +81,7 @@ const KeyInput = () => {
                                         />
                                         <button
                                             className="btn btn-secondary"
-                                            onClick={() =>
-                                                postRequest("/api/keys/ampl_key", { apiKey: amplKey }, sendMessage, toggleLoading)
-                                            }
+                                            onClick={async () => await sendKey('ampl_key', amplKey)}
                                         >
                                             Send
                                         </button>
@@ -99,7 +97,7 @@ const KeyInput = () => {
                                         />
                                         <button
                                             className="btn btn-secondary"
-                                            onClick={() => sendKey('google_maps_key', googleKey)}
+                                            onClick={async () => await sendKey('google_maps_key', googleKey)}
                                         >
                                             Send
                                         </button>

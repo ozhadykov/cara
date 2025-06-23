@@ -28,7 +28,7 @@ class KeysService:
             )
             # todo create validation process
             success = cursor.rowcount
+            self.db.commit()
             if success:
                 return Response(success=True, message="API key updated")
-            self.db.commit()
             return cursor.rowcount
