@@ -1,8 +1,10 @@
+import asyncio
 from fastapi import APIRouter, Depends
 from ..services.children_service import ChildrenService
 from ..services.distance_service import DistanceService
 from ..services.assistants_service import AssistantsService
 from ..schemas.children import ChildrenIn, Child
+from ..schemas.Response import Response
 
 router = APIRouter(
     prefix="/api/children",
@@ -21,6 +23,7 @@ async def get_all_children(children_service: ChildrenService = Depends()):
 @router.get("/{child_id}")
 async def get_child(child_id: int, children_service: ChildrenService = Depends()):
     result = await children_service.get_child(child_id)
+    await asyncio.sleep(1)
     return result
 
 
@@ -30,6 +33,7 @@ async def create_children(children: ChildrenIn,
                           distance_service: DistanceService = Depends(),
                           assistants_service: AssistantsService = Depends()):
     result = await children_service.create_children(children, distance_service, assistants_service)
+    await asyncio.sleep(1)
     return result
 
 
@@ -42,10 +46,12 @@ async def update_child(
         assistant_service: AssistantsService = Depends()
 ):
     result = await child_service.update_child(child, child_id, distance_service, assistant_service)
+    await asyncio.sleep(1)
     return result
 
 
 @router.delete("/{child_id}")
 async def delete_child(child_id: int, children_service: ChildrenService = Depends()):
     result = await children_service.delete_child(child_id)
+    await asyncio.sleep(1)
     return result

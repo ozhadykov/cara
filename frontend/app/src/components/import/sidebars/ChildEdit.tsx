@@ -4,16 +4,13 @@ import { Child } from "../../../lib/models.ts"
 
 import { useRecordSidebar } from "../../../contexts/providers/RecordSidebarContext.tsx"
 import { useChildrenData } from "../../../contexts/providers/ChildrenDataContext.tsx"
-import { useToast } from "../../../contexts/providers/ToastContext.tsx"
+import { useToast, useLoading } from "../../../contexts"
 import ChildrenForm from "./forms/ChildrenForm.tsx"
-
-type InputField = {
-    name: keyof Child
-    type: string
-}
+import { toastTypes } from "../../../lib/constants.ts"
 
 const ChildEdit = () => {
     const { sendMessage } = useToast()
+    const { toggleLoading } = useLoading()
     const { toggle, selectedData } = useRecordSidebar()
     const { refreshChildren } = useChildrenData()
 
@@ -39,10 +36,18 @@ const ChildEdit = () => {
         e.preventDefault()
 
         try {
-            await postRequest(`/api/children/${selectedData.id}`, formData, sendMessage)
+            // todo: check if data changed
+            const response = await postRequest(`/api/children/${selectedData.id}`, formData, sendMessage, toggleLoading)
+            if (response)
+                sendMessage(
+                    response.message,
+                    response.success ? toastTypes.success : toastTypes.error
+                )
             toggle()
             await refreshChildren()
-        } catch (error) {}
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     return (
@@ -58,7 +63,8 @@ const ChildEdit = () => {
                 formName="edit_record_child"
             />
 
-            <div className="flex justify-end gap-6 border-t-1 border-gray-200 p-7 shadow-md shadow-black/5 -translate-y-1">
+            <div
+                className="flex justify-end gap-6 border-t-1 border-gray-200 p-7 shadow-md shadow-black/5 -translate-y-1">
                 <button className="btn btn-ghost px-9" onClick={toggle}>
                     Cancel
                 </button>

@@ -4,7 +4,7 @@ import { Child, TPersonImport } from "../../../lib/models.ts"
 
 import { useRecordSidebar } from "../../../contexts/providers/RecordSidebarContext.tsx"
 import { useChildrenData } from "../../../contexts/providers/ChildrenDataContext.tsx"
-import { useToast } from "../../../contexts/providers/ToastContext.tsx"
+import { useLoading, useToast } from "../../../contexts"
 import { toastTypes } from "../../../lib/constants.ts"
 import ChildrenForm from "./forms/ChildrenForm.tsx"
 
@@ -12,6 +12,7 @@ const ChildCreate = () => {
     const { toggle } = useRecordSidebar()
     const { refreshChildren } = useChildrenData()
     const { sendMessage } = useToast()
+    const { toggleLoading } = useLoading()
 
     const initialFormData = {
         id: 0,
@@ -46,11 +47,11 @@ const ChildCreate = () => {
             const requestBody: TPersonImport = {
                 data: [formData],
             }
-            const response = await postRequest("/api/children", requestBody, sendMessage)
+            const response = await postRequest("/api/children", requestBody, sendMessage, toggleLoading)
             if (response)
                 sendMessage(
                     response.message,
-                    response.success ? toastTypes.success : toastTypes.error
+                    response.success ? toastTypes.success : toastTypes.error,
                 )
             toggle()
             await refreshChildren()
@@ -71,7 +72,8 @@ const ChildCreate = () => {
                 formData={formData}
                 formName="create_record_child"
             />
-            <div className="flex justify-end gap-6 border-t-1 border-gray-200 p-7 shadow-md shadow-black/5 -translate-y-1">
+            <div
+                className="flex justify-end gap-6 border-t-1 border-gray-200 p-7 shadow-md shadow-black/5 -translate-y-1">
                 <button className="btn btn-ghost px-9" onClick={toggle}>
                     Cancel
                 </button>
