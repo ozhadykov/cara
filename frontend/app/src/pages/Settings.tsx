@@ -1,14 +1,18 @@
+import { Icon } from "@iconify/react"
 import { ChangeEvent, useEffect, useState } from "react"
+
+import { Range } from "../components"
 import { postRequest } from "../lib/request"
 import { useLoading, useToast } from "../contexts"
-import { Icon } from "@iconify/react"
 import { toastTypes } from "../lib/constants.ts"
 
-const KeyInput = () => {
+const Settings = () => {
     const { sendMessage } = useToast()
     const { toggleLoading } = useLoading()
     const [amplKey, setAmplKey] = useState("")
     const [googleKey, setGoogleKey] = useState<string>("")
+    const [distanceImportance, setDistanceImportance] = useState<string>("0")
+    const [qualificationImportance, setQualificationImportance] = useState<string>("0")
 
     const handleChangeAmpl = (event: ChangeEvent<HTMLInputElement>) => {
         setAmplKey(event.target.value)
@@ -21,6 +25,21 @@ const KeyInput = () => {
         const response = await postRequest(`/api/keys/${keyId}`, { apiKey: keyValue }, sendMessage, toggleLoading)
         if (response)
             sendMessage(response.message, response.success ? toastTypes.success : toastTypes.error)
+    }
+
+    const saveWeights = async () => {
+        const distanceImpNumber = Number(distanceImportance)
+        const qualificationImpNumber = Number(qualificationImportance)
+
+        if (distanceImpNumber >= 0 && qualificationImpNumber >= 0) {
+            const data = {
+                distanceImportance: distanceImpNumber,
+                qualificationImportance: qualificationImpNumber,
+            }
+            const response = await postRequest('/api/settings/weights', data, sendMessage, toggleLoading)
+            if (response)
+                sendMessage(response.message, response.success ? toastTypes.success : toastTypes.error)
+        }
     }
 
     useEffect(() => {
@@ -70,7 +89,7 @@ const KeyInput = () => {
                                     </span>
                                 </div>
                                 <div
-                                    className="home-content flex flex-col gap-3 items-center justify-center w-full h-full">
+                                    className="keys-settings-content flex flex-col gap-3 items-center justify-center w-full h-full">
                                     <div className="w-full flex flex-row items-center gap-2">
                                         <label className="w-48">AMPL Key</label>
                                         <input
@@ -111,7 +130,28 @@ const KeyInput = () => {
                                 <span className="ml-1">Weights</span>
                             </label>
                             <div className="tab-content bg-base-100 border-base-300 p-6">
-                                weights content
+                                <div className="weights-setting-header d-flex flex-col gap-2 mb-10">
+                                    <h2 className="text-xl font-semibold">Weights setup</h2>
+                                    <span className="mt-1 text-sm text-gray-400 flex items-center gap-1">
+                                         <Icon icon="solar:info-circle-linear" /> This is very important setting, without weights, software will not able to generate pairs
+                                    </span>
+                                </div>
+                                <div
+                                    className="keys-settings-content flex flex-col gap-10 w-full">
+                                    <div className="distance-travel-time-importance">
+                                        <Range label={"Distance importance"}
+                                               description={"Define how important should distance and travel time be interpreted in model"}
+                                               setValueForParent={setDistanceImportance} />
+                                    </div>
+                                    <div className="qualification-importance">
+                                        <Range label={"Qualification importance"}
+                                               description={"Define how important should assistant's qualification be interpreted in model"}
+                                               setValueForParent={setQualificationImportance} />
+                                    </div>
+                                </div>
+                                <div className="weights-setting-footer mt-8 flex justify-end">
+                                    <button className="btn btn-primary btn-wide" onClick={saveWeights}>Save</button>
+                                </div>
                             </div>
 
                             <label className="tab">
@@ -120,7 +160,16 @@ const KeyInput = () => {
                                 <span className="ml-1">Language</span>
                             </label>
                             <div className="tab-content bg-base-100 border-base-300 p-6">
-                                Language settings
+                                <div className="language-setting-header d-flex flex-col gap-2 mb-8">
+                                <h2 className="text-xl font-semibold">Language setup</h2>
+                                    <span className="mt-1 text-sm text-gray-400 flex items-center gap-1">
+                                         <Icon icon="solar:info-circle-linear" /> Here you can choose language
+                                    </span>
+                                </div>
+                                <div
+                                    className="keys-settings-content flex flex-col gap-3 items-center justify-center w-full h-full">
+                                    in development
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -130,4 +179,4 @@ const KeyInput = () => {
     )
 }
 
-export default KeyInput
+export default Settings

@@ -13,6 +13,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
     const [message, setMessage] = useState<string>("")
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [type, setType] = useState<string>("success")
+
     const sendMessage = (message: string, type: string) => {
         setMessage(message)
         setType(type)
