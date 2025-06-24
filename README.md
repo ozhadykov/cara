@@ -88,7 +88,7 @@ We have defined this problem as a maximization problem.
 1. Add Toasts to Add/Update Assistants and Children. - DONE
 2. Add Loading and Toasts to keys Setup - DONE
 3. Add "add all" to table in pairs generator - DONE
-4. Add Weights settings for LP model settings page
+4. Add Weights settings for LP model settings page - DONE
 5. Refactor Settings Page - DONE
 6. Add custom assigment tool to pairs generator page
 7. Finish color Scheme, add success, danger, warning colors - DONE
