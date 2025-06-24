@@ -27,6 +27,7 @@ async def get_api_key(id:str, key_service: SettingsService = Depends()):
 @router.get("/weights")
 async def get_lp_weights(settings_service: SettingsService = Depends()):
     result = await settings_service.get_lp_weights()
+    await asyncio.sleep(1)
     return result
 
 @router.post("/weights")

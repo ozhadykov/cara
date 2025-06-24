@@ -5,7 +5,7 @@ import asyncio
 from fastapi import Depends, WebSocket
 from ..database.database import get_db
 from ..schemas.Response import Response
-from ..schemas.pairs_generator import PairsGeneratorBaseData
+from ..schemas.pairs_generator import PairsGeneratorBaseData, CreateSinglePairIn
 from pymysql.connections import Connection
 from ..services.children_service import ChildrenService
 from ..services.assistants_service import AssistantsService
@@ -48,6 +48,10 @@ class PairsService:
 
         result = PairsGeneratorBaseData(children=children, assistants=assistants, pairs=pairs)
         return Response(success=True, message="pairs data fetched", data=result)
+
+    async def create_pair(self, data:CreateSinglePairIn):
+        # todo: Check if pair possible, create and save pair in db
+        return Response(success=True, message="This is mock!!!!!")
 
     async def generate_pairs(self, websocket: WebSocket, data: GeneratePairsData):
         # preparing data for ampl
@@ -115,6 +119,3 @@ class PairsService:
                 """
             )
             return cursor.fetchone()
-
-
-

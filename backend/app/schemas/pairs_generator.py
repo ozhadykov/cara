@@ -19,3 +19,8 @@ class PairsGeneratorBaseData(BaseModel):
 class GeneratePairsData(BaseModel):
     children: List[Child]
     assistants: List[Assistant]
+
+
+class CreateSinglePairIn(BaseModel):
+    child: Child
+    assistant: Assistant
