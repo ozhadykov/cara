@@ -1,19 +1,26 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Icon } from "@iconify/react"
 
 interface RangeProps {
     label: string,
     description?: string,
-    setValueForParent: (value: string) => void
+    setValueForParent: (value: string) => void,
+    initialValue?: string
 }
 
-const Range = ({ label, description, setValueForParent }: RangeProps) => {
-    const [rangeVal, setRangeVal] = useState<string>("0")
+const Range = ({ label, description, setValueForParent, initialValue }: RangeProps) => {
+    const [rangeVal, setRangeVal] = useState<string>(initialValue ?? '0')
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setRangeVal(e.target.value)
         setValueForParent(e.target.value)
     }
+
+    useEffect(() => {
+        if (initialValue !== undefined) {
+            setRangeVal(initialValue)
+        }
+    }, [initialValue])
 
     return (
         <div className="range-container flex justify-between items-center gap-6 pr-4 py-3">

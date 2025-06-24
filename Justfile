@@ -18,8 +18,8 @@ googleApiKey:=`echo $googleApiKey`
 @_insert_initial_data:
   @echo "--- Inserting initial data into {{DB_NAME}} on {{DB_SERVICE}} ---"
   docker compose exec {{DB_SERVICE}} sh -c "mysql -u {{DB_USER}} -p={{DB_PASS}} {{DB_NAME}} -e '\
-  UPDATE apiKeys SET apiKey=\"{{opencageKey}}\" WHERE id=\"opencage_key\"; \
-  UPDATE apiKeys SET apiKey=\"{{googleApiKey}}\" WHERE id=\"google_maps_key\";'"
+  UPDATE api_keys SET apiKey=\"{{opencageKey}}\" WHERE id=\"opencage_key\"; \
+  UPDATE api_keys SET apiKey=\"{{googleApiKey}}\" WHERE id=\"google_maps_key\";'"
   @echo "API keys updated from environment variables."
 
 @default:

@@ -22,11 +22,12 @@ const Settings = () => {
     }
 
     const sendKey = async (keyId: string, keyValue: string) => {
-        const response = await postRequest(`/api/keys/${keyId}`, { apiKey: keyValue }, sendMessage, toggleLoading)
+        const response = await postRequest(`/api/settings/key/${keyId}`, { apiKey: keyValue }, sendMessage, toggleLoading)
         if (response)
             sendMessage(response.message, response.success ? toastTypes.success : toastTypes.error)
     }
 
+    // todo: get from db
     const saveWeights = async () => {
         const distanceImpNumber = Number(distanceImportance)
         const qualificationImpNumber = Number(qualificationImportance)
@@ -45,7 +46,7 @@ const Settings = () => {
     useEffect(() => {
         // dev only
         const getAmplKey = async () => {
-            const response = await fetch("/api/keys/ampl_key")
+            const response = await fetch("/api/settings/key/ampl_key")
             const data = await response.json()
             if (response.ok) {
                 setAmplKey(data.apiKey)
@@ -53,15 +54,28 @@ const Settings = () => {
         }
 
         const getGoogleKey = async () => {
-            const response = await fetch("/api/keys/google_maps_key")
+            const response = await fetch("/api/settings/key/google_maps_key")
             const data = await response.json()
             if (response.ok) {
                 setGoogleKey(data.apiKey)
             }
         }
 
+        const getWeights = async () => {
+            const response = await fetch("/api/settings/weights")
+            if (response.ok){
+                const responseObj = await response.json()
+                sendMessage(responseObj.message, responseObj.success ? toastTypes.success : toastTypes.error)
+                if (responseObj.success) {
+                    setDistanceImportance(responseObj.data.distanceImportance + '')
+                    setQualificationImportance(responseObj.data.qualificationImportance + '')
+                }
+            }
+        }
+
         getAmplKey()
         getGoogleKey()
+        getWeights()
     }, [])
 
     return (
@@ -141,12 +155,16 @@ const Settings = () => {
                                     <div className="distance-travel-time-importance">
                                         <Range label={"Distance importance"}
                                                description={"Define how important should distance and travel time be interpreted in model"}
-                                               setValueForParent={setDistanceImportance} />
+                                               setValueForParent={setDistanceImportance}
+                                               initialValue={distanceImportance}
+                                        />
                                     </div>
                                     <div className="qualification-importance">
                                         <Range label={"Qualification importance"}
                                                description={"Define how important should assistant's qualification be interpreted in model"}
-                                               setValueForParent={setQualificationImportance} />
+                                               setValueForParent={setQualificationImportance}
+                                               initialValue={qualificationImportance}
+                                        />
                                     </div>
                                 </div>
                                 <div className="weights-setting-footer mt-8 flex justify-end">
