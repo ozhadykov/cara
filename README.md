@@ -95,3 +95,4 @@ We have defined this problem as a maximization problem.
 8. Fix Frontend calls to backend without "npm run dev"
 9. AMPL Model python code
 10. Generate pairs step 4.
+11. Create DB backup rotator.

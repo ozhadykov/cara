@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from .assistants_service import AssistantsService
     from .children_service import ChildrenService
 
-from .keys_service import KeysService
+from .settings_service import SettingsService
 from ..database.database import get_db
 from ..schemas.address import Address, DistanceMatrixAddress
 from ..schemas.Response import Response
@@ -21,13 +21,13 @@ def split_list_by_count(data_list, chunk_size):
 
 
 class DistanceService:
-    def __init__(self, db: Connection = Depends(get_db), keys_service: KeysService = Depends()):
+    def __init__(self, db: Connection = Depends(get_db), settings_service: SettingsService = Depends()):
         self.db = db
-        self.keys_service = keys_service
+        self.settings_service = settings_service
 
     async def validate_address(self, address: Address):
         # preparing credentials
-        google_api_key_data = await self.keys_service.get_api_key('google_maps_key')
+        google_api_key_data = await self.settings_service.get_api_key('google_maps_key')
         if not google_api_key_data or 'apiKey' not in google_api_key_data or not len(google_api_key_data['apiKey']):
             return Response(success=False, message="Google Maps API Key not found or invalid.")
 
@@ -230,7 +230,7 @@ class DistanceService:
         destination_chunks_with_data = split_list_by_count(transformed_destinations, 100)
 
         # preparing credentials
-        google_api_key_data = await self.keys_service.get_api_key('google_maps_key')
+        google_api_key_data = await self.settings_service.get_api_key('google_maps_key')
         if not google_api_key_data or 'apiKey' not in google_api_key_data:
             return Response(success=False, message="Google Maps API Key not found or invalid.")
 

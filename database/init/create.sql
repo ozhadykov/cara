@@ -8,8 +8,9 @@ DROP TABLE IF EXISTS pairs;
 DROP TABLE IF EXISTS address;
 DROP TABLE IF EXISTS children;
 DROP TABLE IF EXISTS assistants;
-DROP TABLE IF EXISTS apiKeys;
+DROP TABLE IF EXISTS api_keys;
 DROP TABLE IF EXISTS qualifications;
+DROP TABLE IF EXISTS distance_matrix;
 
 CREATE TABLE qualifications
 (
@@ -119,13 +120,24 @@ CREATE TABLE distance_matrix
 );
 
 
-CREATE TABLE apiKeys
+CREATE TABLE api_keys
 (
     id     VARCHAR(255) NOT NULL PRIMARY KEY,
     apiKey VARCHAR(255) NOT NULL
 );
 
-INSERT INTO apiKeys (id, apiKey)
+INSERT INTO api_keys (id, apiKey)
 VALUES ('opencage_key', ''),
        ('ampl_key', ''),
        ('google_maps_key', '');
+
+-- Create weights table for lp model
+CREATE TABLE lp_weights
+(
+    id    VARCHAR(255) NOT NULL PRIMARY KEY,
+    value FLOAT        NOT NULL
+);
+
+INSERT INTO lp_weights (id, value)
+VALUES ('distanceImportance', 0),
+       ('qualificationImportance', 0);
