@@ -37,45 +37,52 @@ const Settings = () => {
                 distanceImportance: distanceImpNumber,
                 qualificationImportance: qualificationImpNumber,
             }
-            const response = await postRequest('/api/settings/weights', data, sendMessage, toggleLoading)
+            const response = await postRequest("/api/settings/weights", data, sendMessage, toggleLoading)
             if (response)
                 sendMessage(response.message, response.success ? toastTypes.success : toastTypes.error)
         }
     }
 
     useEffect(() => {
-        // dev only
-        const getAmplKey = async () => {
-            const response = await fetch("/api/settings/key/ampl_key")
-            const data = await response.json()
-            if (response.ok) {
-                setAmplKey(data.apiKey)
-            }
-        }
-
-        const getGoogleKey = async () => {
-            const response = await fetch("/api/settings/key/google_maps_key")
-            const data = await response.json()
-            if (response.ok) {
-                setGoogleKey(data.apiKey)
-            }
-        }
-
-        const getWeights = async () => {
-            const response = await fetch("/api/settings/weights")
-            if (response.ok){
-                const responseObj = await response.json()
-                sendMessage(responseObj.message, responseObj.success ? toastTypes.success : toastTypes.error)
-                if (responseObj.success) {
-                    setDistanceImportance(responseObj.data.distanceImportance + '')
-                    setQualificationImportance(responseObj.data.qualificationImportance + '')
+        const fetchData = async () => {
+            toggleLoading(true)
+            try {
+                const getAmplKey = async () => {
+                    const response = await fetch("/api/settings/key/ampl_key")
+                    const data = await response.json()
+                    if (response.ok) setAmplKey(data.apiKey)
                 }
+
+                const getGoogleKey = async () => {
+                    const response = await fetch("/api/settings/key/google_maps_key")
+                    const data = await response.json()
+                    if (response.ok) setGoogleKey(data.apiKey)
+                }
+
+                const getWeights = async () => {
+                    const response = await fetch("/api/settings/weights")
+                    if (response.ok) {
+                        const responseObj = await response.json()
+                        sendMessage(responseObj.message, responseObj.success ? toastTypes.success : toastTypes.error)
+                        if (responseObj.success) {
+                            setDistanceImportance(responseObj.data.distanceImportance + "")
+                            setQualificationImportance(responseObj.data.qualificationImportance + "")
+                        }
+                    }
+                }
+
+                await getAmplKey()
+                await getGoogleKey()
+                await getWeights()
+            } catch (err) {
+                console.error("Error fetching settings:", err)
+                sendMessage("Error loading settings.", toastTypes.error)
+            } finally {
+                toggleLoading(false)
             }
         }
 
-        getAmplKey()
-        getGoogleKey()
-        getWeights()
+        fetchData()
     }, [])
 
     return (
@@ -170,7 +177,7 @@ const Settings = () => {
                             </label>
                             <div className="tab-content bg-base-100 border-base-300 p-6">
                                 <TabCard title={"Languages"} description={""}>
-                                  in development
+                                    in development
                                 </TabCard>
                             </div>
                         </div>

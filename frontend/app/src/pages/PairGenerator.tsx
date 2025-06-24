@@ -100,7 +100,7 @@ const PairGenerator = () => {
                                 <TabCard title="Auto generation" description="Here you can generate pairs automatically">
                                     <div className="card-body bg-white rounded-lg flex flex-row">
                                         <div
-                                            className="flex flex-col items-center justify-center w-fit pl-4 pr-18 flex-none border-r-1 border-gray-300">
+                                            className="flex flex-col items-center justify-center w-fit pl-4 pr-18 flex-none">
                                             <div className="generator-steps-navigation w-full h-full flex flex-col">
                                                 <ul className="steps steps-vertical grow-1">
                                                     {steps.map(step => <li
@@ -109,11 +109,13 @@ const PairGenerator = () => {
                                                 </ul>
                                             </div>
                                         </div>
+                                        <div className="divider lg:divider-horizontal"></div>
                                         <div
                                             className="generator-step-content pl-4 h-full w-full overflow-x-scroll">
                                             {currentStep === 1 && <ChildrenTable children={children} next={nextStep} />}
                                             {currentStep === 2 &&
-                                                <AssistantTable assistants={assistants} next={nextStep} prev={prevStep} />}
+                                                <AssistantTable assistants={assistants} next={nextStep}
+                                                                prev={prevStep} />}
                                             {currentStep === 3 && <Generator next={nextStep} prev={prevStep} />}
                                         </div>
                                     </div>
@@ -126,7 +128,7 @@ const PairGenerator = () => {
                             </label>
                             <div className="tab-content bg-base-100 border-base-300 p-6">
                                 <TabCard title="Manual generation" description="Here you can manually create pair">
-                                    <ManualAssigment/>
+                                    <ManualAssigment children={children} assistants={assistants}/>
                                 </TabCard>
                             </div>
                         </div>

@@ -2,6 +2,7 @@ import Alert from "./feedback/Alert.tsx"
 import AssistantSingleImport from "./import/AssistantSingleImport.tsx"
 import AssistantTable from "./generator/AssistantTable.tsx"
 import ChildrenSingleImport from "./import/ChildrenSingleImport.tsx"
+import CompareBox from "./generator/CompareBox.tsx"
 import ChildrenTable from "./generator/ChildrenTable.tsx"
 import CSVImport from "./import/CSVImport.tsx"
 import Footer from "./layout/Footer"
@@ -20,6 +21,7 @@ export {
     AssistantTable,
     ChildrenSingleImport,
     ChildrenTable,
+    CompareBox,
     CSVImport,
     Footer,
     Generator,
