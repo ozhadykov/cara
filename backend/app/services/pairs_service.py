@@ -49,7 +49,7 @@ class PairsService:
         result = PairsGeneratorBaseData(children=children, assistants=assistants, pairs=pairs)
         return Response(success=True, message="pairs data fetched", data=result)
 
-    async def create_pair(self, data:CreateSinglePairIn):
+    async def create_pair(self, data: CreateSinglePairIn):
         # todo: Check if pair possible, create and save pair in db
         return Response(success=True, message="This is mock!!!!!")
 
@@ -71,6 +71,7 @@ class PairsService:
                         id, 
                         origin_address_id,
                         destination_address_id,
+                        transport_type,
                         distance,
                         travel_time
                     FROM 
@@ -95,6 +96,7 @@ class PairsService:
                 print("Making request", flush=True)
                 r = await client.post(url=f"{BASE_URL}/generate_pairs", json=data_for_ampl)
                 print(r.json(), flush=True)
+                await websocket.send_text(json.dumps(Response(success=True, message='Pairs generated', data=r.json()).model_dump()))
         except Exception as e:
             await websocket.send_text(
                 json.dumps(Response(success=False, message=f"Error calling ampl: {str(e)}").model_dump()))

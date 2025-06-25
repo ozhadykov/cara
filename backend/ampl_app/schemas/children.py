@@ -13,3 +13,4 @@ class Child(BaseModel):
     street_number: str
     city: str
     zip_code: str
+    address_id: Optional[int] = None
