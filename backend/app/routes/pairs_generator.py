@@ -51,5 +51,3 @@ async def websocket_generate_pairs(websocket: WebSocket, pairs_service: PairsSer
     finally:
         # closing connection
         await websocket.close()
-
-    return 'testing websocket'

@@ -97,3 +97,4 @@ We have defined this problem as a maximization problem.
 10. Generate pairs step 4.
 11. Create DB backup rotator.
 12. Check if assistant/child exists before insertion
+13. Add amounts on step 3 to children and assistants pairs generator

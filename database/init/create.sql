@@ -127,8 +127,7 @@ CREATE TABLE api_keys
 );
 
 INSERT INTO api_keys (id, apiKey)
-VALUES ('opencage_key', ''),
-       ('ampl_key', ''),
+VALUES ('ampl_key', ''),
        ('google_maps_key', '');
 
 -- Create weights table for lp model
