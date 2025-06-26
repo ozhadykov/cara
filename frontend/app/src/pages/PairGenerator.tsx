@@ -69,11 +69,7 @@ const PairGenerator = () => {
             {
                 id: 3,
                 title: "Generate pairs",
-            },
-            {
-                id: 4,
-                title: "Choose Children",
-            },
+            }
         ]
 
 

@@ -93,8 +93,11 @@ We have defined this problem as a maximization problem.
 6. Add custom assigment tool to pairs generator page
 7. Finish color Scheme, add success, danger, warning colors - DONE
 8. Fix Frontend calls to backend without "npm run dev"
-9. AMPL Model python code
-10. Generate pairs step 4.
+9. AMPL Model python code - DONE
+10. Generate pairs step 3. - DONE
 11. Create DB backup rotator.
 12. Check if assistant/child exists before insertion
 13. Add amounts on step 3 to children and assistants pairs generator
+14. Deleting existed pairs in db, before pairs generation
+15. Saving all generations in pairs_archive with id and JSON value
+16. Transforming and using weights from DB in LP model

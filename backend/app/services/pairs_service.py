@@ -85,6 +85,11 @@ class PairsService:
         children = data.children
         assistants = data.assistants
 
+        # clean the pairs table, from chosen children and assistants
+        await websocket.send_text(
+            json.dumps(Response(success=True, message='Preparing database').model_dump()))
+        await asyncio.sleep(2)
+
         # get distances
         await websocket.send_text(json.dumps(Response(success=True, message='Getting distances').model_dump()))
         await asyncio.sleep(2)
@@ -141,18 +146,23 @@ class PairsService:
                         await websocket.send_text(
                             json.dumps(
                                 Response(success=False, message=f"Some pairs could not be created: {len(failed_pairs)}",
-                                         failed_pairs=failed_pairs).model_dump()))
+                                         data=failed_pairs, status="done").model_dump()))
+                        await asyncio.sleep(2)
                         return
 
                     await websocket.send_text(
-                        json.dumps(Response(success=True, message='Pairs successfully created', data=pairs).model_dump()))
+                        json.dumps(Response(success=True, message='Pairs successfully created', data=pairs, status="done").model_dump()))
+                    await asyncio.sleep(2)
                     return
 
                 await websocket.send_text(
-                    json.dumps(Response(success=False, message='AMPL returned error', data=r.json).model_dump()))
+                    json.dumps(Response(success=False, message='AMPL returned error', data=r.json, status="done").model_dump()))
+                await asyncio.sleep(2)
+
         except Exception as e:
             await websocket.send_text(
-                json.dumps(Response(success=False, message=f"Error calling ampl: {str(e)}").model_dump()))
+                json.dumps(Response(success=False, message=f"Error calling ampl: {str(e)}", status="done").model_dump()))
+            await asyncio.sleep(2)
             return
 
     async def get_coverage(self):

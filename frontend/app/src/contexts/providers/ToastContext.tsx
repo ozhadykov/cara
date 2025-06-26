@@ -18,7 +18,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
         setMessage(message)
         setType(type)
         setIsOpen(true)
-        setTimeout(() => setIsOpen(false), 4000)
+        setTimeout(() => setIsOpen(false), 1500)
     }
 
     return (
