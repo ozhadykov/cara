@@ -1,17 +1,26 @@
 import { useLoading, usePairsGenerator, useToast } from "../../contexts"
 import { ColumnDef, getCoreRowModel, useReactTable } from "@tanstack/react-table"
-import { useMemo } from "react"
+import React, { useMemo, useState } from "react"
 import { Assistant, Child } from "../../lib/models.ts"
-import { postRequest } from "../../lib/request.ts"
 import Table from "./Table.tsx"
 import { toastTypes } from "../../lib/constants.ts"
+import { Icon } from "@iconify/react"
 
 interface IGeneratorProps {
     next: () => void
     prev: () => void
 }
 
+const generationSteps = {
+    init: "initial",
+    progress: "progress",
+    done: "done",
+}
+
 const Generator = ({ next, prev }: IGeneratorProps) => {
+    const [generationStep, setGenerationStep] = useState<string>(generationSteps.init)
+    const [generationStatus, setGenerationStatus] = useState<boolean | null>(null)
+    const [pairs, setPairs] = useState<[]>([])
     const { selectedChildrenObj, selectedAssistantsObj } = usePairsGenerator()
     const { sendMessage } = useToast()
     const { toggleLoading } = useLoading()
@@ -132,52 +141,81 @@ const Generator = ({ next, prev }: IGeneratorProps) => {
         const ws = new WebSocket(url)
 
         ws.onopen = () => {
-            console.log('Websocket connected')
             toggleLoading(true)
-            sendMessage('Websocket connected', toastTypes.info)
+            sendMessage("Websocket connected", toastTypes.info)
             ws.send(JSON.stringify(data))
         }
 
         ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            console.log("Received:", data);
+            const response = JSON.parse(event.data)
+            sendMessage(response.message, response.success ? toastTypes.info : toastTypes.error)
+            console.log("Received:", response)
+            if (response.status == "done") {
+                setGenerationStep(generationSteps.done)
+                setGenerationStatus(response.success)
+                if (response.success)
+                    setPairs(response.data)
+            }
         }
 
         ws.onclose = (event) => {
-            console.log("WebSocket disconnected:", event.code, event.reason);
+            console.log("WebSocket disconnected:", event.code, event.reason)
+            sendMessage("Websocket disconnected", toastTypes.info)
             toggleLoading(false)
-        };
+        }
 
         ws.onerror = (err) => {
-            console.error("WebSocket error:", err);
-        };
+            console.error("WebSocket error:", err)
+            sendMessage("Unexpected error on server", toastTypes.error)
+        }
 
         //next()
     }
 
     return (
         <div className="step-3-generator-content w-full h-full flex flex-col gap-4">
-            <div className="header">
-                <span className="text-2xl font-semibold">Generate pairs</span>
-            </div>
-            <div className="body grid grid-cols-2 gap-6">
-                <div className="children-list-container w-full">
-                    <span className="list-header text-lg">Selected children</span>
-                    <div className="table-container mt-4">
-                        <Table table={childrenPreviewTable} controls={false} />
+            {generationStep === generationSteps.done ? (
+                <div className="generator-done flex flex-col gap-5 items-center justify-items-center h-60">
+                    {generationStatus ? (
+                        <>
+                            <Icon icon="solar:check-circle-bold" className="text-success text-8xl"/>
+                            <p className="text-lg">Pairs generated and saved in Database successfully</p>
+                            <button className="btn btn-secondary">See pairs</button>
+                        </>
+                    ) : (
+                        <>
+                            <Icon icon="solar:shield-cross-bold" className="text-error text-8xl" />
+                            <p className="text-lg">All or some pairs could not be saved or generated</p>
+                            <button className="btn btn-warning">Check system</button>
+                        </>
+                    )}
+                </div>
+            ) : (
+                <div className="generator-in-progress">
+                    <div className="header">
+                        <span className="text-2xl font-semibold">Generate pairs</span>
+                    </div>
+                    <div className="body grid grid-cols-2 gap-6">
+                        <div className="children-list-container w-full">
+                            <span className="list-header text-lg">Selected children</span>
+                            <div className="table-container mt-4">
+                                <Table table={childrenPreviewTable} controls={false} />
+                            </div>
+                        </div>
+                        <div className="assistant-list-container w-full">
+                            <span className="list-header text-lg">Selected assistants</span>
+                            <div className="table-container mt-4">
+                                <Table table={assistantsPreviewTable} controls={false} />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="generator-controls flex items-center justify-between gap-3 mt-6">
+                        <button className="btn btn-soft btn-wide" onClick={prev}>previous step</button>
+                        <button className="btn btn-soft btn-wide btn-secondary" onClick={handleGenerate}>generate!
+                        </button>
                     </div>
                 </div>
-                <div className="assistant-list-container w-full">
-                    <span className="list-header text-lg">Selected assistants</span>
-                    <div className="table-container mt-4">
-                        <Table table={assistantsPreviewTable} controls={false} />
-                    </div>
-                </div>
-            </div>
-            <div className="generator-controls flex items-center justify-between gap-3 mt-6">
-                <button className="btn btn-soft btn-wide" onClick={prev}>previous step</button>
-                <button className="btn btn-soft btn-wide btn-secondary" onClick={handleGenerate}>generate!</button>
-            </div>
+            )}
         </div>
     )
 }
