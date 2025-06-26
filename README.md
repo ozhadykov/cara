@@ -96,3 +96,4 @@ We have defined this problem as a maximization problem.
 9. AMPL Model python code
 10. Generate pairs step 4.
 11. Create DB backup rotator.
+12. Check if assistant/child exists before insertion

@@ -31,7 +31,7 @@ print:
 
 build:
   rm -rf database/db_data
-  docker compose down -v
+  docker compose down -v --remove-orphans
   docker compose up -d --build
 
 build_db:

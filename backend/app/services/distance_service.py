@@ -1,3 +1,4 @@
+import json
 import googlemaps
 import pymysql.cursors
 from fastapi import Depends
@@ -49,7 +50,7 @@ class DistanceService:
                 address_validated = result.get('address', {})
                 geocode = result.get('geocode', {})
 
-                if verdict.get('addressComplete') is False or verdict.get('validationGranularity') != 'PREMISE':
+                if not verdict.get('addressComplete') or verdict.get('validationGranularity') not in ['PREMISE', 'PREMISE_PROXIMITY']:
                     return Response(success=False, message="Address validation failed.")
 
                 return Response(success=True,
