@@ -7,6 +7,7 @@ from ..database.database import get_db
 from ..schemas.assistants import AssistantIn, Assistant
 from ..schemas.address import Address
 from ..schemas.Response import Response
+
 if TYPE_CHECKING:
     from .children_service import ChildrenService
     from .distance_service import DistanceService
@@ -22,6 +23,7 @@ class AssistantsService:
             distance_service: "DistanceService",
             children_service: "ChildrenService"
     ):
+        # todo: add check if child/assistant exists
         failed = []
         for assistant in assistant_in.data:
             address = Address(
@@ -32,7 +34,12 @@ class AssistantsService:
             )
             address_response = await distance_service.insert_address(address)
             if not address_response.success:
-                return address_response
+                failed_assistant = {
+                    'insertion_object': assistant,
+                    'reason': address_response
+                }
+                failed.append(failed_assistant)
+                continue
 
             address_id = address_response.data
             try:
@@ -61,7 +68,8 @@ class AssistantsService:
                 self.db.rollback()
 
         if len(failed) > 0:
-            return Response(success=False, message=f"{len(failed)} assistant failed to insert in Database")
+            return Response(success=False, message=f"{len(failed)} assistant failed to insert in Database", data=failed)
+
         return Response(success=True, message="All assistant successfully inserted")
 
     async def update_assistant(

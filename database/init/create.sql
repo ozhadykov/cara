@@ -27,13 +27,13 @@ VALUES ('QHK', 3),
 CREATE TABLE address
 (
     id            INT AUTO_INCREMENT PRIMARY KEY,
-    street        VARCHAR(255)     NOT NULL,
-    street_number VARCHAR(20)      NOT NULL,
-    city          VARCHAR(255)     NOT NULL,
-    zip_code      VARCHAR(20)      NOT NULL,
-    latitude      DOUBLE PRECISION NOT NULL,
-    longitude     DOUBLE PRECISION NOT NULL,
-    place_id      VARCHAR(255)     NOT NULL,
+    street        VARCHAR(255)            NOT NULL,
+    street_number VARCHAR(20)             NOT NULL,
+    city          VARCHAR(255)            NOT NULL,
+    zip_code      VARCHAR(20)             NOT NULL,
+    latitude      DOUBLE PRECISION        NOT NULL,
+    longitude     DOUBLE PRECISION        NOT NULL,
+    place_id      VARCHAR(255) DEFAULT '' NOT NULL,
 
     UNIQUE KEY unique_address (street, street_number, city, zip_code)
 );
@@ -127,8 +127,7 @@ CREATE TABLE api_keys
 );
 
 INSERT INTO api_keys (id, apiKey)
-VALUES ('opencage_key', ''),
-       ('ampl_key', ''),
+VALUES ('ampl_key', ''),
        ('google_maps_key', '');
 
 -- Create weights table for lp model

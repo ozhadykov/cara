@@ -19,6 +19,7 @@ class ChildrenService:
     async def create_children(self, children_in: ChildrenIn,
                               distance_service: "DistanceService",
                               assistant_service: "AssistantsService"):
+        # todo: add check if child/assistant exists
         try:
             failed = []
             for child in children_in.data:
@@ -30,7 +31,12 @@ class ChildrenService:
                 )
                 address_response = await distance_service.insert_address(address)
                 if not address_response.success:
-                    return address_response
+                    failed_child = {
+                        'child': child,
+                        'address_response': address_response
+                    }
+                    failed.append(failed_child)
+                    continue
 
                 address_id = address_response.data
                 try:
@@ -44,6 +50,12 @@ class ChildrenService:
                             (child.first_name, child.family_name, child.required_qualification,
                              child.requested_hours, address_id)
                         )
+                        response = await distance_service.refresh_distance_matrix(self, assistant_service)
+                        if not response.success:
+                            raise Exception(response.message)
+
+                        # commit if only registered all destinations
+                        self.db.commit()
                 except pymysql.err.Error as e:
                     print(f"Database error during child insertion: {e}")
                     failed.append(child)
@@ -52,15 +64,12 @@ class ChildrenService:
                     print(f"An unexpected error occurred during child insertion: {e}")
                     failed.append(child)
                     self.db.rollback()
+
             if len(failed) > 0:
-                return Response(success=False, message=f"{len(failed)} children failed to insert in Database, aborting insertion")
+                return Response(success=False,
+                                message=f"{len(children_in.data) - len(failed)} children added, but {len(failed)} children failed",
+                                data=failed)
 
-            response = await distance_service.refresh_distance_matrix(self, assistant_service)
-            if not response.success:
-                raise Exception(response.message)
-
-            # commit if only registered all destinations
-            self.db.commit()
         except Exception as e:
             print(f"An unexpected error occurred during child insertion: {e}")
             self.db.rollback()
@@ -94,7 +103,8 @@ class ChildrenService:
                             address_id = %s
                         WHERE id = %s;
                     """,
-                    (child.first_name, child.family_name, child.required_qualification, child.requested_hours, address_id, child_id)
+                    (child.first_name, child.family_name, child.required_qualification, child.requested_hours,
+                     address_id, child_id)
                 )
 
             response = await distance_service.refresh_distance_matrix(self, assistant_service)
@@ -159,7 +169,9 @@ class ChildrenService:
 
     async def delete_child(self, child_id: int):
         with self.db.cursor() as cursor:
-            cursor.execute("DELETE FROM address WHERE address.id = (SELECT address_id FROM children WHERE children.id = %s);", (child_id))
+            cursor.execute(
+                "DELETE FROM address WHERE address.id = (SELECT address_id FROM children WHERE children.id = %s);",
+                (child_id))
             cursor.execute("DELETE FROM children WHERE id = %s;", (child_id))
             self.db.commit()
             return cursor.rowcount

@@ -1,7 +1,6 @@
 import pandas as pd
-import numpy as np
-import amplpy
 import json
+from pathlib import Path
 from amplpy import AMPL
 from typing import List
 from fastapi import FastAPI
@@ -40,173 +39,92 @@ class GeneratePairsIN(BaseModel):
 
 @app.post("/generate_pairs")
 async def generate_pairs(data: GeneratePairsIN):
-    print(json.dumps(data.model_dump(), indent=4))
-    return 'hello'
+    children = data.children
+    assistants = data.assistants
+    distances = data.distances
 
+    # 1. --- Extract data into DataFrames ---
+    child_df = pd.DataFrame([{
+        "child_id": str(c.id),
+        "qualification_required": c.required_qualification,
+        "requested_hours": c.requested_hours,
+        "address_id": c.address_id
+    } for c in children])
 
-@app.get("/ampl", summary="solving dummy model with generated data", response_model=devAMPLResponse)
-def read_root():
-    # TODO generate dummy data
-    # 1. generate children df
-    children_df = generate_dummy_children()
+    assistant_df = pd.DataFrame([{
+        "assistant_id": str(a.id),
+        "qualification": a.qualification,
+        "min_capacity": a.min_capacity,
+        "max_capacity": a.max_capacity,
+        "has_car": a.has_car,
+        "address_id": a.address_id
+    } for a in assistants])
 
-    # 2. generate assistant df
-    assistants_df = generate_dummy_assistants()
+    dist_df = pd.DataFrame([{
+        "origin": d.origin_address_id,
+        "destination": d.destination_address_id,
+        "distance": d.distance,
+        "travel_time": d.travel_time
+    } for d in distances])
 
-    # 3. generate Qualification table
-    qual = assistants_df['qualification'].to_numpy().reshape(-1, 1)  # vertical
-    req = children_df['qualification_requirment'].to_numpy().reshape(
-        1, -1)  # horizontal
+    # 2. --- Build travel time matrix ---
+    travel_matrix = {}
+    for a in assistant_df.itertuples():
+        for c in child_df.itertuples():
+            match = dist_df[
+                (dist_df['origin'] == a.address_id) &
+                (dist_df['destination'] == c.address_id)
+                ]
+            if not match.empty:
+                travel_matrix[(str(c.child_id), str(a.assistant_id))] = match.iloc[0]['travel_time']
+            else:
+                travel_matrix[(str(c.child_id), str(a.assistant_id))] = 9999  # infeasible
 
-    diff = np.abs(req - qual)  # calculate the difference
-    score = np.where(diff == 0, 3, np.where(diff == 1, 2, 1))  # setting scores
+    # 3. --- Compute matching score matrix ---
+    score_matrix = {}
+    valid_matrix = {}
+    tau = 900  # 15 min in seconds
 
-    score_df = pd.DataFrame(
-        score, index=assistants_df['assistant_id'], columns=children_df['child_id'])
+    for a in assistant_df.itertuples():
+        for c in child_df.itertuples():
+            diff = abs(a.qualification - c.qualification_required)
+            score = 3 if diff == 0 else (2 if diff == 1 else 1)
+            travel = travel_matrix[(str(c.child_id), str(a.assistant_id))]
+            score_matrix[(str(c.child_id), str(a.assistant_id))] = score
+            valid_matrix[(str(c.child_id), str(a.assistant_id))] = int(
+                a.qualification >= c.qualification_required and travel <= tau)
 
-    # 4. generate distance table, just rand in range from 1 to 50km
-    distances = np.random.randint(low=1, high=100, size=(20, 20))
-    distances_df = pd.DataFrame(
-        distances, index=assistants_df['assistant_id'], columns=children_df['child_id'])
+    # 4. --- Start AMPL and model ---
+    model_path = Path(__file__).parent / "ampl_models" / "model_v_1_2.mod"
+    ampl = AMPL()
+    ampl.set_option("solver", "highs")
+    ampl.read(str(model_path))  # The model from earlier message
 
-    # DEV AND DEBUG ONLY
-    print(score_df)
-    print("\n distance matrix")
-    print(distances_df)
+    ampl.set["CHILDREN"] = list(child_df['child_id'])
+    ampl.set["CARETAKERS"] = list(assistant_df['assistant_id'])
 
-    response = 'hello'
+    ampl.param["D"] = child_df.set_index("child_id")["requested_hours"].to_dict()
+    ampl.param["R"] = child_df.set_index("child_id")["qualification_required"].to_dict()
+    ampl.param["minH"] = assistant_df.set_index("assistant_id")["min_capacity"].to_dict()
+    ampl.param["maxH"] = assistant_df.set_index("assistant_id")["max_capacity"].to_dict()
+    ampl.param["Q"] = assistant_df.set_index("assistant_id")["qualification"].to_dict()
 
-    # 5. use amplpy to calculate best pairs
-    try:
-        ampl = AMPL()
-        ampl.set_option("solver", "highs")
+    ampl.param["T"] = travel_matrix
+    ampl.param["S"] = score_matrix
+    ampl.param["valid"] = valid_matrix
 
-        ampl.eval(
-            r"""
-            set CHILDREN;
-            set ASSISTANTS;
+    ampl.param["lambda1"] = 0.05
+    ampl.param["lambda2"] = 0.001
 
-            param qualification_requirment {CHILDREN};
-            param hours_requested {CHILDREN};
-            param qualification {ASSISTANTS};
-            param capacity_hours {ASSISTANTS};
-            param QUALIFICATIONS {ASSISTANTS, CHILDREN};
-            param DISTANCES {ASSISTANTS, CHILDREN};
+    ampl.solve()
 
-            var Assign {i in CHILDREN, j in ASSISTANTS} binary;
+    # 5. --- Collect solution ---
+    assignment_df = ampl.get_variable("x").get_values().to_pandas().reset_index()
+    assignment_df = assignment_df[assignment_df["x.val"] > 0.5]
+    assignment_df.columns = ["child_id", "assistant_id", "assigned"]
 
-            maximize Total_Pairs:
-                sum {i in CHILDREN, j in ASSISTANTS} Assign[i, j] * QUALIFICATIONS[i, j];
-
-            subject to CapacityConstraint {j in ASSISTANTS}:
-                sum {i in CHILDREN} Assign[i, j] * hours_requested[i] <= capacity_hours[j];
-
-            subject to DistanceConstraint {j in ASSISTANTS}:
-                sum {i in CHILDREN} Assign[i, j] * DISTANCES[i, j] <= 50;
-        """
-        )
-        # additionals
-        # add constraint about Ci <= Qi if i want to assign assistant to child
-        # add discrete timeslots, 2 dimensions: noon, afternoon? time slot lock
-        # greede children and time slot matrix for caretakers, 3 matrixes?
-        # distance measuring? through possible aasosiations, teacher have to reach the school
-
-        ampl.set_data(children_df[['child_id', 'qualification_requirment',
-                                   'hours_requested']].set_index("child_id"), "CHILDREN")
-        ampl.set_data(assistants_df[['assistant_id', 'qualification', 'capacity_hours']].set_index(
-            "assistant_id"), "ASSISTANTS")
-        ampl.get_parameter("QUALIFICATIONS").set_values(score_df)
-        ampl.get_parameter("DISTANCES").set_values(distances_df)
-
-        ampl.solve()
-
-        # check if it is solved
-        result = ampl.get_value("solve_result")
-        if result == "optimal" or "solved":
-            assign_df = ampl.get_variable(
-                "Assign").get_values().to_pandas().reset_index()
-            assign_df = assign_df.rename(
-                columns={"index0": "child_id", "index1": "assistant_id", "Assign.val": "assigned"})
-            # Filter only rows where assignment happened
-            assigned = assign_df[assign_df["assigned"] >= 1]
-            total_pairs = len(assigned['child_id'].unique())
-            print(assigned)
-            response = {
-                "status": "success",
-                "total_pairs": total_pairs,
-                "assignments": assigned.to_json()
-            }
-        else:
-            response = {
-                "status": "failure",
-                "reason": result
-            }
-
-    except amplpy.AMPLException:
-        return amplpy.AMPLException.get_message()
-
-    return response
-
-
-# DEV HELPERS
-
-def generate_dummy_children():
-    children_df = pd.DataFrame(
-        columns=['child_id', 'name', 'family_name', 'qualification_requirment', 'hours_requested'])
-
-    first_names = [
-        "Liam", "Emma", "Noah", "Olivia", "Ava",
-        "Elijah", "Sophia", "Lucas", "Isabella", "Mason",
-        "Amelia", "Logan", "Mia", "Ethan", "Harper",
-        "James", "Evelyn", "Benjamin", "Charlotte", "Alexander"
-    ]
-    family_names = [
-        "Smith", "Johnson", "Williams", "Brown", "Jones",
-        "Garcia", "Miller", "Davis", "Rodriguez", "Martinez",
-        "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson",
-        "Thomas", "Taylor", "Moore", "Jackson", "Martin"
-    ]
-    qualification_requirments = np.random.randint(low=1, high=4, size=(20))
-    hours_requests = np.random.randint(low=5, high=40, size=(20))
-
-    children_df['child_id'] = range(1, 21)
-    children_df['name'] = first_names
-    children_df['family_name'] = family_names
-    children_df['qualification_requirment'] = qualification_requirments
-    children_df['hours_requested'] = hours_requests
-
-    return children_df
-
-
-def generate_dummy_assistants():
-    assistants_df = pd.DataFrame(columns=[
-        'assistant_id',
-        'name',
-        'family_name',
-        'qualification',
-        'capacity_hours'
-    ])
-
-    first_names = [
-        "Anya", "Mateo", "Niko", "Aisha", "Ravi",
-        "Zara", "Hugo", "Sina", "Kai", "Marek",
-        "Leila", "Tariq", "Elina", "Yuki", "Kofi",
-        "Soraya", "Jonas", "Noura", "Elias", "Fatima"
-    ]
-
-    family_names = [
-        "Kowalski", "Nguyen", "Alvarez", "Okafor", "Dubois",
-        "Schneider", "Yamamoto", "Rahman", "Petrov", "Ibrahim",
-        "Fernandes", "O'Connor", "Mendoza", "Chen", "Singh",
-        "Aliyev", "Barros", "Kim", "Nordin", "Jokic"
-    ]
-
-    assistants_df['assistant_id'] = range(1, 21)
-    assistants_df['name'] = first_names
-    assistants_df['family_name'] = family_names
-    assistants_df['qualification'] = np.random.randint(
-        low=1, high=4, size=(20))
-    assistants_df['capacity_hours'] = np.random.randint(
-        low=8, high=40, size=(20))
-
-    return assistants_df
+    return {
+        "status": "success",
+        "assignments": assignment_df.to_dict(orient="records"),
+        "total_children_assigned": int(assignment_df["child_id"].nunique())
+    }
