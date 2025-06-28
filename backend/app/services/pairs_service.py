@@ -127,7 +127,10 @@ class PairsService:
         try:
             async with httpx.AsyncClient() as client:
                 print("Making request", flush=True)
-                r = await client.post(url=f"{BASE_URL}/generate_pairs", json=data_for_ampl)
+                # omar's model
+                #r = await client.post(url=f"{BASE_URL}/generate_pairs", json=data_for_ampl)
+                # alex's model
+                r = await client.post(url=f"{BASE_URL}/generate_pairs_2", json=data_for_ampl)
                 print(r.json(), flush=True)
                 response = r.json()
                 if response.get('status') == 'success':
