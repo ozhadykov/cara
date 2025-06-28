@@ -79,37 +79,54 @@ class PairsService:
 
         try:
             with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
-                cursor.execute(
-                    """
-                    SELECT
+            cursor.execute(
+                """
+                SELECT
+                    CASE
+                        WHEN (
+                            COALESCE((
+                                SELECT SUM(c.required_hours)
+                                FROM pairs p
+                                JOIN children c ON c.id = p.child_id
+                                WHERE p.assistant_id = %s
+                            ), 0) + (
+                                SELECT c.required_hours
+                                FROM children c
+                                WHERE c.id = %s
+                            )
+                        ) > (
+                            SELECT a.max_capacity
+                            FROM assistants a
+                            WHERE a.id = %s
+                        )
+                        THEN TRUE
+                        ELSE FALSE
+                    END AS full_capacity,
 
-                        CASE
-                            WHEN
-                                (SELECT COUNT(*) FROM pairs WHERE assistant_id = %s) >= 
-                                (SELECT max_capacity FROM assistants WHERE id = %s)
-                            THEN TRUE
-                            ELSE FALSE
-                        END AS full_capacity,
-                        CASE 
-                            WHEN 
-                                EXISTS (SELECT 1 FROM pairs WHERE child_id = %s)
-                            THEN TRUE
-                            ELSE FALSE
-                        END AS already_assigned;
-                    """, (assistant_id, assistant_id, child_id)
-                )
+                    CASE
+                        WHEN EXISTS (
+                            SELECT 1
+                            FROM pairs
+                            WHERE child_id = %s
+                        )
+                        THEN TRUE
+                        ELSE FALSE
+                END AS already_assigned;
+                """, 
+                (assistant_id, child_id, assistant_id, child_id)
+            )
 
-                result = cursor.fetchone()
+            result = cursor.fetchone()
 
-                if result["already_assigned"]:
-                    return Response(success=False, message=f"This child is already paired with an assistant. To proceed with a new pairing, please manually remove the existing assignment.")
+            if result["already_assigned"]:
+                return Response(success=False, message=f"This child is already paired with an assistant. To proceed with a new pairing, please manually remove the existing assignment.")
 
-                if result["full_capacity"]:
-                    return Response(success=False, message=f"This assistant has reached the maximum number of assignments. Please remove an existing assignment with this assistant before creating a new pairing.")
+            if result["full_capacity"]:
+                return Response(success=False, message=f"This assistant has reached the maximum number of assignments. Please remove an existing assignment with this assistant before creating a new pairing.")
 
-                await self._create_pair_from_ids(child_id, assistant_id)
+            await self._create_pair_from_ids(child_id, assistant_id)
 
-                return Response(success=True, message=f"Pair has been created")
+            return Response(success=True, message=f"Pair has been created")
         except Exception as e:
             return Response(success=False, message=f"Error {str(e)}")
 
