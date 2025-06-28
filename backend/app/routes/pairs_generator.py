@@ -1,7 +1,7 @@
 import json
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect, WebSocketException
 from ..services.pairs_service import PairsService
-from ..schemas.pairs_generator import GeneratePairsData, CreateSinglePairIn
+from ..schemas.pairs_generator import GeneratePairsData, CreateSinglePairIn, Pair
 
 router = APIRouter(
     prefix="/api/pair_generator",

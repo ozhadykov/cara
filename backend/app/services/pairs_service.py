@@ -10,6 +10,7 @@ from pymysql.connections import Connection
 from ..services.children_service import ChildrenService
 from ..services.assistants_service import AssistantsService
 from ..schemas.pairs_generator import GeneratePairsData
+from ..schemas.pairs_generator import Pair
 
 BASE_URL = 'http://ampl:8000'
 
@@ -49,10 +50,6 @@ class PairsService:
         result = PairsGeneratorBaseData(children=children, assistants=assistants, pairs=pairs)
         return Response(success=True, message="pairs data fetched", data=result)
 
-    async def create_pair(self, data: CreateSinglePairIn):
-        # todo: Check if pair possible, create and save pair in db
-        return Response(success=True, message="This is mock!!!!!")
-
     async def _create_pair_from_ids(self, child_id: int, assistant_id: int):
         try:
             with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
@@ -75,6 +72,70 @@ class PairsService:
             print(f"Database error during pair insertion: {e}")
             self.db.rollback()
             return Response(success=False, message=f"Unexpected error during pair insertion {str(e)}")
+
+    async def create_pair(self, data: CreateSinglePairIn):
+        child_id = data.child.id
+        assistant_id = data.child.id
+
+        try:
+            with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+                cursor.execute(
+                    """
+                    SELECT
+
+                        CASE
+                            WHEN
+                                (SELECT COUNT(*) FROM pairs WHERE assistant_id = %s) >= 
+                                (SELECT max_capacity FROM assistants WHERE id = %s)
+                            THEN TRUE
+                            ELSE FALSE
+                        END AS full_capacity,
+                        CASE 
+                            WHEN 
+                                EXISTS (SELECT 1 FROM pairs WHERE child_id = %s)
+                            THEN TRUE
+                            ELSE FALSE
+                        END AS already_assigned;
+                    """, (assistant_id, assistant_id, child_id)
+                )
+
+                result = cursor.fetchone()
+
+                if result["already_assigned"]:
+                    return Response(success=False, message=f"This child is already paired with an assistant. To proceed with a new pairing, please manually remove the existing assignment.")
+
+                if result["full_capacity"]:
+                    return Response(success=False, message=f"This assistant has reached the maximum number of assignments. Please remove an existing assignment with this assistant before creating a new pairing.")
+
+                await self._create_pair_from_ids(child_id, assistant_id)
+
+                return Response(success=True, message=f"Pair has been created")
+        except Exception as e:
+            return Response(success=False, message=f"Error {str(e)}")
+
+    async def _delete_pairs_from_ids(self, child_id: int):
+        try:
+            with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+                cursor.execute(
+                    """
+                        DELETE FROM pairs
+                        WHERE
+                            child_id = %s
+                    """,
+                    (child_id)
+                )
+                row_count = cursor.rowcount
+                if row_count:
+                    self.db.commit()
+                    return Response(success=True, message="pair deleted", data=row_count)
+        except pymysql.err.Error as e:
+            print(f"Database error during pair deletion: {e}")
+            self.db.rollback()
+            return Response(success=False, message=str(e))
+        except Exception as e:
+            print(f"Database error during pair deletion: {e}")
+            self.db.rollback()
+            return Response(success=False, message=f"Unexpected error during pair deletion {str(e)}")
 
     async def generate_pairs(self, websocket: WebSocket, data: GeneratePairsData):
         # preparing data for ampl
@@ -131,8 +192,16 @@ class PairsService:
                 print(r.json(), flush=True)
                 response = r.json()
                 if response.get('status') == 'success':
-                    # save this in DB
                     pairs = response.get('assignments')
+                    
+                    # delete selected pairs from pairs table
+                    for pair in pairs:
+                        child_id = pair['child_id']
+                        assistant_id = pair['assistant_id']
+                        await self._delete_pairs_from_ids(child_id)
+
+                    # save this in DB
+                    
                     failed_pairs = []
                     for pair in pairs:
                         child_id = pair['child_id']
