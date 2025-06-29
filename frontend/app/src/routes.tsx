@@ -41,7 +41,7 @@ const routes: Array<IRoute> = [
     {
         path: "/pairs",
         component: <PairGenerator />,
-        label: "Calculate pairs",
+        label: "Pairs",
         fillIcon: "solar:transfer-horizontal-bold-duotone",
         outlineIcon: "solar:transfer-horizontal-line-duotone",
     },

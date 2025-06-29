@@ -20,6 +20,12 @@ export interface Assistant extends Person {
     has_car: number
 }
 
+export interface Pair {
+    id: number
+    child_id: number
+    assistant_id: number
+}
+
 export type TPersonImport = {
     data: Child[] | Assistant[]
 }

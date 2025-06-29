@@ -50,6 +50,59 @@ class PairsService:
         result = PairsGeneratorBaseData(children=children, assistants=assistants, pairs=pairs)
         return Response(success=True, message="pairs data fetched", data=result)
 
+    async def get_all_pairs(self):
+        try:
+            # get all children
+            children = await self.children_service.get_all_children()
+
+            # get all assistants
+            assistants = await self.assistants_service.get_all_assistants()
+
+            # get all pairs
+            with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+                cursor.execute(
+                    """
+                    SELECT
+                        p.id AS id,
+                        c.first_name AS c_first_name,
+                        c.family_name AS c_family_name,
+                        c.required_qualification AS c_required_qualification,
+                        ca.street AS c_street,
+                        ca.street_number AS c_street_number,
+                        ca.city AS c_city,
+                        ca.zip_code AS c_zip_code,
+                        a.first_name AS a_first_name,
+                        a.family_name AS a_family_name,
+                        a.qualification AS a_qualification,
+                        a.has_car AS a_has_car,
+                        aa.street AS a_street,
+                        aa.street_number AS a_street_number,
+                        aa.city AS a_city,
+                        aa.zip_code AS a_zip_code
+                    FROM 
+                        pairs p
+                        JOIN children c ON c.id = p.child_id
+                        JOIN assistants a ON a.id = p.assistant_id
+                        JOIN address ca ON ca.id = c.address_id
+                        JOIN address aa ON aa.id = a.address_id    
+                    """
+                )
+                pairs = cursor.fetchall()
+
+                return Response(success=True, message="pairs data fetched", data=pairs)
+        except Exception as e:
+            return Response(success=False, message=str(e))
+        except pymysql.err.Error as e:
+            return Response(success=False, message=str(e))
+
+    async def delete_pair(self, pair_id: int):
+        with self.db.cursor() as cursor:
+            cursor.execute(
+                "DELETE FROM pairs WHERE id = %s;",
+                (pair_id))
+            self.db.commit()
+            return cursor.rowcount
+
     async def _create_pair_from_ids(self, child_id: int, assistant_id: int):
         try:
             with self.db.cursor(pymysql.cursors.DictCursor) as cursor:

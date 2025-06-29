@@ -16,6 +16,15 @@ async def get_base_data(pairs_service: PairsService = Depends()):
     result = await pairs_service.get_base_data()
     return result
 
+@router.get("/pairs")
+async def get_all_pairs(pairs_service: PairsService = Depends()):
+    result = await pairs_service.get_all_pairs()
+    return result
+
+@router.delete("/pair/{pair_id}")
+async def delete_pair(pair_id: int, pairs_service: PairsService = Depends()):
+    result = await pairs_service.delete_pair(pair_id)
+    return result
 
 @router.get("/coverage")
 async def get_base_data(pairs_service: PairsService = Depends()):
