@@ -16,35 +16,56 @@ interface SelectOption {
     label: string
 }
 
-interface Combination {
-    already_assigned: boolean
-    full_capacity: boolean
-}
-
 const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
     const { sendMessage } = useToast()
     const { toggleLoading } = useLoading()
     const [selectedChild, setSelectedChild] = useState<Child | null>(null)
     const [selectedAssistant, setSelectedAssistant] = useState<Assistant | null>(null)
     const [selectedChildForSelect, setSelectedChildForSelect] = useState<SelectOption | null>(null)
-    const [errorText, setErrorText] = useState<string>()
+    const [usedHoursText, setUsedHoursText] = useState<string>("")
+    const [freeHoursText, setFreeHoursText] = useState<string>("")
     const [selectedAssistantForSelect, setSelectedAssistantForSelect] =
         useState<SelectOption | null>(null)
+    const [hasCapacity, setHasCapacity] = useState<boolean>(false)
 
     // todo: 1. get all children, get all assistants, create pair
 
-    const handleChildSelectChange = (e: any) => {
+    const handleChildSelectChange = async (e: any) => {
         const childId = e.value
         const childObj = children.find((obj) => obj.id === childId)
         setSelectedChild(childObj ?? null)
         setSelectedChildForSelect(e)
+
+        if (selectedAssistant && childObj) {
+            await handleAllSelected(childObj, selectedAssistant)
+        }
     }
 
-    const handleAssistantSelectChange = (e: any) => {
+    const handleAssistantSelectChange = async (e: any) => {
         const assistantId = e.value
         const assistantObj = assistants.find((obj) => obj.id === assistantId)
         setSelectedAssistant(assistantObj ?? null)
         setSelectedAssistantForSelect(e)
+
+        if (selectedChild && assistantObj) {
+            await handleAllSelected(selectedChild, assistantObj)
+        }
+    }
+
+    const handleAllSelected = async (child: Child, assistant: Assistant) => {
+        const data = { child_id: child.id, assistant_id: assistant.id }
+        const response = await postRequest(
+            "/api/pair_generator/capacity",
+            data,
+            sendMessage,
+            toggleLoading
+        )
+
+        console.log(response)
+        setFreeHoursText(response.free_hours)
+        setUsedHoursText(response.used_hours)
+
+        setHasCapacity(response.used_hours + child.requested_hours <= response.free_hours)
     }
 
     const childrenOptions = children.map((child) => {
@@ -81,6 +102,9 @@ const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
                 setSelectedChild(null)
                 setSelectedAssistantForSelect(null)
                 setSelectedChildForSelect(null)
+                setFreeHoursText("")
+                setUsedHoursText("")
+                setHasCapacity(false)
             }
 
             return
@@ -130,11 +154,36 @@ const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
                     </div>
                 </div>
             </div>
+
+            {selectedChild && selectedAssistant ? (
+                <div className="flex justify-center w-full">
+                    <table className={`text-${hasCapacity ? "success" : "error"}`}>
+                        <tbody>
+                            <tr>
+                                <td className="pr-2 font-semibold">Used Hours:</td>
+                                <td>
+                                    {usedHoursText} + {selectedChild.requested_hours} ={" "}
+                                    {usedHoursText + selectedChild.requested_hours}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="pr-2 font-semibold">Available Hours:</td>
+                                <td>{freeHoursText}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            ) : (
+                <span></span>
+            )}
+
             <div className="weights-setting-footer mt-8 flex justify-end">
-                <button className="btn btn-primary btn-wide" onClick={createCustomPair}>
+                <button
+                    className={`btn btn-wide btn-${hasCapacity ? "primary" : "disabled"}`}
+                    onClick={createCustomPair}
+                >
                     Create Pair
                 </button>
-                <p>{errorText}</p>
             </div>
         </div>
     )

@@ -28,6 +28,11 @@ async def create_pair(data: CreateSinglePairIn, pairs_service: PairsService = De
     result = await pairs_service.create_pair(data)
     return result
 
+@router.post("/capacity")
+async def create_pair(data: Pair, pairs_service: PairsService = Depends()):
+    result = await pairs_service.get_capacity(data)
+    return result
+
 @router.websocket("/ws/generate_pairs")
 async def websocket_generate_pairs(websocket: WebSocket, pairs_service: PairsService = Depends()):
     await websocket.accept()
