@@ -1,7 +1,7 @@
 import json
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect, WebSocketException
 from ..services.pairs_service import PairsService
-from ..schemas.pairs_generator import GeneratePairsData, CreateSinglePairIn
+from ..schemas.pairs_generator import GeneratePairsData, CreateSinglePairIn, Pair
 
 router = APIRouter(
     prefix="/api/pair_generator",
@@ -16,6 +16,15 @@ async def get_base_data(pairs_service: PairsService = Depends()):
     result = await pairs_service.get_base_data()
     return result
 
+@router.get("/pairs")
+async def get_all_pairs(pairs_service: PairsService = Depends()):
+    result = await pairs_service.get_all_pairs()
+    return result
+
+@router.delete("/pair/{pair_id}")
+async def delete_pair(pair_id: int, pairs_service: PairsService = Depends()):
+    result = await pairs_service.delete_pair(pair_id)
+    return result
 
 @router.get("/coverage")
 async def get_base_data(pairs_service: PairsService = Depends()):
@@ -26,6 +35,11 @@ async def get_base_data(pairs_service: PairsService = Depends()):
 @router.post("/single_pair")
 async def create_pair(data: CreateSinglePairIn, pairs_service: PairsService = Depends()):
     result = await pairs_service.create_pair(data)
+    return result
+
+@router.post("/capacity")
+async def create_pair(data: Pair, pairs_service: PairsService = Depends()):
+    result = await pairs_service.get_capacity(data)
     return result
 
 @router.websocket("/ws/generate_pairs")

@@ -30,42 +30,42 @@ const Generator = ({ next, prev }: IGeneratorProps) => {
         () => [
             {
                 accessorKey: "id",
-                cell: info => info.getValue(),
+                cell: (info) => info.getValue(),
             },
             {
                 accessorKey: "first_name",
-                cell: info => info.getValue(),
+                cell: (info) => info.getValue(),
             },
             {
                 accessorKey: "family_name",
-                cell: info => info.getValue(),
+                cell: (info) => info.getValue(),
             },
             {
                 accessorKey: "city",
-                cell: info => info.getValue(),
+                cell: (info) => info.getValue(),
             },
             {
                 accessorKey: "required_qualification",
-                cell: info => info.getValue(),
+                cell: (info) => info.getValue(),
             },
             {
                 accessorKey: "requested_hours",
-                cell: info => info.getValue(),
+                cell: (info) => info.getValue(),
             },
             {
                 accessorKey: "street",
-                cell: info => info.getValue(),
+                cell: (info) => info.getValue(),
             },
             {
                 accessorKey: "street_number",
-                cell: info => info.getValue(),
+                cell: (info) => info.getValue(),
             },
             {
                 accessorKey: "zip_code",
-                cell: info => info.getValue(),
+                cell: (info) => info.getValue(),
             },
         ],
-        [],
+        []
     )
 
     const childrenPreviewTable = useReactTable({
@@ -81,46 +81,46 @@ const Generator = ({ next, prev }: IGeneratorProps) => {
         () => [
             {
                 accessorKey: "id",
-                cell: info => info.getValue(),
+                cell: (info) => info.getValue(),
             },
             {
                 accessorKey: "first_name",
-                cell: info => info.getValue(),
+                cell: (info) => info.getValue(),
             },
             {
                 accessorKey: "family_name",
-                cell: info => info.getValue(),
+                cell: (info) => info.getValue(),
             },
             {
                 accessorKey: "city",
-                cell: info => info.getValue(),
+                cell: (info) => info.getValue(),
             },
             {
                 accessorKey: "qualification",
-                cell: info => info.getValue(),
+                cell: (info) => info.getValue(),
             },
             {
                 accessorKey: "min_capacity",
-                cell: info => info.getValue(),
+                cell: (info) => info.getValue(),
             },
             {
                 accessorKey: "max_capacity",
-                cell: info => info.getValue(),
+                cell: (info) => info.getValue(),
             },
             {
                 accessorKey: "street",
-                cell: info => info.getValue(),
+                cell: (info) => info.getValue(),
             },
             {
                 accessorKey: "street_number",
-                cell: info => info.getValue(),
+                cell: (info) => info.getValue(),
             },
             {
                 accessorKey: "zip_code",
-                cell: info => info.getValue(),
+                cell: (info) => info.getValue(),
             },
         ],
-        [],
+        []
     )
 
     const assistantsPreviewTable = useReactTable({
@@ -131,7 +131,6 @@ const Generator = ({ next, prev }: IGeneratorProps) => {
     // endregion
 
     const handleGenerate = () => {
-
         const url = `ws://${window.location.host}/api/pair_generator/ws/generate_pairs`
         const data = {
             children: selectedChildrenObj,
@@ -153,8 +152,7 @@ const Generator = ({ next, prev }: IGeneratorProps) => {
             if (response.status == "done") {
                 setGenerationStep(generationSteps.done)
                 setGenerationStatus(response.success)
-                if (response.success)
-                    setPairs(response.data)
+                if (response.success) setPairs(response.data)
             }
         }
 
@@ -178,14 +176,21 @@ const Generator = ({ next, prev }: IGeneratorProps) => {
                 <div className="generator-done flex flex-col gap-5 items-center justify-items-center h-60">
                     {generationStatus ? (
                         <>
-                            <Icon icon="solar:check-circle-bold" className="text-success text-8xl"/>
-                            <p className="text-lg">Pairs generated and saved in Database successfully</p>
+                            <Icon
+                                icon="solar:check-circle-bold"
+                                className="text-success text-8xl"
+                            />
+                            <p className="text-lg">
+                                Pairs generated and saved in Database successfully
+                            </p>
                             <button className="btn btn-secondary">See pairs</button>
                         </>
                     ) : (
                         <>
                             <Icon icon="solar:shield-cross-bold" className="text-error text-8xl" />
-                            <p className="text-lg">All or some pairs could not be saved or generated</p>
+                            <p className="text-lg">
+                                All or some pairs could not be saved or generated
+                            </p>
                             <button className="btn btn-warning">Check system</button>
                         </>
                     )}
@@ -209,9 +214,22 @@ const Generator = ({ next, prev }: IGeneratorProps) => {
                             </div>
                         </div>
                     </div>
+                    <div className="flex mt-7 text-md justify-center">
+                        <span>
+                            Selected <b>{selectedChildrenObj.length}</b> Children and{" "}
+                            <b>{selectedAssistantsObj.length}</b> Assistants
+                        </span>
+                    </div>
+
                     <div className="generator-controls flex items-center justify-between gap-3 mt-6">
-                        <button className="btn btn-soft btn-wide" onClick={prev}>previous step</button>
-                        <button className="btn btn-soft btn-wide btn-secondary" onClick={handleGenerate}>generate!
+                        <button className="btn btn-soft btn-wide" onClick={prev}>
+                            previous step
+                        </button>
+                        <button
+                            className="btn btn-soft btn-wide btn-secondary"
+                            onClick={handleGenerate}
+                        >
+                            generate!
                         </button>
                     </div>
                 </div>
