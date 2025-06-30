@@ -13,6 +13,7 @@ type PairInfo = {
     c_required_qualification: string
     c_street: string
     c_street_number: string
+    c_requested_hours: number
     c_city: string
     c_zip_code: string
 
@@ -21,6 +22,8 @@ type PairInfo = {
     a_family_name: string
     a_qualification: string
     a_has_car: boolean
+    a_min_capacity: string
+    a_max_capacity: string
     a_street: string
     a_street_number: string
     a_city: string
@@ -39,7 +42,7 @@ const PairOverview = () => {
     }
 
     const deletePair = async (id: number) => {
-        const response = await deleteRequest(`/api/pair_generator/pair/${id}`, {})
+        await deleteRequest(`/api/pair_generator/pair/${id}`, {})
         refreshPairs()
     }
 
@@ -159,6 +162,18 @@ const PairOverview = () => {
                                 </div>
 
                                 <div className="flex items-start gap-2">
+                                    <Icon icon="solar:clock-circle-outline" className="text-xl" />
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                                            REQUESTED HOURS
+                                        </p>
+                                        <p className="text-sm text-gray-700">
+                                            {pair.c_requested_hours}h
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-2">
                                     <Icon icon="solar:map-point-linear" className="text-xl" />
                                     <div>
                                         <p className="text-xs text-gray-500 uppercase tracking-wide">
@@ -204,6 +219,18 @@ const PairOverview = () => {
                                         </p>
                                         <p className="text-sm text-gray-700">
                                             {pair.a_qualification}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-2">
+                                    <Icon icon="solar:clock-circle-outline" className="text-xl" />
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                                            CAPACITY
+                                        </p>
+                                        <p className="text-sm text-gray-700">
+                                            {pair.a_min_capacity}h - {pair.a_max_capacity}h
                                         </p>
                                     </div>
                                 </div>
