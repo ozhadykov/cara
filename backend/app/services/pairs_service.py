@@ -57,17 +57,21 @@ class PairsService:
                     """
                     SELECT
                         p.id AS id,
+                        c.id AS c_id,
                         c.first_name AS c_first_name,
                         c.family_name AS c_family_name,
                         c.requested_hours AS c_requested_hours,
-                        cq.qualification_text AS c_required_qualification,
+                        cq.id AS c_required_qualification,
+                        cq.qualification_text AS c_required_qualification_text,
                         ca.street AS c_street,
                         ca.street_number AS c_street_number,
                         ca.city AS c_city,
                         ca.zip_code AS c_zip_code,
+                        a.id AS a_id,
                         a.first_name AS a_first_name,
                         a.family_name AS a_family_name,
-                        aq.qualification_text AS a_qualification,
+                        aq.id AS a_qualification,
+                        aq.qualification_text AS a_qualification_text,
                         a.has_car AS a_has_car,
                         a.min_capacity AS a_min_capacity,
                         a.max_capacity AS a_max_capacity,
@@ -162,7 +166,7 @@ class PairsService:
                             )
                             THEN TRUE
                             ELSE FALSE
-                    END AS already_assigned;
+                        END AS already_assigned
                     """, 
                     (assistant_id, child_id, assistant_id, child_id)
                 )
@@ -321,6 +325,7 @@ class PairsService:
 
     async def get_capacity(self, data: Pair):
         assistant_id = data.assistant_id
+        child_id = data.child_id
 
         with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute(
@@ -329,7 +334,8 @@ class PairsService:
                     SELECT 
                         a.id AS assistant_id,
                         a.max_capacity,
-                        COALESCE(SUM(c.requested_hours), 0) AS used_hours
+                        COALESCE(SUM(c.requested_hours), 0) AS used_hours,
+                        a.qualification
                     FROM 
                         assistants a
                         LEFT JOIN pairs p ON a.id = p.assistant_id
@@ -337,13 +343,21 @@ class PairsService:
                     WHERE 
                         a.id = %s
                     GROUP BY 
-                        a.id, a.max_capacity
+                        a.id, a.max_capacity, a.qualification
                 )
                 SELECT 
-                    used_hours,
-                    (max_capacity - used_hours) AS free_hours                   
+                    ad.used_hours,
+                    (ad.max_capacity - ad.used_hours) AS free_hours,
+                    CASE
+                        WHEN (
+                            (SELECT c.required_qualification FROM children c WHERE c.id = %s)
+                            <= ad.qualification
+                        )
+                        THEN TRUE
+                        ELSE FALSE
+                    END AS is_qualified
                 FROM 
-                    assistant_data;
-                """, (assistant_id)
+                    assistant_data ad;
+                """, (assistant_id, child_id)
             )
             return cursor.fetchone()
