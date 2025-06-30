@@ -188,7 +188,7 @@ const PairOverview = () => {
 
                                     <div className="flex flex-col">
                                         <span className="font-semibold text-lg">
-                                            {pair.c_first_name} {pair.c_family_name}
+                                            {pair.a_first_name} {pair.a_family_name}
                                         </span>
                                         <div className="badge bg-green-100 badge-md text-green-600">
                                             Assistant
