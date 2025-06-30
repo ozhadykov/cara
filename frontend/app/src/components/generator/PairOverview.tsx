@@ -76,7 +76,7 @@ const PairOverview = () => {
                 <div key={pair.id}>
                     <div className="flex flex-col rounded-2xl w-full shadow-md">
                         {/* Header Section */}
-                        <div className="bg-gradient-to-r bg-gray-100 px-6 py-4 border-b border-gray-200 rounded-t-2xl">
+                        <div className=" bg-gray-100 px-6 py-4 border-b border-gray-200 rounded-t-2xl">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-5">
                                     <div className="p-2 bg-white rounded-lg shadow-sm">

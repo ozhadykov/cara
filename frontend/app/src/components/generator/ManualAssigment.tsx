@@ -98,6 +98,19 @@ const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
         }
     })
 
+    const getProgressColor = (used: number, total: number) => {
+        const progress = (used / total) * 100
+
+        if (progress >= 100) {
+            return "progress-error"
+        }
+        if (progress > 50) {
+            return "progress-warning"
+        }
+
+        return "progress-success"
+    }
+
     const createCustomPair = async () => {
         if (selectedAssistant && selectedChild) {
             const data = {
@@ -128,6 +141,16 @@ const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
         }
 
         sendMessage("Please select child and assistant", toastTypes.warning)
+    }
+
+    const styles = {
+        success: "bg-green-50 text-green-700 border-green-200",
+        error: "bg-red-50 text-red-700 border-red-200",
+    }
+
+    const icons = {
+        success: "solar:clock-circle-outline",
+        error: "solar:close-circle-line-duotone",
     }
 
     return (
@@ -176,80 +199,168 @@ const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
                 </div>
             </div>
             {selectedChild && selectedAssistant && (
-                <div className="flex justify-center w-full">
-                    <div className="max-w-md w-full">
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                    <span className="font-medium text-gray-700">Used Capacity</span>
-                                </div>
-                                <span
-                                    className={`font-semibold ${
-                                        hasCapacity ? "text-green-600" : "text-red-600"
+                <div className="flex flex-col rounded-2xl w-1/2 self-center shadow-md">
+                    <div
+                        className={`flex justify-between items-center  ${
+                            isQualified && hasCapacity
+                                ? "bg-gradient-to-r from-green-50 to-emerald-50"
+                                : "bg-gradient-to-r from-red-50 to-orange-50'}"
+                        } px-6 py-4 rounded-t-2xl p-5`}
+                    >
+                        <div className="flex flex-col">
+                            <div className="flex items-center gap-4">
+                                <div
+                                    className={`p-2 rounded-full ${
+                                        isQualified && hasCapacity
+                                            ? "bg-green-100 text-success"
+                                            : "bg-red-100 text-error"
                                     }`}
                                 >
-                                    {usedHoursText}
-                                </span>
-                            </div>
-
-                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                    <span className="font-medium text-gray-700">Free Capacity</span>
+                                    <Icon
+                                        icon={
+                                            isQualified && hasCapacity ? icons.success : icons.error
+                                        }
+                                        className="text-3xl"
+                                    />
                                 </div>
-                                <span
-                                    className={`font-semibold ${
-                                        hasCapacity ? "text-green-600" : "text-red-600"
-                                    }`}
-                                >
-                                    {freeHoursText}
-                                </span>
-                            </div>
 
-                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                    <span className="font-medium text-gray-700">
-                                        Required Capacity
+                                <div className="flex flex-col">
+                                    <span className="font-bold text-lg">
+                                        {isQualified && hasCapacity
+                                            ? "Compatible Match"
+                                            : "Incompatible Match"}
+                                    </span>
+                                    <span className="text-gray-500 text-sm">
+                                        {isQualified && hasCapacity
+                                            ? "This pairing meets all requirements"
+                                            : "This pairing has compatibility issues"}
                                     </span>
                                 </div>
-                                <span
-                                    className={`font-semibold ${
-                                        hasCapacity ? "text-green-600" : "text-red-600"
-                                    }`}
-                                >
-                                    {selectedChild.requested_hours}
+                            </div>
+                        </div>
+
+                        {hasCapacity && isQualified ? (
+                            <button
+                                className={`btn btn-wide btn-primary`}
+                                onClick={createCustomPair}
+                            >
+                                Create Pair
+                            </button>
+                        ) : (
+                            <div></div>
+                        )}
+                    </div>
+                    <div className="flex flex-col flex-grow gap-2 items-stretch p-5">
+                        <div className="flex gap-2 items-center">
+                            <Icon icon="solar:clock-circle-outline" className="text-xl" />
+                            <span className="font-semibold">Capacity</span>
+                        </div>
+                        <div className="bg-gray-100 w-full p-5 rounded-2xl flex flex-col">
+                            <div className="flex justify-between">
+                                <span className="text-gray-500 text-sm mb-2">
+                                    Assistant Availability
+                                </span>
+                                <span className={`${hasCapacity ? "" : "text-red-600"}`}>
+                                    {usedHoursText}/{selectedAssistant.max_capacity}
                                 </span>
                             </div>
 
-                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                                    <span className="font-medium text-gray-700">Qualification</span>
+                            <progress
+                                className={`progress ${getProgressColor(
+                                    parseInt(usedHoursText),
+                                    selectedAssistant.max_capacity
+                                )} w-full`}
+                                value={
+                                    (parseInt(usedHoursText) / selectedAssistant.max_capacity) * 100
+                                }
+                                max="100"
+                            ></progress>
+                            <div className="flex gap-10 mt-5">
+                                <div className="bg-white rounded-2xl p-5 flex flex-col flex-1 items-center border-gray-200">
+                                    <span className={`font-bold text-xl`}>{freeHoursText}</span>
+                                    <span className="text-gray-500">Hours Available</span>
                                 </div>
-                                <span
-                                    className={`font-semibold ${
-                                        isQualified ? "text-green-600" : "text-red-600"
-                                    }`}
-                                >
-                                    {selectedChild.required_qualification_text}{" "}
-                                    {isQualified ? "≤" : ">"} {selectedAssistant.qualification_text}
+                                <div className="bg-white rounded-2xl p-5 flex flex-col flex-1 items-center border-gray-200">
+                                    <span
+                                        className={`font-bold text-xl ${
+                                            hasCapacity ? "" : "text-error"
+                                        }`}
+                                    >
+                                        {selectedChild.requested_hours}
+                                    </span>
+                                    <span className="text-gray-500">Hours Needed</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col flex-grow gap-2 items-stretch p-5">
+                        <div className="flex gap-2 items-center">
+                            {" "}
+                            <Icon icon="solar:book-outline" className="text-xl" />
+                            <span className="font-semibold">Qualification</span>
+                        </div>
+                        <div className="bg-gray-100 w-full p-5 rounded-2xl flex flex-col">
+                            <div className="flex justify-between items-center">
+                                <div className="flex gap-4 items-center">
+                                    <div className="p-2 bg-blue-100 rounded-lg">
+                                        <Icon
+                                            icon="solar:people-nearby-line-duotone"
+                                            className="text-3xl text-blue-600"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        {" "}
+                                        <span className="font-bold">Child Requirement</span>
+                                        <span>{selectedChild.required_qualification_text}</span>
+                                        <span className=" text-gray-500 text-sm">
+                                            Level {selectedChild.required_qualification}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2 text-gray-500">
+                                    <div className="h-px bg-gray-400 w-8"></div>
+                                    <span className="text-md font-medium">VS</span>
+                                    <div className="h-px bg-gray-400 w-8"></div>
+                                </div>
+
+                                <div className="flex gap-4 items-center">
+                                    <div className="flex flex-col">
+                                        {" "}
+                                        <span className="font-bold">Assistant Level</span>
+                                        <span className="text-right">
+                                            {selectedAssistant.qualification_text}
+                                        </span>
+                                        <span className="text-right text-gray-500 text-sm">
+                                            Level {selectedAssistant.qualification}
+                                        </span>
+                                    </div>
+                                    <div className="p-2 bg-green-100 rounded-lg">
+                                        <Icon
+                                            icon="solar:users-group-rounded-line-duotone"
+                                            className="text-3xl text-green-600"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                className={`rounded-xl mt-4 p-2 text-sm border-1 flex gap-2 items-center ${
+                                    isQualified ? styles.success : styles.error
+                                }`}
+                            >
+                                <Icon
+                                    icon={isQualified ? icons.success : icons.error}
+                                    className="text-lg"
+                                />
+                                <span className="font-semibold">
+                                    {isQualified ? "Qualification Met" : "Qualification Gap"}
                                 </span>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
-
-            <div className="weights-setting-footer mt-8 flex justify-end">
-                <button
-                    className={`btn btn-wide btn-${hasCapacity ? "primary" : "disabled"}`}
-                    onClick={createCustomPair}
-                >
-                    Create Pair
-                </button>
-            </div>
         </div>
     )
 }
