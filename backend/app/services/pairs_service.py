@@ -52,13 +52,6 @@ class PairsService:
 
     async def get_all_pairs(self):
         try:
-            # get all children
-            children = await self.children_service.get_all_children()
-
-            # get all assistants
-            assistants = await self.assistants_service.get_all_assistants()
-
-            # get all pairs
             with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
                 cursor.execute(
                     """
@@ -66,14 +59,14 @@ class PairsService:
                         p.id AS id,
                         c.first_name AS c_first_name,
                         c.family_name AS c_family_name,
-                        c.required_qualification AS c_required_qualification,
+                        cq.qualification_text AS c_required_qualification,
                         ca.street AS c_street,
                         ca.street_number AS c_street_number,
                         ca.city AS c_city,
                         ca.zip_code AS c_zip_code,
                         a.first_name AS a_first_name,
                         a.family_name AS a_family_name,
-                        a.qualification AS a_qualification,
+                        aq.qualification_text AS a_qualification,
                         a.has_car AS a_has_car,
                         aa.street AS a_street,
                         aa.street_number AS a_street_number,
@@ -85,6 +78,8 @@ class PairsService:
                         JOIN assistants a ON a.id = p.assistant_id
                         JOIN address ca ON ca.id = c.address_id
                         JOIN address aa ON aa.id = a.address_id    
+                        JOIN qualifications cq ON cq.id = c.required_qualification
+                        JOIN qualifications aq ON aq.id = a.qualification
                     """
                 )
                 pairs = cursor.fetchall()

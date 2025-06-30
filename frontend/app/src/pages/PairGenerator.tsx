@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react"
+import React, { useEffect, useState, useMemo, useRef } from "react"
 import { Icon } from "@iconify/react"
 import { Assistant, Child } from "../lib/models.ts"
 import { useLoading, useToast } from "../contexts"

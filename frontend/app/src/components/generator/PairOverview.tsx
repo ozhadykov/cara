@@ -88,91 +88,153 @@ const PairOverview = () => {
     if (!pairs) return <></>
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8 flex flex-col w-full">
             {pairs.map((pair) => (
-                <div
-                    className="flex flex-col justify-between gap-6 bg-gray-200 rounded-xl shadow p-6"
-                    key={pair.id}
-                >
-                    <button
-                        className="btn btn-error flex self-end"
-                        onClick={() => deletePair(pair.id)}
-                    >
-                        Delete
-                    </button>
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                        {/* Child Section */}
-                        <div className="flex-1">
-                            <table className="w-full text-left">
-                                <thead>
-                                    <tr>
-                                        <th colSpan={2} className="text-lg font-bold pb-2">
-                                            Child
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="text-sm">
-                                    {Object.entries(columns.childrenBase).map(([key, value]) => (
-                                        <tr key={key}>
-                                            <td className="font-medium pr-4">{value}:</td>
-                                            <td>{String(pair[key as keyof PairInfo])}</td>
-                                        </tr>
-                                    ))}
-                                    <tr>
-                                        <td className="pt-4 pb-1 font-bold" colSpan={2}>
-                                            Address
-                                        </td>
-                                    </tr>
-                                    {Object.entries(columns.childrenAddress).map(([key, value]) => (
-                                        <tr key={key}>
-                                            <td className="font-medium pr-4">{value}:</td>
-                                            <td>{String(pair[key as keyof PairInfo])}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                <div key={pair.id}>
+                    <div className="flex flex-col rounded-2xl w-full shadow-md">
+                        {/* Header Section */}
+                        <div className="bg-gradient-to-r bg-gray-100 px-6 py-4 border-b border-gray-200 rounded-t-2xl">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-5">
+                                    <div className="p-2 bg-white rounded-lg shadow-sm">
+                                        <Icon
+                                            icon="solar:transfer-horizontal-line-duotone"
+                                            className="text-2xl"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <h2 className="font-semibold text-gray-900">
+                                            Pair #{pair.id}
+                                        </h2>
+                                        <p className="text-sm text-gray-600">
+                                            {pair.c_first_name} ↔ {pair.a_first_name}
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => deletePair(pair.id)}
+                                    className="flex items-center gap-2 px-4 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors font-medium text-sm cursor-pointer"
+                                >
+                                    <Icon
+                                        icon="solar:trash-bin-trash-outline"
+                                        className="text-lg"
+                                    />
+                                    Remove Pair
+                                </button>
+                            </div>
                         </div>
 
-                        {/* Icon in the middle */}
-                        <div className="hidden md:flex items-center justify-center text-gray-500">
-                            <Icon
-                                icon="solar:transfer-horizontal-line-duotone"
-                                className="text-4xl"
-                            />
+                        {/* Child Section */}
+                        <div className="flex flex-col p-5 gap-7">
+                            <div className="rounded-2xl border-2 border-blue-200 p-5 gap-5 flex flex-col">
+                                <div className="flex gap-5 items-center">
+                                    <div className={`p-2 rounded-full bg-blue-100`}>
+                                        <Icon
+                                            icon="solar:people-nearby-line-duotone"
+                                            className="text-3xl text-blue-600"
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col">
+                                        <span className="font-semibold text-lg">
+                                            {pair.c_first_name} {pair.c_family_name}
+                                        </span>
+                                        <div className="badge bg-blue-100 badge-md text-blue-600">
+                                            Child
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-2">
+                                    <Icon icon="solar:book-outline" className="text-xl" />
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                                            REQUIRED QUALIFICATION
+                                        </p>
+                                        <p className="text-sm text-gray-700">
+                                            {pair.c_required_qualification}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-2">
+                                    <Icon icon="solar:map-point-linear" className="text-xl" />
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                                            Facility
+                                        </p>
+                                        <p className="text-sm text-gray-700">
+                                            {pair.c_street_number} {pair.c_street}
+                                        </p>
+                                        <p className="text-sm text-gray-700">
+                                            {pair.c_city}, {pair.c_zip_code}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Assistant Section */}
-                        <div className="flex-1">
-                            <table className="w-full text-left">
-                                <thead>
-                                    <tr>
-                                        <th colSpan={2} className="text-lg font-bold pb-2">
+                        <div className="flex flex-col p-5 gap-7">
+                            <div className="rounded-2xl border-1 border-green-200 p-5 gap-5 flex flex-col">
+                                <div className="flex gap-5 items-center">
+                                    <div className={`p-2 rounded-full bg-green-100`}>
+                                        <Icon
+                                            icon="solar:users-group-rounded-line-duotone"
+                                            className="text-3xl text-green-600"
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col">
+                                        <span className="font-semibold text-lg">
+                                            {pair.c_first_name} {pair.c_family_name}
+                                        </span>
+                                        <div className="badge bg-green-100 badge-md text-green-600">
                                             Assistant
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="text-sm">
-                                    {Object.entries(columns.assistantsBase).map(([key, value]) => (
-                                        <tr key={key}>
-                                            <td className="font-medium pr-4">{value}:</td>
-                                            <td>{String(pair[key as keyof PairInfo])}</td>
-                                        </tr>
-                                    ))}
-                                    <tr>
-                                        <td className="pt-4 pb-1 font-bold" colSpan={2}>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-2">
+                                    <Icon icon="solar:book-outline" className="text-xl" />
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                                            QUALIFICATION
+                                        </p>
+                                        <p className="text-sm text-gray-700">
+                                            {pair.a_qualification}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-2">
+                                    <Icon icon="solar:map-point-linear" className="text-xl" />
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">
                                             Address
-                                        </td>
-                                    </tr>
-                                    {Object.entries(columns.assistantsAddress).map(
-                                        ([key, value]) => (
-                                            <tr key={key}>
-                                                <td className="font-medium pr-4">{value}:</td>
-                                                <td>{String(pair[key as keyof PairInfo])}</td>
-                                            </tr>
-                                        )
-                                    )}
-                                </tbody>
-                            </table>
+                                        </p>
+                                        <p className="text-sm text-gray-700">
+                                            {pair.a_street_number} {pair.a_street}
+                                        </p>
+                                        <p className="text-sm text-gray-700">
+                                            {pair.a_city}, {pair.a_zip_code}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-2">
+                                    <Icon icon="solar:wheel-outline" className="text-xl" />
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                                            Has a Car?
+                                        </p>
+                                        <p className="text-sm text-gray-700">
+                                            {pair.a_has_car ? "Yes" : "No"}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
