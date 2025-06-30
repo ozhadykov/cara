@@ -3,14 +3,18 @@ import { useLoading, useToast } from "../../contexts"
 import { useEffect, useState } from "react"
 import { Icon } from "@iconify/react/dist/iconify.js"
 import { deleteRequest } from "../../lib/request"
+import ChildBox from "./ChildBox"
+import AssistantBox from "./AssistantBox"
 
 type PairInfo = {
     id: number
 
     // Child info
+    c_id: number
     c_first_name: string
     c_family_name: string
-    c_required_qualification: string
+    c_required_qualification: number
+    c_required_qualification_text: string
     c_street: string
     c_street_number: string
     c_requested_hours: number
@@ -18,12 +22,14 @@ type PairInfo = {
     c_zip_code: string
 
     // Assistant info
+    a_id: number
     a_first_name: string
     a_family_name: string
-    a_qualification: string
+    a_qualification: number
+    a_qualification_text: string
     a_has_car: boolean
-    a_min_capacity: string
-    a_max_capacity: string
+    a_min_capacity: number
+    a_max_capacity: number
     a_street: string
     a_street_number: string
     a_city: string
@@ -61,32 +67,6 @@ const PairOverview = () => {
 
         fetchData()
     }, [])
-
-    const columns = {
-        childrenBase: {
-            c_first_name: "First Name",
-            c_family_name: "Family Name",
-            c_required_qualification: "Required Qualification",
-        },
-        childrenAddress: {
-            c_street: "Street",
-            c_street_number: "Street No.",
-            c_city: "City",
-            c_zip_code: "Zip-Code",
-        },
-        assistantsBase: {
-            a_first_name: "First Name",
-            a_family_name: "Family Name",
-            a_qualification: "Qualification",
-            a_has_car: "Has Car?",
-        },
-        assistantsAddress: {
-            a_street: "Street",
-            a_street_number: "Street No.",
-            a_city: "City",
-            a_zip_code: "Zip-Code",
-        },
-    }
 
     if (!pairs) return <></>
 
@@ -128,140 +108,47 @@ const PairOverview = () => {
                             </div>
                         </div>
 
-                        {/* Child Section */}
-                        <div className="flex flex-col p-5 gap-7">
-                            <div className="rounded-2xl border-2 border-blue-200 p-5 gap-5 flex flex-col">
-                                <div className="flex gap-5 items-center">
-                                    <div className={`p-2 rounded-full bg-blue-100`}>
-                                        <Icon
-                                            icon="solar:people-nearby-line-duotone"
-                                            className="text-3xl text-blue-600"
-                                        />
-                                    </div>
+                        <div className="flex flex-grow gap-2 items-stretch">
+                            {/* Child Section */}
+                            <ChildBox
+                                child={{
+                                    id: pair.c_id,
+                                    first_name: pair.c_first_name,
+                                    family_name: pair.c_family_name,
+                                    required_qualification: pair.c_required_qualification,
+                                    required_qualification_text: pair.c_required_qualification_text,
+                                    requested_hours: pair.c_requested_hours,
+                                    street: pair.c_street,
+                                    street_number: pair.c_street_number,
+                                    city: pair.c_city,
+                                    zip_code: pair.c_zip_code,
+                                }}
+                            />
 
-                                    <div className="flex flex-col">
-                                        <span className="font-semibold text-lg">
-                                            {pair.c_first_name} {pair.c_family_name}
-                                        </span>
-                                        <div className="badge bg-blue-100 badge-md text-blue-600">
-                                            Child
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start gap-2">
-                                    <Icon icon="solar:book-outline" className="text-xl" />
-                                    <div>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">
-                                            REQUIRED QUALIFICATION
-                                        </p>
-                                        <p className="text-sm text-gray-700">
-                                            {pair.c_required_qualification}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start gap-2">
-                                    <Icon icon="solar:clock-circle-outline" className="text-xl" />
-                                    <div>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">
-                                            REQUESTED HOURS
-                                        </p>
-                                        <p className="text-sm text-gray-700">
-                                            {pair.c_requested_hours}h
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start gap-2">
-                                    <Icon icon="solar:map-point-linear" className="text-xl" />
-                                    <div>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">
-                                            Facility
-                                        </p>
-                                        <p className="text-sm text-gray-700">
-                                            {pair.c_street_number} {pair.c_street}
-                                        </p>
-                                        <p className="text-sm text-gray-700">
-                                            {pair.c_city}, {pair.c_zip_code}
-                                        </p>
-                                    </div>
-                                </div>
+                            <div className="flex items-center justify-center px-2">
+                                <Icon
+                                    icon="solar:transfer-horizontal-bold-duotone"
+                                    className="text-5xl text-gray-500"
+                                />
                             </div>
-                        </div>
 
-                        {/* Assistant Section */}
-                        <div className="flex flex-col p-5 gap-7">
-                            <div className="rounded-2xl border-1 border-green-200 p-5 gap-5 flex flex-col">
-                                <div className="flex gap-5 items-center">
-                                    <div className={`p-2 rounded-full bg-green-100`}>
-                                        <Icon
-                                            icon="solar:users-group-rounded-line-duotone"
-                                            className="text-3xl text-green-600"
-                                        />
-                                    </div>
-
-                                    <div className="flex flex-col">
-                                        <span className="font-semibold text-lg">
-                                            {pair.a_first_name} {pair.a_family_name}
-                                        </span>
-                                        <div className="badge bg-green-100 badge-md text-green-600">
-                                            Assistant
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start gap-2">
-                                    <Icon icon="solar:book-outline" className="text-xl" />
-                                    <div>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">
-                                            QUALIFICATION
-                                        </p>
-                                        <p className="text-sm text-gray-700">
-                                            {pair.a_qualification}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start gap-2">
-                                    <Icon icon="solar:clock-circle-outline" className="text-xl" />
-                                    <div>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">
-                                            CAPACITY
-                                        </p>
-                                        <p className="text-sm text-gray-700">
-                                            {pair.a_min_capacity}h - {pair.a_max_capacity}h
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start gap-2">
-                                    <Icon icon="solar:map-point-linear" className="text-xl" />
-                                    <div>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">
-                                            Address
-                                        </p>
-                                        <p className="text-sm text-gray-700">
-                                            {pair.a_street_number} {pair.a_street}
-                                        </p>
-                                        <p className="text-sm text-gray-700">
-                                            {pair.a_city}, {pair.a_zip_code}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start gap-2">
-                                    <Icon icon="solar:wheel-outline" className="text-xl" />
-                                    <div>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">
-                                            Has a Car?
-                                        </p>
-                                        <p className="text-sm text-gray-700">
-                                            {pair.a_has_car ? "Yes" : "No"}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
+                            {/* Assistant Section */}
+                            <AssistantBox
+                                assistant={{
+                                    id: pair.a_id,
+                                    first_name: pair.a_first_name,
+                                    family_name: pair.a_family_name,
+                                    qualification: pair.a_qualification,
+                                    qualification_text: pair.a_qualification_text,
+                                    min_capacity: pair.a_min_capacity,
+                                    max_capacity: pair.a_max_capacity,
+                                    has_car: pair.a_has_car,
+                                    street: pair.a_street,
+                                    street_number: pair.a_street_number,
+                                    city: pair.a_city,
+                                    zip_code: pair.a_zip_code,
+                                }}
+                            />
                         </div>
                     </div>
                 </div>

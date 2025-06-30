@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import Select from "react-select"
 import { toastTypes } from "../../lib/constants.ts"
 import { useLoading, useToast } from "../../contexts"
 import { Assistant, Child } from "../../lib/models.ts"
-import { CompareBox } from "../index.tsx"
 import { postRequest } from "../../lib/request.ts"
+import AssistantBox from "./AssistantBox.tsx"
+import ChildBox from "./ChildBox.tsx"
 
 interface ManualAssigmentProps {
     children: Child[]
@@ -61,7 +62,6 @@ const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
             toggleLoading
         )
 
-        console.log(response)
         setFreeHoursText(response.free_hours)
         setUsedHoursText(response.used_hours)
 
@@ -115,8 +115,8 @@ const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
 
     return (
         <div className="manual-assigment-container flex flex-col gap-8">
-            <div className="select-container flex gap-8">
-                <div className="child-select-container w-1/2">
+            <div className="select-container flex gap-8 items-stretch">
+                <div className="child-select-container w-1/2 flex flex-col">
                     <label htmlFor="children-select" className="mb-3 block">
                         Choose child
                     </label>
@@ -127,14 +127,18 @@ const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
                         value={selectedChildForSelect}
                     />
                     {selectedChild && (
-                        <div className="child-compare-box mt-6">
+                        <div className="child-compare-box mt-6 flex-1 flex flex-col">
                             <div className="divider">Child info</div>
-                            <CompareBox comparable={selectedChild} />
+                            <div className="flex-1 flex flex-col h-full">
+                                <ChildBox child={selectedChild} />
+                            </div>
                         </div>
                     )}
                 </div>
+
                 <div className="divider lg:divider-horizontal"></div>
-                <div className="assistant-select-container w-1/2">
+
+                <div className="assistant-select-container w-1/2 flex flex-col">
                     <label htmlFor="assistant-select" className="mb-3 block">
                         Choose assistant
                     </label>
@@ -144,14 +148,14 @@ const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
                         onChange={handleAssistantSelectChange}
                         value={selectedAssistantForSelect}
                     />
-                    <div className="assistant-compare-box">
-                        {selectedAssistant && (
-                            <div className="assistant-compare-box mt-6">
-                                <div className="divider">Assistant info</div>
-                                <CompareBox comparable={selectedAssistant} />
+                    {selectedAssistant && (
+                        <div className="assistant-compare-box mt-6 flex-1 flex flex-col">
+                            <div className="divider">Assistant info</div>
+                            <div className="flex-1 flex flex-col h-full">
+                                <AssistantBox assistant={selectedAssistant} />
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
             </div>
 

@@ -60,14 +60,16 @@ class PairsService:
                         c.first_name AS c_first_name,
                         c.family_name AS c_family_name,
                         c.requested_hours AS c_requested_hours,
-                        cq.qualification_text AS c_required_qualification,
+                        cq.id AS c_required_qualification,
+                        cq.qualification_text AS c_required_qualification_text,
                         ca.street AS c_street,
                         ca.street_number AS c_street_number,
                         ca.city AS c_city,
                         ca.zip_code AS c_zip_code,
                         a.first_name AS a_first_name,
                         a.family_name AS a_family_name,
-                        aq.qualification_text AS a_qualification,
+                        aq.id AS a_qualification,
+                        aq.qualification_text AS a_qualification_text,
                         a.has_car AS a_has_car,
                         a.min_capacity AS a_min_capacity,
                         a.max_capacity AS a_max_capacity,
@@ -162,9 +164,17 @@ class PairsService:
                             )
                             THEN TRUE
                             ELSE FALSE
-                    END AS already_assigned;
+                        END AS already_assigned,
+                        CASE
+                            WHEN 
+                                SELECT required_qualification FROM children c WHERE c.id = %s
+                                <=
+                                SELECT qualification FROM assistants a WHERE a.id = %s
+                            THEN TRUE
+                            ELSE FALSE
+                        END AS is_qualified;
                     """, 
-                    (assistant_id, child_id, assistant_id, child_id)
+                    (assistant_id, child_id, assistant_id, child_id, child_id, assistant_id)
                 )
 
                 result = cursor.fetchone()

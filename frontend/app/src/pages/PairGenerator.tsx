@@ -23,6 +23,7 @@ const PairGenerator = () => {
                 const response = await fetch(url)
                 const responseData = await response.json()
                 setChildren(responseData.data.children)
+                console.log(responseData.data.children)
                 setAssistants(responseData.data.assistants)
                 setPairs(responseData.data.pairs)
                 toggleLoading(false)
@@ -84,6 +85,22 @@ const PairGenerator = () => {
                 <div className="generator-body card shadow-md">
                     <div className="tab-container shadow-md">
                         <div className="tabs tabs-lift">
+                            {/* Overview Tab */}
+                            <label className="tab">
+                                <input type="radio" name="my_tabs_4" defaultChecked />
+                                <Icon icon="solar:eye-linear" className="mr-1" />
+                                Overview
+                            </label>
+                            <div className="tab-content bg-base-100 border-base-300 p-6">
+                                <TabCard
+                                    title="Overview"
+                                    description="Here you can view and delete pairs"
+                                >
+                                    <PairOverview />
+                                </TabCard>
+                            </div>
+
+                            {/* Auto-Generate Tab */}
                             <label className="tab">
                                 <input type="radio" name="my_tabs_4" />
                                 <Icon icon="solar:user-check-line-duotone" />
@@ -134,6 +151,8 @@ const PairGenerator = () => {
                                     </div>
                                 </TabCard>
                             </div>
+
+                            {/* Manual Assignment Tab */}
                             <label className="tab">
                                 <input type="radio" name="my_tabs_4" />
                                 <Icon icon="solar:hand-shake-outline" className="mr-1" />
@@ -145,20 +164,6 @@ const PairGenerator = () => {
                                     description="Here you can manually create pair"
                                 >
                                     <ManualAssigment children={children} assistants={assistants} />
-                                </TabCard>
-                            </div>
-
-                            <label className="tab">
-                                <input type="radio" name="my_tabs_4" defaultChecked />
-                                <Icon icon="solar:hand-shake-outline" className="mr-1" />
-                                Overview
-                            </label>
-                            <div className="tab-content bg-base-100 border-base-300 p-6">
-                                <TabCard
-                                    title="Overview"
-                                    description="Here you can view and delete pairs"
-                                >
-                                    <PairOverview />
                                 </TabCard>
                             </div>
                         </div>
