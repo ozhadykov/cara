@@ -6,6 +6,7 @@ import { Assistant, Child } from "../../lib/models.ts"
 import { postRequest } from "../../lib/request.ts"
 import AssistantBox from "./AssistantBox.tsx"
 import ChildBox from "./ChildBox.tsx"
+import { Icon } from "@iconify/react/dist/iconify.js"
 
 interface ManualAssigmentProps {
     children: Child[]
@@ -17,17 +18,27 @@ interface SelectOption {
     label: string
 }
 
+interface CompatibilityResponse {
+    free_hours: number
+    used_hours: number
+    is_qualified: boolean
+}
+
 const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
     const { sendMessage } = useToast()
     const { toggleLoading } = useLoading()
     const [selectedChild, setSelectedChild] = useState<Child | null>(null)
     const [selectedAssistant, setSelectedAssistant] = useState<Assistant | null>(null)
     const [selectedChildForSelect, setSelectedChildForSelect] = useState<SelectOption | null>(null)
+
     const [usedHoursText, setUsedHoursText] = useState<string>("")
     const [freeHoursText, setFreeHoursText] = useState<string>("")
+
+    const [isQualified, setIsQualified] = useState<boolean>(false)
+    const [hasCapacity, setHasCapacity] = useState<boolean>(false)
+
     const [selectedAssistantForSelect, setSelectedAssistantForSelect] =
         useState<SelectOption | null>(null)
-    const [hasCapacity, setHasCapacity] = useState<boolean>(false)
 
     // todo: 1. get all children, get all assistants, create pair
 
@@ -55,17 +66,22 @@ const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
 
     const handleAllSelected = async (child: Child, assistant: Assistant) => {
         const data = { child_id: child.id, assistant_id: assistant.id }
-        const response = await postRequest(
+        const response: CompatibilityResponse = await postRequest(
             "/api/pair_generator/capacity",
             data,
             sendMessage,
             toggleLoading
         )
 
-        setFreeHoursText(response.free_hours)
-        setUsedHoursText(response.used_hours)
+        setFreeHoursText(response.free_hours.toString())
+        setUsedHoursText(response.used_hours.toString())
+        setIsQualified(response.is_qualified)
+        console.log(response)
 
-        setHasCapacity(response.used_hours + child.requested_hours <= response.free_hours)
+        setHasCapacity(
+            response.used_hours + child.requested_hours <= response.free_hours &&
+                response.is_qualified
+        )
     }
 
     const childrenOptions = children.map((child) => {
@@ -105,6 +121,7 @@ const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
                 setFreeHoursText("")
                 setUsedHoursText("")
                 setHasCapacity(false)
+                setIsQualified(false)
             }
 
             return
@@ -158,27 +175,71 @@ const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
                     )}
                 </div>
             </div>
-
-            {selectedChild && selectedAssistant ? (
+            {selectedChild && selectedAssistant && (
                 <div className="flex justify-center w-full">
-                    <table className={`text-${hasCapacity ? "success" : "error"}`}>
-                        <tbody>
-                            <tr>
-                                <td className="pr-2 font-semibold">Used Hours:</td>
-                                <td>
-                                    {usedHoursText} + {selectedChild.requested_hours} ={" "}
-                                    {usedHoursText + selectedChild.requested_hours}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td className="pr-2 font-semibold">Available Hours:</td>
-                                <td>{freeHoursText}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div className="max-w-md w-full">
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                    <span className="font-medium text-gray-700">Used Capacity</span>
+                                </div>
+                                <span
+                                    className={`font-semibold ${
+                                        hasCapacity ? "text-green-600" : "text-red-600"
+                                    }`}
+                                >
+                                    {usedHoursText}
+                                </span>
+                            </div>
+
+                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <span className="font-medium text-gray-700">Free Capacity</span>
+                                </div>
+                                <span
+                                    className={`font-semibold ${
+                                        hasCapacity ? "text-green-600" : "text-red-600"
+                                    }`}
+                                >
+                                    {freeHoursText}
+                                </span>
+                            </div>
+
+                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <span className="font-medium text-gray-700">
+                                        Required Capacity
+                                    </span>
+                                </div>
+                                <span
+                                    className={`font-semibold ${
+                                        hasCapacity ? "text-green-600" : "text-red-600"
+                                    }`}
+                                >
+                                    {selectedChild.requested_hours}
+                                </span>
+                            </div>
+
+                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                                    <span className="font-medium text-gray-700">Qualification</span>
+                                </div>
+                                <span
+                                    className={`font-semibold ${
+                                        isQualified ? "text-green-600" : "text-red-600"
+                                    }`}
+                                >
+                                    {selectedChild.required_qualification_text}{" "}
+                                    {isQualified ? "≤" : ">"} {selectedAssistant.qualification_text}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            ) : (
-                <span></span>
             )}
 
             <div className="weights-setting-footer mt-8 flex justify-end">

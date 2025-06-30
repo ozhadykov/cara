@@ -21,7 +21,9 @@ const ChildBox = ({ child }: ChildBoxProps) => {
                         <span className="font-semibold text-lg">
                             {child.first_name} {child.family_name}
                         </span>
-                        <div className="badge bg-blue-100 badge-md text-blue-600">Child</div>
+                        <div className="badge bg-blue-100 badge-md text-blue-600">
+                            Child #{child.id}
+                        </div>
                     </div>
                 </div>
 

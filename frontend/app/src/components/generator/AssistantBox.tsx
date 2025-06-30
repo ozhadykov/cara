@@ -8,7 +8,7 @@ type AssistantBoxProps = {
 const AssistantBox = ({ assistant }: AssistantBoxProps) => {
     return (
         <div className="flex-1 flex flex-col p-5">
-            <div className="rounded-2xl border-1 h-full border-green-200 p-5 gap-5 flex flex-col">
+            <div className="rounded-2xl border-2 h-full border-green-200 p-5 gap-5 flex flex-col">
                 <div className="flex gap-5 items-center">
                     <div className={`p-2 rounded-full bg-green-100`}>
                         <Icon
@@ -21,7 +21,9 @@ const AssistantBox = ({ assistant }: AssistantBoxProps) => {
                         <span className="font-semibold text-lg">
                             {assistant.first_name} {assistant.family_name}
                         </span>
-                        <div className="badge bg-green-100 badge-md text-green-600">Assistant</div>
+                        <div className="badge bg-green-100 badge-md text-green-600">
+                            Assistant #{assistant.id}
+                        </div>
                     </div>
                 </div>
 

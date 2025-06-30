@@ -98,8 +98,8 @@ const AssistantSingleImport = ({ refresh }: { refresh: boolean }) => {
                                 <td className="font-bold">{assistant.id}</td>
                                 <td>{assistant.first_name}</td>
                                 <td>{assistant.family_name}</td>
-                                <td>{assistant.qualification}</td>
-                                <td>{assistant.has_car}</td>
+                                <td>{assistant.qualification_text}</td>
+                                <td>{assistant.has_car ? "Yes" : "No"}</td>
                                 <td>{assistant.street}</td>
                                 <td>{assistant.street_number}</td>
                                 <td>{assistant.zip_code}</td>
