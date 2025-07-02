@@ -39,7 +39,12 @@ const AssistantEdit = () => {
 
         try {
             // todo: check if data changed
-            const response = await postRequest(`/api/assistants/${selectedData.id}`, formData, sendMessage, toggleLoading)
+            const response = await postRequest(
+                `/api/assistants/${selectedData.id}`,
+                formData,
+                sendMessage,
+                toggleLoading
+            )
             if (response)
                 sendMessage(
                     response.message,
@@ -64,8 +69,7 @@ const AssistantEdit = () => {
                 formData={formData}
                 formName="edit_record_assistant"
             />
-            <div
-                className="flex justify-end gap-6 border-t-1 border-gray-200 p-7 shadow-md shadow-black/5 -translate-y-1">
+            <div className="flex justify-end gap-6 border-t-1 border-gray-200 p-7 shadow-md shadow-black/5 -translate-y-1">
                 <button className="btn btn-ghost px-9" onClick={toggle}>
                     Cancel
                 </button>

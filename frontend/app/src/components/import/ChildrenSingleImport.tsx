@@ -20,8 +20,7 @@ const ChildrenSingleImport = ({ refresh }: { refresh: boolean }) => {
             setCheckedItems([])
             setIsCheckAll(false)
             await refreshChildren()
-        } catch (error) {
-        }
+        } catch (error) {}
     }
 
     const handleSelectAll = (e: any) => {
@@ -56,64 +55,63 @@ const ChildrenSingleImport = ({ refresh }: { refresh: boolean }) => {
                 </button>
             </div>
             <div className="overflow-x-scroll rounded-box border border-base-content/5 bg-base-100">
-
                 <table className="table">
                     <thead>
-                    <tr>
-                        <th>
-                            <input
-                                type="checkbox"
-                                className="checkbox checkbox-secondary"
-                                onChange={handleSelectAll}
-                                id="selectAll"
-                                name="selectAll"
-                                checked={isCheckAll}
-                            />
-                        </th>
-                        <th>id</th>
-                        <th>name</th>
-                        <th>family_name</th>
-                        <th>required_qualification</th>
-                        <th>street</th>
-                        <th>street_number</th>
-                        <th>zip_code</th>
-                        <th>city</th>
-                        <th>requested_hours</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {children.map((child) => (
-                        <tr key={child.id} className="border-gray-200 border-b-1">
-                            <td>
+                        <tr>
+                            <th>
                                 <input
-                                    id={String(child.id)}
                                     type="checkbox"
                                     className="checkbox checkbox-secondary"
-                                    onChange={handleCheck}
-                                    name={child.first_name}
-                                    checked={checkedItems.includes(String(child.id))}
+                                    onChange={handleSelectAll}
+                                    id="selectAll"
+                                    name="selectAll"
+                                    checked={isCheckAll}
                                 />
-                            </td>
-                            <td className="font-bold">{child.id}</td>
-                            <td>{child.first_name}</td>
-                            <td>{child.family_name}</td>
-                            <td>{child.required_qualification}</td>
-                            <td>{child.street}</td>
-                            <td>{child.street_number}</td>
-                            <td>{child.zip_code}</td>
-                            <td>{child.city}</td>
-                            <td>{child.requested_hours}</td>
-                            <td>
-                                <button
-                                    onClick={() => toggleEditRecord(child)}
-                                    className="btn btn-ghost"
-                                >
-                                    <Icon icon="solar:pen-line-duotone" />
-                                </button>
-                            </td>
+                            </th>
+                            <th>id</th>
+                            <th>name</th>
+                            <th>family_name</th>
+                            <th>required_qualification</th>
+                            <th>street</th>
+                            <th>street_number</th>
+                            <th>zip_code</th>
+                            <th>city</th>
+                            <th>requested_hours</th>
+                            <th></th>
                         </tr>
-                    ))}
+                    </thead>
+                    <tbody>
+                        {children.map((child) => (
+                            <tr key={child.id} className="border-gray-200 border-b-1">
+                                <td>
+                                    <input
+                                        id={String(child.id)}
+                                        type="checkbox"
+                                        className="checkbox checkbox-secondary"
+                                        onChange={handleCheck}
+                                        name={child.first_name}
+                                        checked={checkedItems.includes(String(child.id))}
+                                    />
+                                </td>
+                                <td className="font-bold">{child.id}</td>
+                                <td>{child.first_name}</td>
+                                <td>{child.family_name}</td>
+                                <td>{child.required_qualification_text}</td>
+                                <td>{child.street}</td>
+                                <td>{child.street_number}</td>
+                                <td>{child.zip_code}</td>
+                                <td>{child.city}</td>
+                                <td>{child.requested_hours}</td>
+                                <td>
+                                    <button
+                                        onClick={() => toggleEditRecord(child)}
+                                        className="btn btn-ghost"
+                                    >
+                                        <Icon icon="solar:pen-line-duotone" />
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>

@@ -10,6 +10,7 @@ from pymysql.connections import Connection
 from ..services.children_service import ChildrenService
 from ..services.assistants_service import AssistantsService
 from ..schemas.pairs_generator import GeneratePairsData
+from ..schemas.pairs_generator import Pair
 
 BASE_URL = 'http://ampl:8000'
 
@@ -49,9 +50,60 @@ class PairsService:
         result = PairsGeneratorBaseData(children=children, assistants=assistants, pairs=pairs)
         return Response(success=True, message="pairs data fetched", data=result)
 
-    async def create_pair(self, data: CreateSinglePairIn):
-        # todo: Check if pair possible, create and save pair in db
-        return Response(success=True, message="This is mock!!!!!")
+    async def get_all_pairs(self):
+        try:
+            with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+                cursor.execute(
+                    """
+                    SELECT
+                        p.id AS id,
+                        c.id AS c_id,
+                        c.first_name AS c_first_name,
+                        c.family_name AS c_family_name,
+                        c.requested_hours AS c_requested_hours,
+                        cq.id AS c_required_qualification,
+                        cq.qualification_text AS c_required_qualification_text,
+                        ca.street AS c_street,
+                        ca.street_number AS c_street_number,
+                        ca.city AS c_city,
+                        ca.zip_code AS c_zip_code,
+                        a.id AS a_id,
+                        a.first_name AS a_first_name,
+                        a.family_name AS a_family_name,
+                        aq.id AS a_qualification,
+                        aq.qualification_text AS a_qualification_text,
+                        a.has_car AS a_has_car,
+                        a.min_capacity AS a_min_capacity,
+                        a.max_capacity AS a_max_capacity,
+                        aa.street AS a_street,
+                        aa.street_number AS a_street_number,
+                        aa.city AS a_city,
+                        aa.zip_code AS a_zip_code
+                    FROM 
+                        pairs p
+                        JOIN children c ON c.id = p.child_id
+                        JOIN assistants a ON a.id = p.assistant_id
+                        JOIN address ca ON ca.id = c.address_id
+                        JOIN address aa ON aa.id = a.address_id    
+                        JOIN qualifications cq ON cq.id = c.required_qualification
+                        JOIN qualifications aq ON aq.id = a.qualification
+                    """
+                )
+                pairs = cursor.fetchall()
+
+                return Response(success=True, message="pairs data fetched", data=pairs)
+        except Exception as e:
+            return Response(success=False, message=str(e))
+        except pymysql.err.Error as e:
+            return Response(success=False, message=str(e))
+
+    async def delete_pair(self, pair_id: int):
+        with self.db.cursor() as cursor:
+            cursor.execute(
+                "DELETE FROM pairs WHERE id = %s;",
+                (pair_id))
+            self.db.commit()
+            return cursor.rowcount
 
     async def _create_pair_from_ids(self, child_id: int, assistant_id: int):
         try:
@@ -75,6 +127,87 @@ class PairsService:
             print(f"Database error during pair insertion: {e}")
             self.db.rollback()
             return Response(success=False, message=f"Unexpected error during pair insertion {str(e)}")
+
+    async def create_pair(self, data: CreateSinglePairIn):
+        child_id = data.child.id
+        assistant_id = data.child.id
+
+        try:
+            with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+                cursor.execute(
+                    """
+                    SELECT
+                        CASE
+                            WHEN (
+                                COALESCE((
+                                    SELECT SUM(c.required_hours)
+                                    FROM pairs p
+                                    JOIN children c ON c.id = p.child_id
+                                    WHERE p.assistant_id = %s
+                                ), 0) + (
+                                    SELECT c.required_hours
+                                    FROM children c
+                                    WHERE c.id = %s
+                                )
+                            ) > (
+                                SELECT a.max_capacity
+                                FROM assistants a
+                                WHERE a.id = %s
+                            )
+                            THEN TRUE
+                            ELSE FALSE
+                        END AS full_capacity,
+
+                        CASE
+                            WHEN EXISTS (
+                                SELECT 1
+                                FROM pairs
+                                WHERE child_id = %s
+                            )
+                            THEN TRUE
+                            ELSE FALSE
+                        END AS already_assigned
+                    """, 
+                    (assistant_id, child_id, assistant_id, child_id)
+                )
+
+                result = cursor.fetchone()
+
+                if result["already_assigned"]:
+                    return Response(success=False, message=f"This child is already paired with an assistant. To proceed with a new pairing, please manually remove the existing assignment.")
+
+                if result["full_capacity"]:
+                    return Response(success=False, message=f"This assistant has reached the maximum number of assignments. Please remove an existing assignment with this assistant before creating a new pairing.")
+
+                await self._create_pair_from_ids(child_id, assistant_id)
+
+                return Response(success=True, message=f"Pair has been created")
+        except Exception as e:
+            return Response(success=False, message=f"Error {str(e)}")
+
+    async def _delete_pairs_from_ids(self, child_id: int):
+        try:
+            with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+                cursor.execute(
+                    """
+                        DELETE FROM pairs
+                        WHERE
+                            child_id = %s
+                    """,
+                    (child_id)
+                )
+                row_count = cursor.rowcount
+                if row_count:
+                    self.db.commit()
+                    return Response(success=True, message="pair deleted", data=row_count)
+        except pymysql.err.Error as e:
+            print(f"Database error during pair deletion: {e}")
+            self.db.rollback()
+            return Response(success=False, message=str(e))
+        except Exception as e:
+            print(f"Database error during pair deletion: {e}")
+            self.db.rollback()
+            return Response(success=False, message=f"Unexpected error during pair deletion {str(e)}")
 
     async def generate_pairs(self, websocket: WebSocket, data: GeneratePairsData):
         # preparing data for ampl
@@ -134,8 +267,16 @@ class PairsService:
                 print(r.json(), flush=True)
                 response = r.json()
                 if response.get('status') == 'success':
-                    # save this in DB
                     pairs = response.get('assignments')
+                    
+                    # delete selected pairs from pairs table
+                    for pair in pairs:
+                        child_id = pair['child_id']
+                        assistant_id = pair['assistant_id']
+                        await self._delete_pairs_from_ids(child_id)
+
+                    # save this in DB
+                    
                     failed_pairs = []
                     for pair in pairs:
                         child_id = pair['child_id']
@@ -182,5 +323,44 @@ class PairsService:
                         (SELECT COUNT(*) FROM pairs) As pairs_count
                     FROM pairs p;
                 """
+            )
+            return cursor.fetchone()
+
+    async def get_capacity(self, data: Pair):
+        assistant_id = data.assistant_id
+        child_id = data.child_id
+
+        with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute(
+                """
+                WITH assistant_data AS (
+                    SELECT 
+                        a.id AS assistant_id,
+                        a.max_capacity,
+                        COALESCE(SUM(c.requested_hours), 0) AS used_hours,
+                        a.qualification
+                    FROM 
+                        assistants a
+                        LEFT JOIN pairs p ON a.id = p.assistant_id
+                        LEFT JOIN children c ON c.id = p.child_id
+                    WHERE 
+                        a.id = %s
+                    GROUP BY 
+                        a.id, a.max_capacity, a.qualification
+                )
+                SELECT 
+                    ad.used_hours,
+                    (ad.max_capacity - ad.used_hours) AS free_hours,
+                    CASE
+                        WHEN (
+                            (SELECT c.required_qualification FROM children c WHERE c.id = %s)
+                            <= ad.qualification
+                        )
+                        THEN TRUE
+                        ELSE FALSE
+                    END AS is_qualified
+                FROM 
+                    assistant_data ad;
+                """, (assistant_id, child_id)
             )
             return cursor.fetchone()
