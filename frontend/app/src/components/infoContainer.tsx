@@ -7,18 +7,24 @@ type InfoContainerType = {
     header: string
     icon: string
     href: string
+    color: string
 }
 
-const InfoContainer = ({ children, header, icon, href }: InfoContainerType) => {
+const InfoContainer = ({ children, header, icon, href, color }: InfoContainerType) => {
     return (
-        <div className="card bg-white text-primary-content shadow-md flex flex-grow">
+        <div
+            className={`flex flex-grow card bg-white text-primary-content border-2 border-${color}-200 p-5`}
+        >
             <div className="card-body justify-between">
-                <div className="flex flex-col">
-                    <div className="mb-5 self-center">
-                        <Icon icon={icon} style={{ fontSize: "48px" }} />
+                <div className="flex flex-col items-start gap-5">
+                    <div className="flex items-center gap-5">
+                        <div className={`p-2 rounded-full bg-${color}-100`}>
+                            <Icon icon={icon} className={`text-3xl text-${color}-600`} />
+                        </div>
+                        <h2 className="font-semibold text-lg">{header}</h2>
                     </div>
-                    <h2 className="card-title mb-2">{header}</h2>
-                    <div className="flex flex-col gap-1 text-gray-600">{children}</div>
+
+                    <div className="flex flex-col gap-2 text-gray-600">{children}</div>
                 </div>
 
                 <div className="card-actions justify-end mt-2">
