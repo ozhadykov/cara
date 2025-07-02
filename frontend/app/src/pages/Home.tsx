@@ -12,6 +12,8 @@ type Coverage = {
     covered_children_relative: number
     covered_assistants_relative: number
 
+    total_hours: number
+
     pairs_count: number
 }
 
@@ -25,6 +27,7 @@ const Home = () => {
 
             console.log(data)
             if (response.ok) {
+                console.log(data)
                 setCoverage(data)
             }
         }
@@ -78,6 +81,10 @@ const Home = () => {
                     <p>
                         Activity Rate:
                         <b className="text-black"> {coverage.covered_assistants_relative}%</b>
+                    </p>
+                    <p>
+                        Total Working Hours:
+                        <b className="text-black"> {coverage.total_hours}h</b>
                     </p>
                 </InfoContainer>
 

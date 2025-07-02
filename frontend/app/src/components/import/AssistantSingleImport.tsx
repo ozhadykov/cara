@@ -11,7 +11,7 @@ const AssistantSingleImport = ({ refresh }: { refresh: boolean }) => {
     const { assistants, refreshAssistants } = useAssistantData()
     const { toggleCreateRecord, toggleEditRecord } = useRecordSidebar()
 
-    const deleteAssistant = async () => {
+    const deleteAssistants = async () => {
         try {
             for (const assistant_id of checkedItems) {
                 await deleteRequest(`/api/assistants/${assistant_id}`, {})
@@ -21,6 +21,10 @@ const AssistantSingleImport = ({ refresh }: { refresh: boolean }) => {
             setIsCheckAll(false)
             await refreshAssistants()
         } catch (error) {}
+    }
+
+    const resetSelection = () => {
+        setCheckedItems([])
     }
 
     const handleSelectAll = (e: any) => {
@@ -129,10 +133,15 @@ const AssistantSingleImport = ({ refresh }: { refresh: boolean }) => {
                     <div>
                         Selected <strong>{checkedItems.length}</strong> records
                     </div>
-                    <button className="btn btn-ghost btn-xs">Reset</button>
+                    <button className="btn btn-ghost btn-xs" onClick={resetSelection}>
+                        Reset
+                    </button>
                 </div>
 
-                <button className="btn btn-error text-white btn-xs" onClick={deleteAssistant}>
+                <button
+                    onClick={deleteAssistants}
+                    className="btn btn-xs btn-ghost text-red-600 bg-red-50 hover:bg-red-100 transition-colors"
+                >
                     Delete
                 </button>
             </div>
