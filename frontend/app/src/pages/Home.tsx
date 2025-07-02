@@ -45,58 +45,81 @@ const Home = () => {
                 </span>
             </div>
 
-            <div className="flex flex-row gap-16 pt-20">
+            <div className="flex flex-row gap-16 pt-20 bg-white p-16 shadow-md rounded-md">
                 <InfoContainer
                     icon="solar:people-nearby-line-duotone"
                     header="Children"
                     href="children"
+                    color="green"
                 >
-                    <p>
-                        Total Children:
-                        <b className="text-black"> {coverage.total_children}</b>
-                    </p>
-                    <p>
-                        Assigned Children:
-                        <b className="text-black"> {coverage.covered_children_absolute}</b>
-                    </p>
-                    <p>
-                        Coverage:
-                        <b className="text-black"> {coverage.covered_children_relative}%</b>
-                    </p>
+                    <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                            Total Children
+                        </p>
+                        <p className="text-sm text-gray-700">{coverage.total_children}</p>
+                    </div>
+                    <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">Coverage</p>
+                        <p className="text-sm text-gray-700">
+                            {coverage.covered_children_relative}%
+                        </p>
+                    </div>
                 </InfoContainer>
 
                 <InfoContainer
                     icon="solar:users-group-rounded-line-duotone"
                     header="Assistants"
                     href="assistants"
+                    color="blue"
                 >
-                    <p>
-                        Total Assistants:
-                        <b className="text-black"> {coverage.total_assistants}</b>
-                    </p>
-                    <p>
-                        Active Assistants:
-                        <b className="text-black"> {coverage.covered_assistants_absolute}</b>
-                    </p>
-                    <p>
-                        Activity Rate:
-                        <b className="text-black"> {coverage.covered_assistants_relative}%</b>
-                    </p>
-                    <p>
-                        Total Working Hours:
-                        <b className="text-black"> {coverage.total_hours}h</b>
-                    </p>
+                    <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                            Total Assistants
+                        </p>
+                        <p className="text-sm text-gray-700">{coverage.total_assistants}</p>
+                    </div>
+                    <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                            Activity Rate
+                        </p>
+                        <p className="text-sm text-gray-700">
+                            {coverage.covered_assistants_relative}%
+                        </p>
+                    </div>
+                    <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                            Total Working Hours
+                        </p>
+                        <p className="text-sm text-gray-700">{coverage.total_hours}h</p>
+                    </div>
                 </InfoContainer>
 
                 <InfoContainer
                     icon="solar:transfer-horizontal-line-duotone"
                     header="Pairs"
                     href="pairs"
+                    color="gray"
                 >
-                    <p>
-                        Total Pairs:
-                        <b className="text-black"> {coverage.total_children}</b>
-                    </p>
+                    <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                            Assigned Children
+                        </p>
+                        <p className="text-sm text-gray-700">
+                            {coverage.covered_children_absolute}
+                        </p>
+                    </div>
+                    <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                            Active Assistants
+                        </p>
+                        <p className="text-sm text-gray-700">
+                            {coverage.covered_assistants_absolute}
+                        </p>
+                    </div>
+                    <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">Total Pairs</p>
+                        <p className="text-sm text-gray-700">{coverage.total_children}</p>
+                    </div>
                 </InfoContainer>
             </div>
         </div>
