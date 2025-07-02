@@ -12,6 +12,7 @@ const ModelParams = ({ next, prev, setWeightsForModel }: IModelParamsProps) => {
 
     const [travelTimeImportance, setTravelTimeImportance] = useState<string>("1")
     const [overtimePenalty, setOvertimePenalty] = useState<string>("2")
+    const [allowedOvertime, setAllowedOvertime] = useState<string>("4")
     const [undertimePenalty, setUndertimePenalty] = useState<string>("4")
     const [splitThreshold, setSplitThreshold] = useState<string>("27")
 
@@ -21,6 +22,7 @@ const ModelParams = ({ next, prev, setWeightsForModel }: IModelParamsProps) => {
             overtimePenalty: parseInt(overtimePenalty),
             undertimePenalty: parseInt(undertimePenalty),
             splitThreshold: parseInt(splitThreshold),
+            allowedOvertime: parseInt(allowedOvertime)
         }
 
         setWeightsForModel(params)
@@ -47,6 +49,16 @@ const ModelParams = ({ next, prev, setWeightsForModel }: IModelParamsProps) => {
                                description={"Define how strong will be overtime hours penalized in model"}
                                setValueForParent={setOvertimePenalty}
                                initialValue={overtimePenalty}
+                               min={0}
+                               max={10}
+                               step={1}
+                        />
+                    </div>
+                    <div className="param-card">
+                        <Range label={"Max allowed overtime"}
+                               description={"Define the number of requested hours from which the model should attempt to assign two assistants to a child."}
+                               setValueForParent={setAllowedOvertime}
+                               initialValue={allowedOvertime}
                                min={0}
                                max={10}
                                step={1}

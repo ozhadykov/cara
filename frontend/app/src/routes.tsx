@@ -1,4 +1,4 @@
-import { Home, AssistantsImport, ChildrenImport, Settings, PairGenerator, PairsPreview } from "./pages"
+import { Home, AssistantsImport, ChildrenImport, Settings, PairGenerator } from "./pages"
 import { ReactElement } from "react"
 
 interface IRoute {
@@ -45,14 +45,6 @@ const routes: Array<IRoute> = [
         fillIcon: "solar:transfer-horizontal-bold-duotone",
         outlineIcon: "solar:transfer-horizontal-line-duotone",
     },
-    {
-        path: "/pair-overview",
-        component: <PairsPreview/>,
-        label: "Pairs overview",
-        fillIcon: "solar:eye-bold",
-        outlineIcon: "solar:eye-linear",
-
-    }
 ]
 
 export default routes
