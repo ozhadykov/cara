@@ -231,6 +231,7 @@ async def generate_pairs(data: GeneratePairsIN):
 
     ampl.param['wTU'] = model_params.get("overtimePenalty", 1.0)
     ampl.param['wTS'] = model_params.get("undertimePenalty", 2.0)
+    ampl.param['aOT'] = model_params.get("allowedOvertime", 4)
 
     ampl.solve()
 

@@ -12,6 +12,7 @@ export interface IModelParams {
     overtimePenalty: number
     undertimePenalty: number
     splitThreshold: number
+    allowedOvertime: number
 }
 
 const PairGenerator = () => {

@@ -10,6 +10,7 @@ param MaxBetreuer {I};            # Max number of assistants per child (1 or 2)
 
 param wTU >= 0;                   # Penalty weight for overtime
 param wTS >= 0;                   # Penalty weight for underutilization
+param aOT >= 0;                   # allowed overtime
 
 # Decision Variables
 var x {I, J} binary;              # 1 if assistant j assigned to child i
@@ -25,7 +26,7 @@ maximize GesamtScore:
 
 # Maximal Ueberzeit is 4 Hours
 subject to MaxUeberzeit {j in J}:
-    Ueberzeit[j] <= 4;
+    Ueberzeit[j] <= aOT;
 
 # Each child gets at least one assistant
 subject to Versorgungspflicht {i in I}:
