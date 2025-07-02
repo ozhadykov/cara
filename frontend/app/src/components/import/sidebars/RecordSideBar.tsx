@@ -7,12 +7,13 @@ import AssistantCreate from "./AssistantCreate"
 type PageType = "assistants" | "children"
 
 const RecordSidebar = ({ pageType }: { pageType: PageType }) => {
-    const { isOpen, toggle, mode } = useRecordSidebar()
+    const { isOpen, toggle, mode, selectedData } = useRecordSidebar()
 
     const renderContent = () => {
-        if (pageType === "children" && mode === Mode.EDIT) return <ChildEdit />
+        if (pageType === "children" && mode === Mode.EDIT) return <ChildEdit data={selectedData} />
         if (pageType === "children" && mode === Mode.CREATE) return <ChildCreate />
-        if (pageType === "assistants" && mode === Mode.EDIT) return <AssistantEdit />
+        if (pageType === "assistants" && mode === Mode.EDIT)
+            return <AssistantEdit data={selectedData} />
         if (pageType === "assistants" && mode === Mode.CREATE) return <AssistantCreate />
         return null
     }

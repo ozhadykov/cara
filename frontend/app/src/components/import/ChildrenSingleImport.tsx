@@ -70,7 +70,7 @@ const ChildrenSingleImport = ({ refresh }: { refresh: boolean }) => {
                             </th>
                             <th>id</th>
                             <th>name</th>
-                            <th>family_name</th>
+                            <th>family name</th>
                             <th>required_qualification</th>
                             <th>street</th>
                             <th>street_number</th>

@@ -9,6 +9,7 @@ export type RecordSidebarType = {
     isOpen: boolean
     mode: Mode
     selectedData: any
+    setSelectedData: (selectedData: any) => void
     toggle: () => void
     toggleCreateRecord: () => void
     toggleEditRecord: (data: any) => void
@@ -38,7 +39,15 @@ export const RecordSidebarProvider = ({ children }: { children: ReactNode }) => 
 
     return (
         <RecordSidebarContext.Provider
-            value={{ isOpen, mode, selectedData, toggle, toggleCreateRecord, toggleEditRecord }}
+            value={{
+                isOpen,
+                mode,
+                selectedData,
+                setSelectedData,
+                toggle,
+                toggleCreateRecord,
+                toggleEditRecord,
+            }}
         >
             {children}
         </RecordSidebarContext.Provider>
