@@ -10,6 +10,10 @@ type AssistantFormType = {
 }
 
 const AssistantsForm = ({ handleChange, handleSubmit, formData, formName }: AssistantFormType) => {
+    const getHasCarValue = (has_car: boolean): number => {
+        if (has_car) return 1
+        return 0
+    }
     return (
         <div className="overflow-auto scrollbar-hide p-7">
             <form onSubmit={handleSubmit} id={formName}>
@@ -146,7 +150,7 @@ const AssistantsForm = ({ handleChange, handleSubmit, formData, formName }: Assi
                         <select
                             name="has_car"
                             id="has_car"
-                            value={formData.has_car}
+                            value={getHasCarValue(formData.has_car)}
                             onChange={handleChange}
                             required
                             className="outline-none text-sm validator"

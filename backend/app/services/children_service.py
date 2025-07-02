@@ -169,9 +169,6 @@ class ChildrenService:
 
     async def delete_child(self, child_id: int):
         with self.db.cursor() as cursor:
-            cursor.execute(
-                "DELETE FROM address WHERE address.id = (SELECT address_id FROM children WHERE children.id = %s);",
-                (child_id))
             cursor.execute("DELETE FROM children WHERE id = %s;", (child_id))
             self.db.commit()
             return cursor.rowcount

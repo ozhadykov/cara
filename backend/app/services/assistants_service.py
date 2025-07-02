@@ -173,9 +173,6 @@ class AssistantsService:
 
     async def delete_assistant(self, assistant_id: int):
         with self.db.cursor() as cursor:
-            cursor.execute(
-                "DELETE FROM address WHERE address.id = (SELECT address_id FROM assistants WHERE assistants.id = %s);",
-                (assistant_id))
             cursor.execute("DELETE FROM assistants WHERE id = %s;", (assistant_id))
             self.db.commit()
             return cursor.rowcount

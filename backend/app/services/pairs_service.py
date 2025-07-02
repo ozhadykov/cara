@@ -320,6 +320,10 @@ class PairsService:
                         COUNT(DISTINCT p.child_id) / (SELECT COUNT(*) FROM children) AS covered_children_relative,
                         COUNT(DISTINCT p.assistant_id) AS covered_assistants_absolute,
                         COUNT(DISTINCT p.assistant_id) / (SELECT COUNT(*) FROM assistants) AS covered_assistants_relative,
+                        (SELECT SUM(c.requested_hours) 
+                        FROM children c 
+                        WHERE c.id IN (SELECT DISTINCT child_id FROM pairs)
+                        ) AS total_hours,
                         (SELECT COUNT(*) FROM children) AS total_children,
                         (SELECT COUNT(*) FROM assistants) AS total_assistants,
                         (SELECT COUNT(*) FROM pairs) As pairs_count
