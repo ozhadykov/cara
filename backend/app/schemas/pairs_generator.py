@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Dict
 
 from .assistants import Assistant
 from .children import Child
@@ -19,6 +19,7 @@ class PairsGeneratorBaseData(BaseModel):
 class GeneratePairsData(BaseModel):
     children: List[Child]
     assistants: List[Assistant]
+    modelParams: Dict[str, int]
 
 
 class CreateSinglePairIn(BaseModel):

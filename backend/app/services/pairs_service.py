@@ -217,6 +217,7 @@ class PairsService:
 
         children = data.children
         assistants = data.assistants
+        model_params = data.modelParams
 
         # clean the pairs table, from chosen children and assistants
         await websocket.send_text(
@@ -252,7 +253,8 @@ class PairsService:
         data_for_ampl = {
             "children": [child.model_dump() for child in children],
             "assistants": [assistant.model_dump() for assistant in assistants],
-            "distances": distances
+            "distances": distances,
+            "model_params": model_params
         }
 
         await websocket.send_text(json.dumps(Response(success=True, message='Generating pairs').model_dump()))
@@ -260,7 +262,10 @@ class PairsService:
         try:
             async with httpx.AsyncClient() as client:
                 print("Making request", flush=True)
-                r = await client.post(url=f"{BASE_URL}/generate_pairs", json=data_for_ampl)
+                # omar's model
+                #r = await client.post(url=f"{BASE_URL}/generate_pairs", json=data_for_ampl)
+                # alex's model
+                r = await client.post(url=f"{BASE_URL}/generate_pairs_2", json=data_for_ampl)
                 print(r.json(), flush=True)
                 response = r.json()
                 if response.get('status') == 'success':
