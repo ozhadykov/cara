@@ -2,7 +2,7 @@ import pandas as pd
 import json
 from pathlib import Path
 from amplpy import AMPL
-from typing import List
+from typing import List, Dict
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -35,6 +35,7 @@ class GeneratePairsIN(BaseModel):
     children: List[Child]
     assistants: List[Assistant]
     distances: List[Distance]
+    model_params: Dict[str, int]
 
 
 @app.post("/generate_pairs")
@@ -135,6 +136,7 @@ async def generate_pairs(data: GeneratePairsIN):
     children = data.children
     assistants = data.assistants
     distances = data.distances
+    model_params = data.model_params
 
     # --- Step 1: Prepare DataFrames ---
     child_df = pd.DataFrame([{
@@ -198,7 +200,7 @@ async def generate_pairs(data: GeneratePairsIN):
                 qualibonus[(i, j)] = 0
 
     # --- Step 5: Final Nutzenij score ---
-    wRS = 10  # travel score weight, configurable
+    wRS = model_params.get("travelTimeImportance", 10)  # travel score weight, configurable
     nutzen = {}
     for key in travel_times:
         if qualibonus[key] < 0:
@@ -207,7 +209,7 @@ async def generate_pairs(data: GeneratePairsIN):
             nutzen[key] = round(wRS * reisescore[key] + qualibonus[key], 2)
 
     # --- Step 6: MaxBetreueri based on Split_Threshold ---
-    split_threshold = 20
+    split_threshold = model_params.get("splitThreshold", 20)
     max_betreuer = {
         c.child_id: 2 if c.requested_hours >= split_threshold else 1
         for c in child_df.itertuples()
@@ -227,8 +229,8 @@ async def generate_pairs(data: GeneratePairsIN):
     ampl.param['MaxBetreuer'] = max_betreuer
     ampl.param['Nutzen'] = nutzen
 
-    ampl.param['wTU'] = 2.0
-    ampl.param['wTS'] = 1.0
+    ampl.param['wTU'] = model_params.get("overtimePenalty", 1.0)
+    ampl.param['wTS'] = model_params.get("undertimePenalty", 2.0)
 
     ampl.solve()
 

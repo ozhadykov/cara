@@ -6,6 +6,7 @@ import Checkbox from "../input/Checkbox.tsx"
 import { usePairsGenerator } from "../../contexts/providers/PairsGeneratorContext.tsx"
 import { useToast } from "../../contexts"
 import { toastTypes } from "../../lib/constants.ts"
+import { TabCard } from "../index.tsx"
 
 interface IAssistantTable {
     assistants: Assistant[]
@@ -121,13 +122,15 @@ const AssistantTable = ({ assistants, next, prev }: IAssistantTable) => {
 
 
     return (
-        <div className="step-2-assistant-pick overflow-y-hidden">
-            <Table table={table} />
-            <div className="generator-controls flex items-center justify-between gap-3 mt-6">
-                <button className="btn btn-soft btn-wide" onClick={prev}>previous step</button>
-                <button className="btn btn-soft btn-wide btn-secondary" onClick={handleNextStep}>next step</button>
+        <TabCard title="Step 2: Choose assistants">
+            <div className="step-2-assistant-pick overflow-y-hidden">
+                <Table table={table} />
+                <div className="generator-controls flex items-center justify-between gap-3 mt-6">
+                    <button className="btn btn-soft btn-wide" onClick={prev}>previous step</button>
+                    <button className="btn btn-soft btn-wide btn-secondary" onClick={handleNextStep}>next step</button>
+                </div>
             </div>
-        </div>
+        </TabCard>
     )
 }
 

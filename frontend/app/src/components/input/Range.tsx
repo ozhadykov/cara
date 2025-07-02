@@ -5,10 +5,13 @@ interface RangeProps {
     label: string,
     description?: string,
     setValueForParent: (value: string) => void,
-    initialValue?: string
+    initialValue?: string,
+    min?: number,
+    max?: number,
+    step?: number
 }
 
-const Range = ({ label, description, setValueForParent, initialValue }: RangeProps) => {
+const Range = ({ label, description, setValueForParent, initialValue, min = 0, max = 100, step = 10 }: RangeProps) => {
     const [rangeVal, setRangeVal] = useState<string>(initialValue ?? '0')
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,8 +26,8 @@ const Range = ({ label, description, setValueForParent, initialValue }: RangePro
     }, [initialValue])
 
     return (
-        <div className="range-container flex justify-between items-center gap-6 pr-4 py-3">
-            <div className="label h-full flex flex-col items-start">
+        <div className="range-container grid grid-cols-12 gap-6 justify-between pr-4 py-3">
+            <div className="label h-full col-span-5 flex flex-col items-start text-wrap overflow-hidden">
                 <p className="text-black font-medium text-lg">{label}</p>
                 {description && (
                     <span className="text-sm text-gray-400 flex items-center gap-1">
@@ -32,25 +35,23 @@ const Range = ({ label, description, setValueForParent, initialValue }: RangePro
                     </span>
                 )}
             </div>
-            <div className="range-slider w-full max-w-md">
+            <div className="range-slider col-span-5 w-full max-w-md">
                 <div className="w-full max-w-md">
-                    <input type="range" min={0} max="100" value={rangeVal} className="range range-sm w-full"
-                           step="10" onChange={handleChange} />
+                    <input type="range" min={min} max={max} value={rangeVal} className="range range-xs w-full"
+                           step={step} onChange={handleChange} />
                     <div className="flex justify-between px-2.5 mt-2 text-xs">
-                        <span>1</span>
-                        <span>2</span>
-                        <span>3</span>
-                        <span>4</span>
-                        <span>5</span>
-                        <span>6</span>
-                        <span>7</span>
-                        <span>8</span>
-                        <span>9</span>
-                        <span>10</span>
+                        <span>{min}</span>
+                        <span>|</span>
+                        <span>|</span>
+                        <span>|</span>
+                        <span>|</span>
+                        <span>|</span>
+                        <span>|</span>
+                        <span>{max}</span>
                     </div>
                 </div>
             </div>
-            <div className="slider-value flex items-center gap-3">
+            <div className="slider-value col-span-2 flex items-center gap-3">
                 <p>Value:</p>
                 <p className="font-bold text-lg">{rangeVal}</p>
             </div>

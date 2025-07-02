@@ -5,10 +5,12 @@ import { Assistant, Child } from "../../lib/models.ts"
 import Table from "./Table.tsx"
 import { toastTypes } from "../../lib/constants.ts"
 import { Icon } from "@iconify/react"
+import { IModelParams } from "../../pages/PairGenerator.tsx"
 
 interface IGeneratorProps {
     next: () => void
     prev: () => void
+    modelParams: IModelParams | null
 }
 
 const generationSteps = {
@@ -17,7 +19,7 @@ const generationSteps = {
     done: "done",
 }
 
-const Generator = ({ next, prev }: IGeneratorProps) => {
+const Generator = ({ next, prev, modelParams }: IGeneratorProps) => {
     const [generationStep, setGenerationStep] = useState<string>(generationSteps.init)
     const [generationStatus, setGenerationStatus] = useState<boolean | null>(null)
     const [pairs, setPairs] = useState<[]>([])
@@ -131,10 +133,16 @@ const Generator = ({ next, prev }: IGeneratorProps) => {
     // endregion
 
     const handleGenerate = () => {
+        if (!modelParams){
+            sendMessage("Model params are not set, aborting execution", toastTypes.error)
+            return
+        }
+
         const url = `ws://${window.location.host}/api/pair_generator/ws/generate_pairs`
         const data = {
             children: selectedChildrenObj,
             assistants: selectedAssistantsObj,
+            modelParams
         }
 
         const ws = new WebSocket(url)

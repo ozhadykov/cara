@@ -6,6 +6,7 @@ import Table from "./Table.tsx"
 import { usePairsGenerator } from "../../contexts/providers/PairsGeneratorContext.tsx"
 import { useToast } from "../../contexts"
 import { toastTypes } from "../../lib/constants.ts"
+import { TabCard } from "../index.tsx"
 
 interface IChildrenTable {
     children: Child[],
@@ -116,12 +117,14 @@ const ChildrenTable = ({ children, next }: IChildrenTable) => {
 
 
     return (
-        <div className="overflow-y-hidden step-1-chidlren-pick">
-            <Table table={table} />
-            <div className="generator-controls flex items-center justify-end gap-3 mt-6">
-                <button className="btn btn-soft btn-wide btn-secondary" onClick={handleNextStep}>next step</button>
+        <TabCard title="Step 1: Choose children">
+            <div className="overflow-y-hidden step-1-chidlren-pick">
+                <Table table={table} />
+                <div className="generator-controls flex items-center justify-end gap-3 mt-6">
+                    <button className="btn btn-soft btn-wide btn-secondary" onClick={handleNextStep}>next step</button>
+                </div>
             </div>
-        </div>
+        </TabCard>
     )
 }
 

@@ -14,6 +14,7 @@ import Navbar from "./layout/Navbar"
 import Range from "./input/Range.tsx"
 import TabCard from "./layout/TabCard.tsx"
 import Toast from "./feedback/Toast.tsx"
+import ModelParams from "./generator/ModelParams.tsx"
 
 export {
     Alert,
@@ -28,6 +29,7 @@ export {
     Loading,
     MainSidebar,
     ManualAssigment,
+    ModelParams,
     Navbar,
     Range,
     TabCard,

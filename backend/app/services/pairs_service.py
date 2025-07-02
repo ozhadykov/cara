@@ -217,6 +217,7 @@ class PairsService:
 
         children = data.children
         assistants = data.assistants
+        model_params = data.modelParams
 
         # clean the pairs table, from chosen children and assistants
         await websocket.send_text(
@@ -252,7 +253,8 @@ class PairsService:
         data_for_ampl = {
             "children": [child.model_dump() for child in children],
             "assistants": [assistant.model_dump() for assistant in assistants],
-            "distances": distances
+            "distances": distances,
+            "model_params": model_params
         }
 
         await websocket.send_text(json.dumps(Response(success=True, message='Generating pairs').model_dump()))

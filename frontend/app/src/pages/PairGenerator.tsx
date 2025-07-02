@@ -1,17 +1,25 @@
-import React, { useEffect, useState, useMemo, useRef } from "react"
+import React, { useEffect, useState, useMemo } from "react"
 import { Icon } from "@iconify/react"
 import { Assistant, Child } from "../lib/models.ts"
 import { useLoading, useToast } from "../contexts"
 import { toastTypes } from "../lib/constants.ts"
-import { ChildrenTable, AssistantTable, Generator, TabCard, ManualAssigment } from "../components"
+import { ChildrenTable, AssistantTable, Generator, TabCard, ManualAssigment, ModelParams } from "../components"
 import { PairsGeneratorProvider } from "../contexts/providers/PairsGeneratorContext.tsx"
 import PairOverview from "../components/generator/PairOverview.tsx"
+
+export interface IModelParams {
+    travelTimeImportance: number
+    overtimePenalty: number
+    undertimePenalty: number
+    splitThreshold: number
+}
 
 const PairGenerator = () => {
     const [children, setChildren] = useState<Child[]>([])
     const [assistants, setAssistants] = useState<Assistant[]>([])
     const [pairs, setPairs] = useState([])
     const [currentStep, setCurrentStep] = useState<number>(1)
+    const [modelParams, setModelParams] = useState<IModelParams | null>(null)
     const { toggleLoading } = useLoading()
     const { sendMessage } = useToast()
 
@@ -23,7 +31,6 @@ const PairGenerator = () => {
                 const response = await fetch(url)
                 const responseData = await response.json()
                 setChildren(responseData.data.children)
-                console.log(responseData.data.children)
                 setAssistants(responseData.data.assistants)
                 setPairs(responseData.data.pairs)
                 toggleLoading(false)
@@ -67,6 +74,10 @@ const PairGenerator = () => {
             },
             {
                 id: 3,
+                title: "Set model params",
+            },
+            {
+                id: 4,
                 title: "Generate pairs",
             },
         ]
@@ -145,7 +156,10 @@ const PairGenerator = () => {
                                                 />
                                             )}
                                             {currentStep === 3 && (
-                                                <Generator next={nextStep} prev={prevStep} />
+                                                <ModelParams next={nextStep} prev={prevStep} setWeightsForModel={setModelParams}/>
+                                            )}
+                                            {currentStep === 4 && (
+                                                <Generator next={nextStep} prev={prevStep} modelParams={modelParams}/>
                                             )}
                                         </div>
                                     </div>

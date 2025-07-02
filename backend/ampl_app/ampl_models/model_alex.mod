@@ -23,6 +23,10 @@ maximize GesamtScore:
 
 # Constraints
 
+# Maximal Ueberzeit is 4 Hours
+subject to MaxUeberzeit {j in J}:
+    Ueberzeit[j] <= 4;
+
 # Each child gets at least one assistant
 subject to Versorgungspflicht {i in I}:
     sum {j in J} x[i, j] >= 1;
