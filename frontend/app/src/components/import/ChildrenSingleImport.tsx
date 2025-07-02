@@ -23,6 +23,10 @@ const ChildrenSingleImport = ({ refresh }: { refresh: boolean }) => {
         } catch (error) {}
     }
 
+    const resetSelection = () => {
+        setCheckedItems([])
+    }
+
     const handleSelectAll = (e: any) => {
         setIsCheckAll(!isCheckAll)
         if (!children) return
@@ -70,7 +74,7 @@ const ChildrenSingleImport = ({ refresh }: { refresh: boolean }) => {
                             </th>
                             <th>id</th>
                             <th>name</th>
-                            <th>family_name</th>
+                            <th>family name</th>
                             <th>required_qualification</th>
                             <th>street</th>
                             <th>street_number</th>
@@ -125,10 +129,15 @@ const ChildrenSingleImport = ({ refresh }: { refresh: boolean }) => {
                     <div>
                         Selected <strong>{checkedItems.length}</strong> records
                     </div>
-                    <button className="btn btn-ghost btn-xs">Reset</button>
+                    <button className="btn btn-ghost btn-xs" onClick={resetSelection}>
+                        Reset
+                    </button>
                 </div>
 
-                <button className="btn btn-error text-white btn-xs" onClick={deleteChildren}>
+                <button
+                    onClick={deleteChildren}
+                    className="btn btn-xs btn-ghost text-red-600 bg-red-50 hover:bg-red-100 transition-colors"
+                >
                     Delete
                 </button>
             </div>
