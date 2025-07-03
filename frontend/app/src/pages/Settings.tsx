@@ -13,6 +13,8 @@ const Settings = () => {
     const [googleKey, setGoogleKey] = useState<string>("")
     const [distanceImportance, setDistanceImportance] = useState<string>("0")
     const [qualificationImportance, setQualificationImportance] = useState<string>("0")
+    const [showAmplKey, setShowAmplKey] = useState(false)
+    const [showGoogleKey, setShowGoogleKey] = useState(false)
 
     const handleChangeAmpl = (event: ChangeEvent<HTMLInputElement>) => {
         setAmplKey(event.target.value)
@@ -22,7 +24,12 @@ const Settings = () => {
     }
 
     const sendKey = async (keyId: string, keyValue: string) => {
-        const response = await postRequest(`/api/settings/key/${keyId}`, { apiKey: keyValue }, sendMessage, toggleLoading)
+        const response = await postRequest(
+            `/api/settings/key/${keyId}`,
+            { apiKey: keyValue },
+            sendMessage,
+            toggleLoading
+        )
         if (response)
             sendMessage(response.message, response.success ? toastTypes.success : toastTypes.error)
     }
@@ -37,9 +44,17 @@ const Settings = () => {
                 distanceImportance: distanceImpNumber,
                 qualificationImportance: qualificationImpNumber,
             }
-            const response = await postRequest("/api/settings/weights", data, sendMessage, toggleLoading)
+            const response = await postRequest(
+                "/api/settings/weights",
+                data,
+                sendMessage,
+                toggleLoading
+            )
             if (response)
-                sendMessage(response.message, response.success ? toastTypes.success : toastTypes.error)
+                sendMessage(
+                    response.message,
+                    response.success ? toastTypes.success : toastTypes.error
+                )
         }
     }
 
@@ -63,10 +78,15 @@ const Settings = () => {
                     const response = await fetch("/api/settings/weights")
                     if (response.ok) {
                         const responseObj = await response.json()
-                        sendMessage(responseObj.message, responseObj.success ? toastTypes.success : toastTypes.error)
+                        sendMessage(
+                            responseObj.message,
+                            responseObj.success ? toastTypes.success : toastTypes.error
+                        )
                         if (responseObj.success) {
                             setDistanceImportance(responseObj.data.distanceImportance + "")
-                            setQualificationImportance(responseObj.data.qualificationImportance + "")
+                            setQualificationImportance(
+                                responseObj.data.qualificationImportance + ""
+                            )
                         }
                     }
                 }
@@ -103,21 +123,39 @@ const Settings = () => {
                                 <span className="ml-1">Keys</span>
                             </label>
                             <div className="tab-content bg-base-100 border-base-300 p-6">
-                                <TabCard title={"Keys setup"}
-                                         description="This is very important setting, without google api keys, software will not able to work">
-                                    <div
-                                        className="keys-settings-content flex flex-col gap-3 items-center justify-center w-full h-full">
+                                <TabCard
+                                    title={"Keys setup"}
+                                    description="This is a very important setting! Without the Google API and AMPL keys, the software will not be able to work"
+                                >
+                                    <div className="keys-settings-content flex flex-col gap-3 items-center justify-center w-full h-full">
                                         <div className="w-full flex flex-row items-center gap-2">
                                             <label className="w-48">AMPL Key</label>
-                                            <input
-                                                className="border border-gray-300 rounded px-3 py-2 w-64"
-                                                type="text"
-                                                value={amplKey}
-                                                onChange={handleChangeAmpl}
-                                            />
+                                            <div className="relative w-64">
+                                                <input
+                                                    className="border border-gray-300 rounded px-3 py-2 w-full pr-10"
+                                                    type={showAmplKey ? "text" : "password"}
+                                                    value={amplKey}
+                                                    onChange={handleChangeAmpl}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
+                                                    onClick={() => setShowAmplKey(!showAmplKey)}
+                                                >
+                                                    <Icon
+                                                        icon={
+                                                            showAmplKey
+                                                                ? "solar:eye-bold"
+                                                                : "mdi:eye-off"
+                                                        }
+                                                    />
+                                                </button>
+                                            </div>
                                             <button
                                                 className="btn btn-secondary"
-                                                onClick={async () => await sendKey("ampl_key", amplKey)}
+                                                onClick={async () =>
+                                                    await sendKey("ampl_key", amplKey)
+                                                }
                                             >
                                                 Send
                                             </button>
@@ -125,15 +163,32 @@ const Settings = () => {
 
                                         <div className="w-full flex flex-row items-center gap-2">
                                             <label className="w-48">Google Cloud Key</label>
-                                            <input
-                                                className="border border-gray-300 rounded px-3 py-2 w-64"
-                                                type="text"
-                                                value={googleKey}
-                                                onChange={handleChangeGoogle}
-                                            />
+                                            <div className="relative w-64">
+                                                <input
+                                                    className="border border-gray-300 rounded px-3 py-2 w-full pr-10"
+                                                    type={showGoogleKey ? "text" : "password"}
+                                                    value={googleKey}
+                                                    onChange={handleChangeGoogle}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
+                                                    onClick={() => setShowGoogleKey(!showGoogleKey)}
+                                                >
+                                                    <Icon
+                                                        icon={
+                                                            showGoogleKey
+                                                                ? "solar:eye-bold"
+                                                                : "mdi:eye-off"
+                                                        }
+                                                    />
+                                                </button>
+                                            </div>
                                             <button
                                                 className="btn btn-secondary"
-                                                onClick={async () => await sendKey("google_maps_key", googleKey)}
+                                                onClick={() =>
+                                                    sendKey("google_maps_key", googleKey)
+                                                }
                                             >
                                                 Send
                                             </button>
@@ -148,24 +203,39 @@ const Settings = () => {
                                 <span className="ml-1">Weights</span>
                             </label>
                             <div className="tab-content bg-base-100 border-base-300 p-6">
-                                <TabCard title={"Weights setup"}
-                                         description={"This is very important setting, without weights, software will not able to generate pairs"}>
+                                <TabCard
+                                    title={"Weights setup"}
+                                    description={
+                                        "This is a very important setting, without weights, software will not able to generate pairs"
+                                    }
+                                >
                                     <div className="distance-travel-time-importance">
-                                        <Range label={"Distance importance"}
-                                               description={"Define how important should distance and travel time be interpreted in model"}
-                                               setValueForParent={setDistanceImportance}
-                                               initialValue={distanceImportance}
+                                        <Range
+                                            label={"Distance importance"}
+                                            description={
+                                                "Define how important should distance and travel time be interpreted in model"
+                                            }
+                                            setValueForParent={setDistanceImportance}
+                                            initialValue={distanceImportance}
                                         />
                                     </div>
                                     <div className="qualification-importance">
-                                        <Range label={"Qualification importance"}
-                                               description={"Define how important should assistant's qualification be interpreted in model"}
-                                               setValueForParent={setQualificationImportance}
-                                               initialValue={qualificationImportance}
+                                        <Range
+                                            label={"Qualification importance"}
+                                            description={
+                                                "Define how important should assistant's qualification be interpreted in model"
+                                            }
+                                            setValueForParent={setQualificationImportance}
+                                            initialValue={qualificationImportance}
                                         />
                                     </div>
                                     <div className="weights-setting-footer mt-8 flex justify-end">
-                                        <button className="btn btn-primary btn-wide" onClick={saveWeights}>Save</button>
+                                        <button
+                                            className="btn btn-primary btn-wide"
+                                            onClick={saveWeights}
+                                        >
+                                            Save
+                                        </button>
                                     </div>
                                 </TabCard>
                             </div>

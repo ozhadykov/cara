@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@tanstack/react-table": "^8.21.3",
+    "react-select": "^5.10.1",
+    "tanstack": "^1.0.0"
+  }
+}
