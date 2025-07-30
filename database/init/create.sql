@@ -21,8 +21,8 @@ CREATE TABLE qualifications
 
 INSERT INTO qualifications (qualification_text, qualification_value)
 VALUES ('ReKo', 1), 
-    ('HK', 2),
-    ('QHK', 3);
+    ('QHK', 2),
+    ('HK', 3);
 
 CREATE TABLE address
 (
