@@ -128,6 +128,7 @@ class AssistantsService:
                         a.family_name AS family_name,
                         a.qualification AS qualification,
                         q.qualification_text AS qualification_text,
+                        q.qualification_value AS qualification_value,
                         a.has_car AS has_car,
                         a.min_capacity AS min_capacity,
                         a.max_capacity AS max_capacity,

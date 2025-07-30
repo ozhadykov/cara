@@ -127,6 +127,7 @@ class ChildrenService:
                         c.family_name AS family_name,
                         c.required_qualification AS required_qualification,
                         q.qualification_text AS required_qualification_text,
+                        q.qualification_value AS required_qualification_value,
                         c.requested_hours AS requested_hours,
                         REPLACE(adr.street, '+', ' ') AS street,
                         REPLACE(adr.street_number, '+', ' ') AS street_number,

@@ -8,6 +8,7 @@ class Assistant(BaseModel):
     family_name: str
     qualification: int
     qualification_text: Optional[str] = None
+    qualification_value: Optional[int] = None
     min_capacity: int
     max_capacity: int
     has_car: bool

@@ -3,7 +3,14 @@ import { Icon } from "@iconify/react"
 import { Assistant, Child } from "../lib/models.ts"
 import { useLoading, useToast } from "../contexts"
 import { toastTypes } from "../lib/constants.ts"
-import { ChildrenTable, AssistantTable, Generator, TabCard, ManualAssigment, ModelParams } from "../components"
+import {
+    ChildrenTable,
+    AssistantTable,
+    Generator,
+    TabCard,
+    ManualAssigment,
+    ModelParams,
+} from "../components"
 import { PairsGeneratorProvider } from "../contexts/providers/PairsGeneratorContext.tsx"
 import PairOverview from "../components/generator/PairOverview.tsx"
 
@@ -157,10 +164,18 @@ const PairGenerator = () => {
                                                 />
                                             )}
                                             {currentStep === 3 && (
-                                                <ModelParams next={nextStep} prev={prevStep} setWeightsForModel={setModelParams}/>
+                                                <ModelParams
+                                                    next={nextStep}
+                                                    prev={prevStep}
+                                                    setWeightsForModel={setModelParams}
+                                                />
                                             )}
                                             {currentStep === 4 && (
-                                                <Generator next={nextStep} prev={prevStep} modelParams={modelParams}/>
+                                                <Generator
+                                                    next={nextStep}
+                                                    prev={prevStep}
+                                                    modelParams={modelParams}
+                                                />
                                             )}
                                         </div>
                                     </div>

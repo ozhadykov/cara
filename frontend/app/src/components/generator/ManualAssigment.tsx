@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import Select from "react-select"
 import { toastTypes } from "../../lib/constants.ts"
 import { useLoading, useToast } from "../../contexts"
@@ -40,8 +40,6 @@ const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
     const [selectedAssistantForSelect, setSelectedAssistantForSelect] =
         useState<SelectOption | null>(null)
 
-    // todo: 1. get all children, get all assistants, create pair
-
     const handleChildSelectChange = async (e: any) => {
         const childId = e.value
         const childObj = children.find((obj) => obj.id === childId)
@@ -76,7 +74,6 @@ const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
         setFreeHoursText(response.free_hours.toString())
         setUsedHoursText(response.used_hours.toString())
         setIsQualified(response.is_qualified)
-        console.log(response)
 
         setHasCapacity(
             response.used_hours + child.requested_hours <= response.free_hours &&
@@ -198,7 +195,7 @@ const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
                     )}
                 </div>
             </div>
-            {selectedChild && selectedAssistant && (
+            {selectedChild && selectedAssistant && freeHoursText && (
                 <div className="flex flex-col rounded-2xl w-1/2 self-center shadow-md">
                     <div
                         className={`flex justify-between items-center  ${
@@ -314,7 +311,7 @@ const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
                                         <span className="font-bold">Child Requirement</span>
                                         <span>{selectedChild.required_qualification_text}</span>
                                         <span className=" text-gray-500 text-sm">
-                                            Level {selectedChild.required_qualification}
+                                            Level {selectedChild.required_qualification_value}
                                         </span>
                                     </div>
                                 </div>
@@ -333,7 +330,7 @@ const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
                                             {selectedAssistant.qualification_text}
                                         </span>
                                         <span className="text-right text-gray-500 text-sm">
-                                            Level {selectedAssistant.qualification}
+                                            Level {selectedAssistant.qualification_value}
                                         </span>
                                     </div>
                                     <div className="p-2 bg-green-100 rounded-lg">

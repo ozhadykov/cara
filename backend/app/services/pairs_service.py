@@ -63,6 +63,7 @@ class PairsService:
                         c.requested_hours AS c_requested_hours,
                         cq.id AS c_required_qualification,
                         cq.qualification_text AS c_required_qualification_text,
+                    
                         ca.street AS c_street,
                         ca.street_number AS c_street_number,
                         ca.city AS c_city,
@@ -359,8 +360,8 @@ class PairsService:
                     (ad.max_capacity - ad.used_hours) AS free_hours,
                     CASE
                         WHEN (
-                            (SELECT c.required_qualification FROM children c WHERE c.id = %s)
-                            <= ad.qualification
+                            (SELECT q.qualification_value FROM qualifications q WHERE q.id = (SELECT c.required_qualification FROM children c WHERE c.id = %s))
+                            <= (SELECT q.qualification_value FROM qualifications q WHERE q.id = ad.qualification)
                         )
                         THEN TRUE
                         ELSE FALSE
