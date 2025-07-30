@@ -52,5 +52,4 @@ async def update_child(
 @router.delete("/{child_id}")
 async def delete_child(child_id: int, children_service: ChildrenService = Depends()):
     result = await children_service.delete_child(child_id)
-    await asyncio.sleep(1)
     return result
