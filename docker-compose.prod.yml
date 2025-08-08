@@ -22,7 +22,7 @@ services:
   ampl:
     container_name: ampl
     command: 'uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload'
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile.ampl
     volumes:
@@ -32,7 +32,7 @@ services:
       - phenix
   db:
     container_name: database
-    build: 
+    build:
       context: ./database
       dockerfile: Dockerfile.database
     environment:
