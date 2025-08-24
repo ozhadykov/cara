@@ -9,7 +9,7 @@ class Child(BaseModel):
     required_qualification: int
     required_qualification_text: Optional[str] = None
     required_qualification_value: Optional[int] = None
-    requested_hours: int
+    requested_hours: float
     street: str
     street_number: str
     city: str

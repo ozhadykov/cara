@@ -9,8 +9,8 @@ class Assistant(BaseModel):
     qualification: int
     qualification_text: Optional[str] = None
     qualification_value: Optional[int] = None
-    min_capacity: int
-    max_capacity: int
+    min_capacity: float
+    max_capacity: float
     has_car: bool
     street: str
     street_number: str

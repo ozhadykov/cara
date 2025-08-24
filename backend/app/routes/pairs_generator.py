@@ -5,7 +5,7 @@ from ..schemas.pairs_generator import GeneratePairsData, CreateSinglePairIn, Pai
 
 router = APIRouter(
     prefix="/api/pair_generator",
-    tags=["db"],
+    tags=["pair_generator"],
     dependencies=[],
     responses={404: {"description": "nothing found in pairs service"}},
 )

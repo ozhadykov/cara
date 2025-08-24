@@ -7,7 +7,7 @@ from ..schemas.children import ChildrenIn, Child
 
 router = APIRouter(
     prefix="/api/children",
-    tags=["db"],
+    tags=["children"],
     dependencies=[],
     responses={404: {"description": "nothing found in children service"}},
 )
