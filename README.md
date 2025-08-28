@@ -1,103 +1,237 @@
-# CARA (Child and Assistant Resource Assignment)
+# CARA - Caretaker Assignment & Resource Allocation
 
-## Important notes about development
+🎯 **Intelligent optimization system for assigning caretakers to children based on qualifications, travel time, and workload balance.**
 
-I will note important things.
+CARA is a comprehensive web application designed to optimize the assignment of caretakers (assistants) to children requiring care. The system uses linear programming optimization to create the most efficient assignments while considering multiple weighted criteria.
 
-We are working with docker, so all links, are relative to local machines, but when it will be in production
-and someone will call this website with a domain, `http://localhost` will mean a different thing. It will
-mean localhost of a users machine, so it will be dead wrong.
+## 🌟 Key Features
 
-This is the reason why WE MUST work with frontend like that:
+- **Multi-criteria Optimization**: Considers travel time, qualifications, and workload balance
+- **Three Qualification Levels**: ReKo (Basic), QHK (Qualified Helper), FK (Specialist)
+- **Smart Address Management**: Address validation and reuse to minimize Google API calls
+- **Flexible Assignment**: Manual and automatic pairing with intelligent load distribution
+- **Real-time Travel Time Calculation**: Integration with Google Distance Matrix API
+- **Batch Processing**: Efficient CSV import for bulk data management
+- **Interactive Web Interface**: User-friendly React-based frontend
+
+## 🏗️ Architecture
+
+CARA follows a containerized microservices architecture:
 
 ```
-# activate local dev
-npm run dev
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Frontend      │    │    Backend       │    │  Optimization   │
+│   (React)       │◄──►│   (FastAPI)      │◄──►│    (AMPL)       │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+                              │
+                       ┌──────▼──────┐
+                       │  Database   │
+                       │ (MySQL)│
+                       └─────────────┘
 ```
 
-And when we will push it to production we will have to add Nginx proxy, which will THE ONLY entry point to our Docker network. Please pay attention and try to understand that. Each api call should be in a form like:
+### Components
 
+- **Frontend**: React with TypeScript, DaisyUI, and Tailwind CSS
+- **Backend**: Python FastAPI with business logic and API endpoints
+- **Optimization Module**: AMPL-based linear programming solver
+- **Database**: PostgreSQL for data persistence
+- **Admin Interface**: Adminer for database management
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Docker and Docker Compose installed on your system
+- [Install Docker](https://docs.docker.com/get-started/get-docker/)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/ozhadykov/cara.git
+   cd cara
+   ```
+
+2. **Start the application**
+   ```bash
+   docker compose up --build -d
+   ```
+
+3. **Verify all containers are running**
+   ```bash
+   docker ps
+   ```
+
+4. **Access the application**
+   - Main Application: `http://localhost`
+   - Database Admin: `http://localhost:8081`
+
+## 🔑 Google API Setup (Required)
+
+Before importing new children or caretakers, you need a valid Google API key with these services enabled:
+
+### Required APIs
+- **Distance Matrix API** - For travel time calculations
+- **Address Validation API** - For address verification
+
+### Free Tier Limits
+- Address Validation: 5,000 calls/month
+- Distance Matrix: 5,000 calls/month (up to 100 destinations per call)
+
+⚠️ **Important**: Without a valid API key, you cannot import new data into the system.
+
+### Configuration
+Add your Google API key in the application settings after startup.
+
+## 📊 Data Import
+
+### CSV Format for Children
+```csv
+first_name,family_name,required_qualification,street,street_number,city,zip_code,requested_hours
+Lena,Meyer,2,Lessingstraße,10,"Halle (Saale)",06114,20
+Paul,Schmidt,1,Goethestraße,5,"Halle (Saale)",06110,25
+Sophie,Weber,3,Hallorenring,1,"Halle (Saale)",06108,15
 ```
-fetch('/api/service') -> this is wright
 
-fetch('http://localhost:8080') -> this is WRONG, please don't do that.
+### CSV Format for Caretakers
+```csv
+first_name,family_name,qualification,has_car,street,street_number,city,zip_code,min_capacity,max_capacity
+Sophie,Schneider,2,0,Lessingstraße,15,"Halle (Saale)",06114,25,35
+Michael,Weber,1,1,Goethestraße,8,"Halle (Saale)",06110,15,25
+Laura,Fischer,3,0,Hallorenring,3,"Halle (Saale)",06108,35,40
 ```
 
-## Planning
+**Note**: Use quotes for decimal numbers (e.g., "25.56") and dots instead of commas for float values.
 
-Milestones:
+## 🎯 Optimization Model
 
-- first presentation 22.05.2025
-- last presentation 03.07.2025 or 26.06.2025, depends on us
-- Report 28.08.2205
+CARA uses advanced linear programming to find optimal assignments:
 
-Our milestones:
+### Optimization Criteria
+1. **Qualification Matching**
+   - Perfect match: 100 points
+   - One level overqualified: 66.6 points
+   - Two levels overqualified: 33.3 points
+   - Underqualified: Excluded
 
-- 04.05.2025 first model, should not be optimal
-- 8.05.2025 minimal frontend wich outputs model results
-- 15.05.2025 DB from excel tables, Frontend with iput Forms for Children and Assitents. Also fine tuned model
-- 22.05.2025 Dashboards about capacity of phenix. (How many children, how many assitents, how many hours total and so on)
-- 29.05.2025 Bug fixes and fine tuning.
-- 05.06.2025 Production ready. (installed proxy for communicating with docekr network)
-- 12.06.2025 fully tested and documented for future installation in phenix
+2. **Travel Time Optimization**
+   - Normalized score (0-1)
+   - Short distances (≤15 min): Score 1.0
+   - Long distances (≥90 min): Score 0.0
 
-# Requierments
+3. **Workload Balance**
+   - Minimizes overtime penalties
+   - Reduces underutilization
+   - Ensures fair distribution
 
-1. CRUD Operations on children and assitents
+### Smart Features
+- **Automatic Load Splitting**: High-demand children (>20 hours) can be assigned multiple caretakers
+- **Existing Assignment Preservation**: Maintains manually created pairs
+- **Configurable Weights**: Adjustable importance for different criteria
 
-   - Add new child / assitent
-   - delete child / assitent
-   - update child / assitent
+## 🛠️ Usage Scenarios
 
-2. Dashboard / Overview
+### What Requires Google API:
+✅ Importing new children  
+✅ Importing new caretakers  
+✅ Adding/editing records with new addresses  
 
-   - Capacity, how many hours are free, how many assitents are free and so on
-   - list of children and assitents, who is working with whom
+### What Works Without Google API:
+✅ Pairs Manager (always functional)  
+✅ Linear programming optimization  
+✅ Viewing existing data  
+✅ Creating assignments from existing records  
 
-3. Creating a new paln
+## 🔧 Development
 
-   - select children and assitents, who need a pair (because some assitents want to continue work with the same child)
-   - set up soft constraints, such as 'time to destination' as range in mins and more if there are
+### Project Structure
+```
+/cara
+├── /frontend/app          # React frontend
+├── /backend/app           # FastAPI backend
+├── /backend/ampl_app      # AMPL optimization module
+├── /database              # Database configuration
+└── docker-compose.yml     # Container orchestration
+```
 
-4. Working with "non assigned"
+### Making Changes
 
-   - after a new plan is created, create a list with children and assitents who don't have a pair
-   - add to pool new requests from children and new apllications from assistants
-   - use model to find "new possible" pairs
+**Frontend updates:**
+```bash
+# Make changes in /frontend
+docker compose up --build -d
+```
 
-5. Working with edge cases
+**Backend updates:**
+```bash
+# Make changes in /backend/app
+docker compose up --build -d
+```
 
-   - handling "unusual" working days
-   - handling "working pairs", two assitents work with one child, changing in defined period of times
-   - qualification missmatch, but it assitent can still work with a child (FK with QHK)
-   - and citation, because I did not understand the meaning "Begleiter:innen, die als Übungsleiter:innen tätig sind, sind im Moment als Vertretung eingeplant und bekommen kein festes Kind!"
+### API Documentation
+Full API documentation is available in the application under Settings → API Overview.
 
-6. Data migration. Phenix already has children in care, so this pairs should be imported in the app.
-   - Migration tool from csv, for existing pairs
+## 🔒 Security
 
-# Goal
+- **Reverse Proxy**: NGINX protects internal services
+- **Container Isolation**: Backend and optimization modules are not externally accessible
+- **Network Segmentation**: All services communicate through internal Docker network
 
-As requested the goal is to get as many pairs as possible with the best possible conditions for every child and assitent
+## 💾 Backup & Maintenance
 
-## Look into problem
+### Database Backup
+```bash
+docker exec -t database mysqldump -u root -p phenix_mysql > backup.sql
+```
 
-We have defined this problem as a maximization problem.
+### Database Restore
+```bash
+docker exec -i database mysql -u root -p phenix_mysql < backup.sql
+```
 
-# TODO:
+### Stop Application
+```bash
+docker compose down -v
+```
 
-1. Add Toasts to Add/Update Assistants and Children. - DONE
-2. Add Loading and Toasts to keys Setup - DONE
-3. Add "add all" to table in pairs generator - DONE
-4. Add Weights settings for LP model settings page - DONE
-5. Refactor Settings Page - DONE
-6. Add custom assigment tool to pairs generator page
-7. Finish color Scheme, add success, danger, warning colors - DONE
-8. Fix Frontend calls to backend without "npm run dev"
-9. AMPL Model python code - DONE
-10. Generate pairs step 3. - DONE
-11. Create DB backup rotator.
-12. Check if assistant/child exists before insertion
-13. Add amounts on step 3 to children and assistants pairs generator
-14. Deleting existed pairs in db, before pairs generation
-15. Saving all generations in pairs_archive with id and JSON value
-16. Transforming and using weights from DB in LP model
+### Restart Application
+```bash
+docker compose up --build -d
+```
+
+## 🐛 Troubleshooting
+
+**Containers won't start:**
+- Check if Docker is running
+- Verify ports 80, 3306, 8081 are available
+
+**Database connection issues:**
+- Ensure database container is running: `docker ps`
+- Check logs: `docker logs database`
+
+**Optimization failures:**
+- Check AMPL container logs: `docker logs ampl`
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 📞 Support
+
+For questions or issues:
+- Create an issue on GitHub
+- Check the troubleshooting section above
+- Review the API documentation in the application
+
+---
+
+**Built with** ❤️ **for optimizing caretaker assignments and improving care coordination efficiency.**
