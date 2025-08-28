@@ -36,8 +36,8 @@ type PairInfo = {
     a_zip_code: string
 }
 
-const PairOverview = () => {
-    const [pairs, setPairs] = useState<PairInfo[]>()
+const PairOverview = (pairsProp : PairInfo[]) => {
+    const [pairs, setPairs] = useState<PairInfo[]>(pairsProp)
     const { toggleLoading } = useLoading()
     const { sendMessage } = useToast()
 

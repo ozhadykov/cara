@@ -45,6 +45,16 @@ const ModelParams = ({ next, prev, setWeightsForModel }: IModelParamsProps) => {
                         />
                     </div>
                     <div className="param-card">
+                        <Range label={"Undertime penalty rate"}
+                               description={"Define how strong will be undertime hours penalized in model"}
+                               setValueForParent={setUndertimePenalty}
+                               initialValue={undertimePenalty}
+                               min={0}
+                               max={10}
+                               step={1}
+                        />
+                    </div>
+                    <div className="param-card">
                         <Range label={"Overtime penalty rate"}
                                description={"Define how strong will be overtime hours penalized in model"}
                                setValueForParent={setOvertimePenalty}
@@ -56,19 +66,9 @@ const ModelParams = ({ next, prev, setWeightsForModel }: IModelParamsProps) => {
                     </div>
                     <div className="param-card">
                         <Range label={"Max allowed overtime"}
-                               description={"Define the number of requested hours from which the model should attempt to assign two assistants to a child."}
+                               description={"Define how much overtime hours are allowed."}
                                setValueForParent={setAllowedOvertime}
                                initialValue={allowedOvertime}
-                               min={0}
-                               max={10}
-                               step={1}
-                        />
-                    </div>
-                    <div className="param-card">
-                        <Range label={"Undertime importance"}
-                               description={"Define how strong will be undertime hours penalized in model"}
-                               setValueForParent={setUndertimePenalty}
-                               initialValue={undertimePenalty}
                                min={0}
                                max={10}
                                step={1}

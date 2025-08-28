@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react"
 import { ChangeEvent, useEffect, useState } from "react"
 
-import { Range, TabCard } from "../components"
+import { TabCard } from "../components"
 import { postRequest } from "../lib/request"
 import { useLoading, useToast } from "../contexts"
 import { toastTypes } from "../lib/constants.ts"
@@ -9,12 +9,8 @@ import { toastTypes } from "../lib/constants.ts"
 const Settings = () => {
     const { sendMessage } = useToast()
     const { toggleLoading } = useLoading()
-    const [amplKey, setAmplKey] = useState("")
     const [googleKey, setGoogleKey] = useState<string>("")
 
-    const handleChangeAmpl = (event: ChangeEvent<HTMLInputElement>) => {
-        setAmplKey(event.target.value)
-    }
     const handleChangeGoogle = (event: ChangeEvent<HTMLInputElement>) => {
         setGoogleKey(event.target.value)
     }
@@ -35,12 +31,6 @@ const Settings = () => {
         const fetchData = async () => {
             toggleLoading(true)
             try {
-                const getAmplKey = async () => {
-                    const response = await fetch("/api/settings/key/ampl_key")
-                    const data = await response.json()
-                    if (response.ok) setAmplKey(data.apiKey)
-                }
-
                 const getGoogleKey = async () => {
                     const response = await fetch("/api/settings/key/google_maps_key")
                     const data = await response.json()
@@ -48,7 +38,6 @@ const Settings = () => {
                 }
 
 
-                await getAmplKey()
                 await getGoogleKey()
             } catch (err) {
                 console.error("Error fetching settings:", err)
@@ -85,24 +74,6 @@ const Settings = () => {
                                 >
                                     <div
                                         className="keys-settings-content flex flex-col gap-3 items-center justify-center w-full h-full">
-                                        <div className="w-full flex flex-row items-center gap-2">
-                                            <label className="w-48">AMPL Key</label>
-                                            <input
-                                                className="border border-gray-300 rounded px-3 py-2 w-64"
-                                                type="text"
-                                                value={amplKey}
-                                                onChange={handleChangeAmpl}
-                                            />
-                                            <button
-                                                className="btn btn-secondary"
-                                                onClick={async () =>
-                                                    await sendKey("ampl_key", amplKey)
-                                                }
-                                            >
-                                                Send
-                                            </button>
-                                        </div>
-
                                         <div className="w-full flex flex-row items-center gap-2">
                                             <label className="w-48">Google Cloud Key</label>
                                             <input

@@ -11,6 +11,7 @@ interface IGeneratorProps {
     next: () => void
     prev: () => void
     modelParams: IModelParams | null
+    updateData: () => void
 }
 
 const generationSteps = {
@@ -19,7 +20,7 @@ const generationSteps = {
     done: "done",
 }
 
-const Generator = ({ next, prev, modelParams }: IGeneratorProps) => {
+const Generator = ({ next, prev, modelParams, updateData }: IGeneratorProps) => {
     const [generationStep, setGenerationStep] = useState<string>(generationSteps.init)
     const [generationStatus, setGenerationStatus] = useState<boolean | null>(null)
     const [pairs, setPairs] = useState<[]>([])
@@ -168,6 +169,7 @@ const Generator = ({ next, prev, modelParams }: IGeneratorProps) => {
             console.log("WebSocket disconnected:", event.code, event.reason)
             sendMessage("Websocket disconnected", toastTypes.info)
             toggleLoading(false)
+            updateData()
         }
 
         ws.onerror = (err) => {
@@ -191,7 +193,6 @@ const Generator = ({ next, prev, modelParams }: IGeneratorProps) => {
                             <p className="text-lg">
                                 Pairs generated and saved in Database successfully
                             </p>
-                            <button className="btn btn-secondary">See pairs</button>
                         </>
                     ) : (
                         <>
