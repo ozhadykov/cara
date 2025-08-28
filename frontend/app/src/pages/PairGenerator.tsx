@@ -31,6 +31,13 @@ const PairGenerator = () => {
     const { toggleLoading } = useLoading()
     const { sendMessage } = useToast()
 
+    const [data, setData] = useState(0)
+
+    const updateData = () => {
+        setData(prevData => prevData + 1)
+        console.log('setting data')
+    }
+
     useEffect(() => {
         const getInitData = async () => {
             try {
@@ -55,7 +62,7 @@ const PairGenerator = () => {
         }
 
         getInitData()
-    }, [])
+    }, [data])
 
     // 1. select children to pass in model
     // 2. select assistants to pass in model
@@ -115,7 +122,7 @@ const PairGenerator = () => {
                                     title="Overview"
                                     description="Here you can view and delete pairs"
                                 >
-                                    <PairOverview />
+                                    <PairOverview pairProp={pairs}/>
                                 </TabCard>
                             </div>
 
@@ -131,7 +138,8 @@ const PairGenerator = () => {
                                     description="Here you can generate pairs automatically"
                                 >
                                     <div className="card-body bg-white rounded-lg flex flex-row">
-                                        <div className="flex flex-col items-center justify-center w-fit pl-4 pr-18 flex-none">
+                                        <div
+                                            className="flex flex-col items-center justify-center w-fit pl-4 pr-18 flex-none">
                                             <div className="generator-steps-navigation w-full h-full flex flex-col">
                                                 <ul className="steps steps-vertical grow-1">
                                                     {steps.map((step) => (
@@ -175,6 +183,7 @@ const PairGenerator = () => {
                                                     next={nextStep}
                                                     prev={prevStep}
                                                     modelParams={modelParams}
+                                                    updateData={updateData}
                                                 />
                                             )}
                                         </div>

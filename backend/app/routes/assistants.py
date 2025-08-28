@@ -6,7 +6,7 @@ from ..schemas.assistants import AssistantIn, Assistant
 
 router = APIRouter(
     prefix="/api/assistants",
-    tags=["db"],
+    tags=["assistants"],
     dependencies=[],
     responses={404: {"description": "nothing found in assistant service"}},
 )

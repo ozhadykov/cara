@@ -1,6 +1,6 @@
 first_name,family_name,qualification,has_car,street,street_number,city,zip_code,min_capacity,max_capacity
-Sophie,Schneider,2,0,Lessingstraße,15,"Halle (Saale)",06114,25,35
-Michael,Weber,1,1,Goethestraße,8,"Halle (Saale)",06110,15,25
+Sophie,Schneider,2,0,Lessingstraße,15,"Halle (Saale)",06114,"25.56",35
+Michael,Weber,1,1,Goethestraße,8,"Halle (Saale)",06110,"15.5",25
 Laura,Fischer,3,0,Hallorenring,3,"Halle (Saale)",06108,35,40
 Daniel,Meyer,1,1,Merseburger Straße,60,"Halle (Saale)",06112,25,25
 Anna,Schulz,2,0,Bernburger Straße,115,"Halle (Saale)",06108,15,15

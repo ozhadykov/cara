@@ -5,7 +5,7 @@ from ..schemas.api_key import ApiKey, WeightsIn
 
 router = APIRouter(
     prefix="/api/settings",
-    tags=["db"],
+    tags=["settings"],
     dependencies=[],
     responses={404: {"description": "nothing found in key service"}},
 )

@@ -1,8 +1,8 @@
-first_name,family_name,required_qualification,street,street_number,city,zip_code,requested_hours,time_start,time_end
-Lena,Meyer,2,Lessingstraße,10,"Halle (Saale)",06114,20,09:00:00,12:00:00
-Paul,Schmidt,1,Goethestraße,5,"Halle (Saale)",06110,25,14:00:00,17:00:00
-Sophie,Weber,3,Hallorenring,1,"Halle (Saale)",06108,15,10:00:00,11:30:00
-Max,Fischer,1,Merseburger Straße,50,"Halle (Saale)",06112,30,08:30:00,13:30:00
+first_name,family_name,required_qualification,street,street_number,city,zip_code,requested_hours
+Lena,Meyer,2,Lessingstraße,10,"Halle (Saale)",06114,20
+Paul,Schmidt,1,Goethestraße,5,"Halle (Saale)",06110,25
+Sophie,Weber,3,Hallorenring,1,"Halle (Saale)",06108,15
+Max,Fischer,1,Merseburger Straße,50,"Halle (Saale)",06112,30,
 Anna,Müller,2,Bernburger Straße,100,"Halle (Saale)",06108,18,15:00:00,17:30:00
 Felix,Schulz,3,Dessauer Straße,120,"Halle (Saale)",06118,22,09:30:00,12:30:00
 Mia,Wagner,1,Leipziger Straße,70,"Halle (Saale)",06108,28,13:00:00,16:00:00
