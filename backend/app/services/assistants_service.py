@@ -1,6 +1,10 @@
 from typing import TYPE_CHECKING
 from fastapi import Depends
+from fastapi.responses import StreamingResponse
+import io
+import pandas as pd
 from pymysql.connections import Connection
+
 import pymysql.cursors
 
 from ..database.database import get_db
@@ -179,4 +183,35 @@ class AssistantsService:
             return cursor.rowcount
         
     async def export_assistants(self):
-        assistants = await self.get_all_assistants()
+        
+        try:
+            # 1. HIER NUTZEN WIR IHRE BESTEHENDE FUNKTION!
+            # Wir rufen einfach die Service-Methode auf, die Sie bereits haben.
+            assistants_data = await self.get_all_assistants()
+
+            if not assistants_data:
+                # Wenn keine Daten da sind, eine leere CSV mit Spaltenüberschriften erstellen
+                headers = [
+                    "id", "first_name", "family_name", "qualification", "qualification_text", 
+                    "qualification_value", "has_car", "min_capacity", "max_capacity", 
+                    "street", "street_number", "city", "zip_code", "address_id", 
+                    "latitude", "longitude"
+                ]
+                csv_content = ','.join(headers)
+            else:
+                # 2. Die Liste von Dictionaries in einen pandas DataFrame umwandeln
+                df = pd.DataFrame(assistants_data)
+            
+                # 3. Den DataFrame in einen CSV-String im Speicher umwandeln
+                csv_content = df.to_csv(index=False, encoding='utf-8')
+
+            buffer = io.BytesIO(csv_content.encode("utf-8"))
+
+            return StreamingResponse(
+                buffer,
+                media_type="text/csv",
+                headers={"Content-Disposition": "attachment; filename=assistans.csv"}
+            )
+
+        except Exception as e:
+            return {"error": f"Ein Fehler beim CSV-Export ist aufgetreten: {e}"}
