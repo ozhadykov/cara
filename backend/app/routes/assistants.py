@@ -17,6 +17,10 @@ async def get_all_assistants(assistant_service: AssistantsService = Depends()):
     result = await assistant_service.get_all_assistants()
     return result
 
+@router.get("/export")
+async def export_assistants(assistant_service: AssistantsService = Depends()):
+     return await assistant_service.export_assistants()
+
 
 @router.get("/{assistant_id}")
 async def get_assistant(assistant_id: int, assistant_service: AssistantsService = Depends()):
@@ -33,7 +37,6 @@ async def create_assistants(
 ):
     result = await assistant_service.create_assistant(assistants, distance_service, children_service)
     return result
-
 
 @router.post("/{assistant_id}")
 async def update_assistant(
@@ -52,6 +55,3 @@ async def delete_assistant(assistant_id: int, assistant_service: AssistantsServi
     result = await assistant_service.delete_assistant(assistant_id)
     return result
 
-@router.get("/export")
-async def export_assistants(assistant_service: AssistantsService = Depends()):
-     return assistant_service.export_assistants()

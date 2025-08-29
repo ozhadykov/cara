@@ -7,6 +7,10 @@ from ..schemas.children import ChildrenIn, Child
 from ..schemas.address import Address
 from ..schemas.Response import Response
 
+from fastapi.responses import StreamingResponse
+import io
+import pandas as pd
+
 if TYPE_CHECKING:
     from ..services.distance_service import DistanceService
     from ..services.assistants_service import AssistantsService
@@ -175,5 +179,29 @@ class ChildrenService:
             return cursor.rowcount
     
     async def export_children(self):
-        children = self.get_all_children()
+        try:
+            children = await self.get_all_children()
+
+            if not children or len(children) == 0:
+                headers = [
+                    "id", "first_name","family_name","required_qualification","required_qualification_text",
+                    "required_qualification_value","requested_hours","street","street_number",
+                    "city","zip_code","address_id","latitude","longitude"
+                ]
+                csv_content = ','.join(headers)
+            else:
+                df = pd.DataFrame(children)
+            
+                csv_content = df.to_csv(index=False, encoding='utf-8')
+
+            buffer = io.BytesIO(csv_content.encode("utf-8"))
+
+            return StreamingResponse(
+                buffer,
+                media_type="text/csv",
+                headers={"Content-Disposition": "attachment; filename=assistans.csv"}
+            )
+
+        except Exception as e:
+            return {"error": f"Ein Fehler beim CSV-Export ist aufgetreten: {e}"}
         

@@ -18,6 +18,10 @@ async def get_all_children(children_service: ChildrenService = Depends()):
     result = await children_service.get_all_children()
     return result
 
+@router.get("/export")
+async def export_children(children_service: ChildrenService = Depends()):
+    return await children_service.export_children()
+
 
 @router.get("/{child_id}")
 async def get_child(child_id: int, children_service: ChildrenService = Depends()):
@@ -54,6 +58,3 @@ async def delete_child(child_id: int, children_service: ChildrenService = Depend
     result = await children_service.delete_child(child_id)
     return result
 
-@router.get("/export")
-async def export_children(children_service: ChildrenService = Depends()):
-    return children_service.export_children()

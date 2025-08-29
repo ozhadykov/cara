@@ -21,6 +21,10 @@ async def get_all_pairs(pairs_service: PairsService = Depends()):
     result = await pairs_service.get_all_pairs()
     return result
 
+@router.get("/export")
+async def export_pairs(pairsService: PairsService = Depends()):
+    return await pairsService.export_pairs()
+
 @router.delete("/pair/{pair_id}")
 async def delete_pair(pair_id: int, pairs_service: PairsService = Depends()):
     result = await pairs_service.delete_pair(pair_id)
@@ -66,6 +70,3 @@ async def websocket_generate_pairs(websocket: WebSocket, pairs_service: PairsSer
         # closing connection
         await websocket.close()
 
-@router.get("/export")
-async def export_pairs(pairsService: PairsService = Depends()):
-    return await pairsService.export_pairs()

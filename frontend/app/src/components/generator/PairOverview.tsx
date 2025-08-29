@@ -25,7 +25,19 @@ const PairOverview = ({ pairsProp }: { pairsProp: PairInfo[] }) => {
     }
 
     const exportPairs = async () => {
-        await fetch("/api/pair_generator/export")
+        const res = await fetch("/api/pair_generator/export")
+
+        const blob = await res.blob()
+
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+
+        a.download = "pairs.csv"
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        window.URL.revokeObjectURL(url)
     }
 
     useEffect(() => {

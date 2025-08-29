@@ -48,7 +48,19 @@ const ChildrenSingleImport = ({ refresh }: { refresh: boolean }) => {
     }
 
     const exportChildren = async () => {
-        await fetch("/api/children/export")
+        const res = await fetch("/api/children/export")
+
+        const blob = await res.blob()
+
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+
+        a.download = "children.csv"
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        window.URL.revokeObjectURL(url)
     }
 
     useEffect(() => {

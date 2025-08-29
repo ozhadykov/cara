@@ -48,7 +48,19 @@ const AssistantSingleImport = ({ refresh }: { refresh: boolean }) => {
     }
 
     const exportAssistants = async () => {
-        await fetch("/api/assistants/export")
+        const res = await fetch("/api/assistants/export")
+
+        const blob = await res.blob()
+
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+
+        a.download = "assistants.csv"
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        window.URL.revokeObjectURL(url)
     }
 
     useEffect(() => {

@@ -12,6 +12,10 @@ from ..services.assistants_service import AssistantsService
 from ..schemas.pairs_generator import GeneratePairsData
 from ..schemas.pairs_generator import Pair
 
+from fastapi.responses import StreamingResponse
+import io
+import pandas as pd
+
 BASE_URL = 'http://ampl:8000'
 
 
@@ -373,4 +377,33 @@ class PairsService:
             return cursor.fetchone()
         
     async def export_pairs(self):
-        pairs = await self.get_all_pairs()
+        try:
+            pairs = await self.get_all_pairs()
+
+            if not pairs.data or len(pairs.data) == 0:
+                headers = [
+                    "id","c_id","c_first_name",
+                    "c_family_name","c_requested_hours",
+                    "c_required_qualification","c_required_qualification_text","c_street",
+                    "c_street_number","c_city","c_zip_code",
+                    "a_id","a_first_name","a_family_name",
+                    "a_qualification","a_qualification_text","a_has_car",
+                    "a_min_capacity","a_max_capacity","a_street",
+                    "a_street_number","a_city","a_zip_code"
+                ]
+                csv_content = ','.join(headers)
+            else:
+                df = pd.DataFrame(pairs.data)
+            
+                csv_content = df.to_csv(index=False, encoding='utf-8')
+
+            buffer = io.BytesIO(csv_content.encode("utf-8"))
+
+            return StreamingResponse(
+                buffer,
+                media_type="text/csv",
+                headers={"Content-Disposition": "attachment; filename=assistans.csv"}
+            )
+
+        except Exception as e:
+            return {"error": f"Ein Fehler beim CSV-Export ist aufgetreten: {e}"}
