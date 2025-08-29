@@ -51,3 +51,7 @@ async def update_assistant(
 async def delete_assistant(assistant_id: int, assistant_service: AssistantsService = Depends()):
     result = await assistant_service.delete_assistant(assistant_id)
     return result
+
+@router.get("/export")
+async def export_assistants(assistant_service: AssistantsService = Depends()):
+     return assistant_service.export_assistants()

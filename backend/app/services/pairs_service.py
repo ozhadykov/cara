@@ -371,3 +371,6 @@ class PairsService:
                 """, (assistant_id, child_id)
             )
             return cursor.fetchone()
+        
+    async def export_pairs(self):
+        pairs = await self.get_all_pairs()

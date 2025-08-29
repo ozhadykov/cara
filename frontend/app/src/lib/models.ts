@@ -41,3 +41,33 @@ export type TChildImport = {
 export type TAssistantImport = {
     assistants: Assistant[]
 }
+
+export type PairInfo = {
+    id: number
+
+    // Child info
+    c_id: number
+    c_first_name: string
+    c_family_name: string
+    c_required_qualification: number
+    c_required_qualification_text: string
+    c_street: string
+    c_street_number: string
+    c_requested_hours: number
+    c_city: string
+    c_zip_code: string
+
+    // Assistant info
+    a_id: number
+    a_first_name: string
+    a_family_name: string
+    a_qualification: number
+    a_qualification_text: string
+    a_has_car: boolean
+    a_min_capacity: number
+    a_max_capacity: number
+    a_street: string
+    a_street_number: string
+    a_city: string
+    a_zip_code: string
+}

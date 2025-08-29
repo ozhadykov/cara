@@ -47,13 +47,20 @@ const ChildrenSingleImport = ({ refresh }: { refresh: boolean }) => {
         }
     }
 
+    const exportChildren = async () => {
+        await fetch("/api/children/export")
+    }
+
     useEffect(() => {
         refreshChildren()
     }, [refresh])
     if (!children) return <></>
     return (
         <div>
-            <div className="w-full flex justify-end">
+            <div className="w-full flex justify-end gap-5">
+                <button className="btn btn-outline mb-10" onClick={exportChildren}>
+                    Export
+                </button>
                 <button className="btn btn-secondary mb-10" onClick={toggleCreateRecord}>
                     Add Record
                 </button>

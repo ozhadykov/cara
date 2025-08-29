@@ -177,3 +177,6 @@ class AssistantsService:
             cursor.execute("DELETE FROM assistants WHERE id = %s;", (assistant_id))
             self.db.commit()
             return cursor.rowcount
+        
+    async def export_assistants(self):
+        assistants = await self.get_all_assistants()

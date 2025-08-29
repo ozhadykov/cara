@@ -53,3 +53,7 @@ async def update_child(
 async def delete_child(child_id: int, children_service: ChildrenService = Depends()):
     result = await children_service.delete_child(child_id)
     return result
+
+@router.get("/export")
+async def export_children(children_service: ChildrenService = Depends()):
+    return children_service.export_children()

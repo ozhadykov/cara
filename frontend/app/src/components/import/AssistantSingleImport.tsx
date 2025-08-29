@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { deleteRequest } from "../../lib/request"
+import { deleteRequest, postRequest } from "../../lib/request"
 import { Icon } from "@iconify/react/dist/iconify.js"
 import { useRecordSidebar } from "../../contexts/providers/RecordSidebarContext"
 import { useAssistantData } from "../../contexts/providers/AssistantDataContext"
@@ -47,13 +47,20 @@ const AssistantSingleImport = ({ refresh }: { refresh: boolean }) => {
         }
     }
 
+    const exportAssistants = async () => {
+        await fetch("/api/assistants/export")
+    }
+
     useEffect(() => {
         refreshAssistants()
     }, [refresh])
     if (!assistants) return <></>
     return (
         <div>
-            <div className="w-full flex justify-end">
+            <div className="w-full flex justify-end gap-5">
+                <button className="btn btn-outline mb-10" onClick={exportAssistants}>
+                    Export
+                </button>
                 <button className="btn btn-secondary mb-10" onClick={toggleCreateRecord}>
                     Add Record
                 </button>

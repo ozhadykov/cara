@@ -65,3 +65,7 @@ async def websocket_generate_pairs(websocket: WebSocket, pairs_service: PairsSer
     finally:
         # closing connection
         await websocket.close()
+
+@router.get("/export")
+async def export_pairs(pairsService: PairsService = Depends()):
+    return await pairsService.export_pairs()

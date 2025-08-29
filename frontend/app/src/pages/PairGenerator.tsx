@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react"
 import { Icon } from "@iconify/react"
-import { Assistant, Child } from "../lib/models.ts"
+import { Assistant, Child, PairInfo } from "../lib/models.ts"
 import { useLoading, useToast } from "../contexts"
 import { toastTypes } from "../lib/constants.ts"
 import {
@@ -25,7 +25,7 @@ export interface IModelParams {
 const PairGenerator = () => {
     const [children, setChildren] = useState<Child[]>([])
     const [assistants, setAssistants] = useState<Assistant[]>([])
-    const [pairs, setPairs] = useState([])
+    const [pairs, setPairs] = useState<PairInfo[]>([])
     const [currentStep, setCurrentStep] = useState<number>(1)
     const [modelParams, setModelParams] = useState<IModelParams | null>(null)
     const { toggleLoading } = useLoading()
@@ -34,8 +34,8 @@ const PairGenerator = () => {
     const [data, setData] = useState(0)
 
     const updateData = () => {
-        setData(prevData => prevData + 1)
-        console.log('setting data')
+        setData((prevData) => prevData + 1)
+        console.log("setting data")
     }
 
     useEffect(() => {
@@ -122,7 +122,7 @@ const PairGenerator = () => {
                                     title="Overview"
                                     description="Here you can view and delete pairs"
                                 >
-                                    <PairOverview pairProp={pairs}/>
+                                    <PairOverview pairsProp={pairs} />
                                 </TabCard>
                             </div>
 
@@ -138,8 +138,7 @@ const PairGenerator = () => {
                                     description="Here you can generate pairs automatically"
                                 >
                                     <div className="card-body bg-white rounded-lg flex flex-row">
-                                        <div
-                                            className="flex flex-col items-center justify-center w-fit pl-4 pr-18 flex-none">
+                                        <div className="flex flex-col items-center justify-center w-fit pl-4 pr-18 flex-none">
                                             <div className="generator-steps-navigation w-full h-full flex flex-col">
                                                 <ul className="steps steps-vertical grow-1">
                                                     {steps.map((step) => (

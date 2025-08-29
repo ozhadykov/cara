@@ -173,3 +173,7 @@ class ChildrenService:
             cursor.execute("DELETE FROM children WHERE id = %s;", (child_id))
             self.db.commit()
             return cursor.rowcount
+    
+    async def export_children(self):
+        children = self.get_all_children()
+        

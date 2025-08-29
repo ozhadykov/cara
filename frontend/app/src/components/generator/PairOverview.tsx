@@ -5,38 +5,9 @@ import { Icon } from "@iconify/react/dist/iconify.js"
 import { deleteRequest } from "../../lib/request"
 import ChildBox from "./ChildBox"
 import AssistantBox from "./AssistantBox"
+import { PairInfo } from "../../lib/models"
 
-type PairInfo = {
-    id: number
-
-    // Child info
-    c_id: number
-    c_first_name: string
-    c_family_name: string
-    c_required_qualification: number
-    c_required_qualification_text: string
-    c_street: string
-    c_street_number: string
-    c_requested_hours: number
-    c_city: string
-    c_zip_code: string
-
-    // Assistant info
-    a_id: number
-    a_first_name: string
-    a_family_name: string
-    a_qualification: number
-    a_qualification_text: string
-    a_has_car: boolean
-    a_min_capacity: number
-    a_max_capacity: number
-    a_street: string
-    a_street_number: string
-    a_city: string
-    a_zip_code: string
-}
-
-const PairOverview = (pairsProp : PairInfo[]) => {
+const PairOverview = ({ pairsProp }: { pairsProp: PairInfo[] }) => {
     const [pairs, setPairs] = useState<PairInfo[]>(pairsProp)
     const { toggleLoading } = useLoading()
     const { sendMessage } = useToast()
@@ -44,6 +15,7 @@ const PairOverview = (pairsProp : PairInfo[]) => {
     const refreshPairs = async () => {
         const res = await fetch("/api/pair_generator/pairs")
         const data = await res.json()
+
         setPairs([...data.data])
     }
 
@@ -52,11 +24,17 @@ const PairOverview = (pairsProp : PairInfo[]) => {
         refreshPairs()
     }
 
+    const exportPairs = async () => {
+        await fetch("/api/pair_generator/export")
+    }
+
     useEffect(() => {
         const fetchData = async () => {
             toggleLoading(true)
             try {
                 refreshPairs()
+                console.log("PAIRS")
+                console.log(pairs)
             } catch (err) {
                 console.error("Error fetching pairs:", err)
                 sendMessage("Error loading pairs.", toastTypes.error)
@@ -72,6 +50,12 @@ const PairOverview = (pairsProp : PairInfo[]) => {
 
     return (
         <div className="space-y-8 flex flex-col w-full">
+            <div className="w-full flex justify-end mb-5">
+                <button className="btn btn-outline mb-10" onClick={exportPairs}>
+                    Export
+                </button>
+            </div>
+
             {pairs.map((pair) => (
                 <div key={pair.id}>
                     <div className="flex flex-col rounded-2xl w-full shadow-md">
