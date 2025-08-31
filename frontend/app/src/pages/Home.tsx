@@ -25,9 +25,7 @@ const Home = () => {
             const response = await fetch("/api/pair_generator/coverage")
             const data = await response.json()
 
-            console.log(data)
             if (response.ok) {
-                console.log(data)
                 setCoverage(data)
             }
         }

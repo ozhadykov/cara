@@ -134,7 +134,7 @@ const Generator = ({ next, prev, modelParams, updateData }: IGeneratorProps) => 
     // endregion
 
     const handleGenerate = () => {
-        if (!modelParams){
+        if (!modelParams) {
             sendMessage("Model params are not set, aborting execution", toastTypes.error)
             return
         }
@@ -143,7 +143,7 @@ const Generator = ({ next, prev, modelParams, updateData }: IGeneratorProps) => 
         const data = {
             children: selectedChildrenObj,
             assistants: selectedAssistantsObj,
-            modelParams
+            modelParams,
         }
 
         const ws = new WebSocket(url)
@@ -157,7 +157,6 @@ const Generator = ({ next, prev, modelParams, updateData }: IGeneratorProps) => 
         ws.onmessage = (event) => {
             const response = JSON.parse(event.data)
             sendMessage(response.message, response.success ? toastTypes.info : toastTypes.error)
-            console.log("Received:", response)
             if (response.status == "done") {
                 setGenerationStep(generationSteps.done)
                 setGenerationStatus(response.success)
@@ -166,7 +165,6 @@ const Generator = ({ next, prev, modelParams, updateData }: IGeneratorProps) => 
         }
 
         ws.onclose = (event) => {
-            console.log("WebSocket disconnected:", event.code, event.reason)
             sendMessage("Websocket disconnected", toastTypes.info)
             toggleLoading(false)
             updateData()

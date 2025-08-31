@@ -47,9 +47,9 @@ CREATE TABLE children
 
     required_qualification INT CHECK (required_qualification > 0 AND required_qualification <= 3),
 
-    requested_hours        INT          NOT NULL,
+    requested_hours        FLOAT DEFAULT 0.00  NOT NULL ,
 
-    address_id             INT          NOT NULL,
+    address_id             INT                 NOT NULL,
 
     created_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at             DATETIME  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -69,11 +69,11 @@ CREATE TABLE assistants
 
     qualification INT CHECK (qualification > 0 AND qualification <= 3),
 
-    min_capacity  INT          NOT NULL CHECK (min_capacity >= 0),
-    max_capacity  INT          NOT NULL CHECK (max_capacity >= 0),
+    min_capacity  FLOAT    DEFAULT 0.00      NOT NULL CHECK (min_capacity >= 0) ,
+    max_capacity  FLOAT    DEFAULT 0.00      NOT NULL CHECK (max_capacity >= 0),
 
-    address_id    INT          NOT NULL,
-    has_car       BOOL         NOT NULL,
+    address_id    INT                        NOT NULL,
+    has_car       BOOL                       NOT NULL,
 
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    DATETIME  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

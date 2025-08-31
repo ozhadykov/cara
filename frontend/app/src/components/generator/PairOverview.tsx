@@ -45,8 +45,6 @@ const PairOverview = ({ pairsProp }: { pairsProp: PairInfo[] }) => {
             toggleLoading(true)
             try {
                 refreshPairs()
-                console.log("PAIRS")
-                console.log(pairs)
             } catch (err) {
                 console.error("Error fetching pairs:", err)
                 sendMessage("Error loading pairs.", toastTypes.error)

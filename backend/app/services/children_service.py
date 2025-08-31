@@ -180,27 +180,50 @@ class ChildrenService:
     
     async def export_children(self):
         try:
-            children = await self.get_all_children()
+            with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+                cursor.execute(
+                    """
+                        SELECT
+                            c.first_name AS first_name,
+                            c.family_name AS family_name,
+                            c.required_qualification AS required_qualification,
+                            REPLACE(adr.street, '+', ' ') AS street,
+                            REPLACE(adr.street_number, '+', ' ') AS street_number,
+                            REPLACE(adr.city, '+', ' ') AS city,
+                            adr.zip_code AS zip_code,
+                            c.requested_hours AS requested_hours
+                        FROM 
+                            children c
+                            JOIN address adr ON adr.id = c.address_id
+                        ORDER BY c.id;
+                    """
+                )
+                children = cursor.fetchall()
 
-            if not children or len(children) == 0:
-                headers = [
-                    "id", "first_name","family_name","required_qualification","required_qualification_text",
-                    "required_qualification_value","requested_hours","street","street_number",
-                    "city","zip_code","address_id","latitude","longitude"
-                ]
-                csv_content = ','.join(headers)
-            else:
-                df = pd.DataFrame(children)
-            
-                csv_content = df.to_csv(index=False, encoding='utf-8')
+                if not children or len(children) == 0:
+                    headers = [
+                        "first_name",
+                        "family_name",
+                        "required_qualification", 
+                        "street",
+                        "street_number", 
+                        "city",
+                        "zip_code",
+                        "requested_hours"
+                    ]
+                    csv_content = ','.join(headers)
+                else:
+                    df = pd.DataFrame(children)
+                
+                    csv_content = df.to_csv(index=False, encoding='utf-8')
 
-            buffer = io.BytesIO(csv_content.encode("utf-8"))
+                buffer = io.BytesIO(csv_content.encode("utf-8"))
 
-            return StreamingResponse(
-                buffer,
-                media_type="text/csv",
-                headers={"Content-Disposition": "attachment; filename=assistans.csv"}
-            )
+                return StreamingResponse(
+                    buffer,
+                    media_type="text/csv",
+                    headers={"Content-Disposition": "attachment; filename=assistans.csv"}
+                )
 
         except Exception as e:
             return {"error": f"Ein Fehler beim CSV-Export ist aufgetreten: {e}"}

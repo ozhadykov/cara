@@ -135,7 +135,7 @@ class PairsService:
 
     async def create_pair(self, data: CreateSinglePairIn):
         child_id = data.child.id
-        assistant_id = data.child.id
+        assistant_id = data.assistant.id
 
         try:
             with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
@@ -145,12 +145,12 @@ class PairsService:
                         CASE
                             WHEN (
                                 COALESCE((
-                                    SELECT SUM(c.required_hours)
+                                    SELECT SUM(c.requested_hours)
                                     FROM pairs p
                                     JOIN children c ON c.id = p.child_id
                                     WHERE p.assistant_id = %s
                                 ), 0) + (
-                                    SELECT c.required_hours
+                                    SELECT c.requested_hours
                                     FROM children c
                                     WHERE c.id = %s
                                 )
@@ -249,7 +249,7 @@ class PairsService:
                 )
                 distances = cursor.fetchall()
         except Exception as e:
-            return Response(success=False, message=f"WTFFFF {str(e)}")
+            return Response(success=False, message=f"Something went wrong! {str(e)}")
 
         await websocket.send_text(json.dumps(Response(success=True, message='Distances retrieved').model_dump()))
         await asyncio.sleep(2)
@@ -378,32 +378,78 @@ class PairsService:
         
     async def export_pairs(self):
         try:
-            pairs = await self.get_all_pairs()
+            with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+                cursor.execute(
+                    """
+                    SELECT
+                        c.id AS c_id,
+                        c.first_name AS c_first_name,
+                        c.family_name AS c_family_name,
+                        c.required_qualification AS c_required_qualification,
+                        ca.street AS c_street,
+                        ca.street_number AS c_street_number,
+                        ca.city AS c_city,
+                        ca.zip_code AS c_zip_code,
+                        c.requested_hours AS c_requested_hours,
 
-            if not pairs.data or len(pairs.data) == 0:
-                headers = [
-                    "id","c_id","c_first_name",
-                    "c_family_name","c_requested_hours",
-                    "c_required_qualification","c_required_qualification_text","c_street",
-                    "c_street_number","c_city","c_zip_code",
-                    "a_id","a_first_name","a_family_name",
-                    "a_qualification","a_qualification_text","a_has_car",
-                    "a_min_capacity","a_max_capacity","a_street",
-                    "a_street_number","a_city","a_zip_code"
-                ]
-                csv_content = ','.join(headers)
-            else:
-                df = pd.DataFrame(pairs.data)
-            
-                csv_content = df.to_csv(index=False, encoding='utf-8')
+                        a.id AS a_id,
+                        a.first_name AS a_first_name,
+                        a.family_name AS a_family_name,
+                        a.qualification AS a_qualification,
+                        a.has_car AS a_has_car,
+                        aa.street AS a_street,
+                        aa.street_number AS a_street_number,
+                        aa.city AS a_city,
+                        aa.zip_code AS a_zip_code,
+                        a.min_capacity AS a_min_capacity,
+                        a.max_capacity AS a_max_capacity
+                    FROM 
+                        pairs p
+                        JOIN children c ON c.id = p.child_id
+                        JOIN assistants a ON a.id = p.assistant_id
+                        JOIN address ca ON ca.id = c.address_id
+                        JOIN address aa ON aa.id = a.address_id    
+                    """
+                )
+                pairs = cursor.fetchall()
 
-            buffer = io.BytesIO(csv_content.encode("utf-8"))
+                if not pairs or len(pairs) == 0:
+                    headers = [
+                        "c_id",
+                        "c_first_name",
+                        "c_family_name",
+                        "c_requested_hours",
+                        "c_required_qualification",
+                        "c_street",
+                        "c_street_number",
+                        "c_city",
+                        "c_zip_code",
 
-            return StreamingResponse(
-                buffer,
-                media_type="text/csv",
-                headers={"Content-Disposition": "attachment; filename=assistans.csv"}
-            )
+                        "a_id",
+                        "a_first_name",
+                        "a_family_name",
+                        "a_qualification",
+                        "a_has_car",
+                        "a_street",
+                        "a_street_number",
+                        "a_city",
+                        "a_zip_code"
+                        "a_min_capacity",
+                        "a_max_capacity",
+                    ]
+                    csv_content = ','.join(headers)
+                else:
+                    df = pd.DataFrame(pairs)
+                
+                    csv_content = df.to_csv(index=False, encoding='utf-8')
+
+                buffer = io.BytesIO(csv_content.encode("utf-8"))
+
+                return StreamingResponse(
+                    buffer,
+                    media_type="text/csv",
+                    headers={"Content-Disposition": "attachment; filename=assistans.csv"}
+                )
 
         except Exception as e:
             return {"error": f"Ein Fehler beim CSV-Export ist aufgetreten: {e}"}

@@ -114,6 +114,7 @@ const ManualAssigment = ({ children, assistants }: ManualAssigmentProps) => {
                 child: selectedChild,
                 assistant: selectedAssistant,
             }
+
             const url = "/api/pair_generator/single_pair"
 
             const response = await postRequest(url, data, sendMessage, toggleLoading)

@@ -184,28 +184,55 @@ class AssistantsService:
         
     async def export_assistants(self):
         try:
-            assistants_data = await self.get_all_assistants()
+            with self.db.cursor(pymysql.cursors.DictCursor) as cursor:
+                cursor.execute(
+                    """
+                        SELECT
+                            a.first_name AS first_name,
+                            a.family_name AS family_name,
+                            a.qualification AS qualification,
+                            a.has_car AS has_car,
+                            REPLACE(adr.street, '+', ' ') AS street,
+                            REPLACE(adr.street_number, '+', ' ') AS street_number,
+                            REPLACE(adr.city, '+', ' ') AS city,
+                            adr.zip_code AS zip_code,
+                            a.min_capacity AS min_capacity,
+                            a.max_capacity AS max_capacity
+                        FROM 
+                            assistants a
+                            JOIN address adr ON adr.id = a.address_id
+                        ORDER BY a.id;
+                    """
+                )
 
-            if not assistants_data or len(assistants_data == 0):
-                headers = [
-                    "id", "first_name", "family_name", "qualification", "qualification_text", 
-                    "qualification_value", "has_car", "min_capacity", "max_capacity", 
-                    "street", "street_number", "city", "zip_code", "address_id", 
-                    "latitude", "longitude"
-                ]
-                csv_content = ','.join(headers)
-            else:
-                df = pd.DataFrame(assistants_data)
-            
-                csv_content = df.to_csv(index=False, encoding='utf-8')
+                assistants = cursor.fetchall()
 
-            buffer = io.BytesIO(csv_content.encode("utf-8"))
+                if not assistants or len(assistants) == 0:
+                    headers = [
+                        "first_name", 
+                        "family_name", 
+                        "qualification", 
+                        "has_car", 
+                        "street", 
+                        "street_number", 
+                        "city", 
+                        "zip_code",
+                        "min_capacity",
+                        "max_capacity", 
+                    ]
+                    csv_content = ','.join(headers)
+                else:
+                    df = pd.DataFrame(assistants)
+                
+                    csv_content = df.to_csv(index=False, encoding='utf-8')
 
-            return StreamingResponse(
-                buffer,
-                media_type="text/csv",
-                headers={"Content-Disposition": "attachment; filename=assistans.csv"}
-            )
+                buffer = io.BytesIO(csv_content.encode("utf-8"))
+
+                return StreamingResponse(
+                    buffer,
+                    media_type="text/csv",
+                    headers={"Content-Disposition": "attachment; filename=assistans.csv"}
+                )
 
         except Exception as e:
             return {"error": f"Ein Fehler beim CSV-Export ist aufgetreten: {e}"}

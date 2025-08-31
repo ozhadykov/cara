@@ -35,7 +35,6 @@ const PairGenerator = () => {
 
     const updateData = () => {
         setData((prevData) => prevData + 1)
-        console.log("setting data")
     }
 
     useEffect(() => {

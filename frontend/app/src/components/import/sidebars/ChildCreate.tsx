@@ -62,7 +62,7 @@ const ChildCreate = () => {
             await refreshChildren()
             setFormData(initialFormData)
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
     }
     return (

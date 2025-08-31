@@ -64,7 +64,7 @@ const AssistantCreate = () => {
             await refreshAssistants()
             setFormData(initialFormData)
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
     }
 
